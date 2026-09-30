@@ -2,7 +2,7 @@
 
 Hub estático para estudiar Bases de Datos II: papers (GFS, Bigtable, Aurora, Zanzibar) + Contenerización.
 
-Estilo hub/papers: **Study-desk editorial**. Contenerización: **Muelle**. Sin backend; progreso en `localStorage`.
+Estilo: **Study-desk editorial** (hub, papers y Contenerización). Sin backend; progreso en `localStorage`.
 
 ## Abrir en local
 
@@ -31,7 +31,7 @@ Hay un archivo `.nojekyll` para que GitHub no procese el sitio con Jekyll. El hu
 ```
 index.html                 # hub
 papers/gfs|bigtable|aurora|zanzibar/
-contenerizacion/           # Muelle (Docker → K8s)
+contenerizacion/           # Docker → K8s (Study-desk, layout dock)
 SISTEMA_HTML_ESTUDIO.md    # spec para generar papers nuevos
 ```
 

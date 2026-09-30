@@ -1,22 +1,43 @@
-/* Navegación, progreso y ensamblado de vistas. */
+/* Navegación, progreso, tema y ensamblado de vistas. */
 (function () {
   "use strict";
 
   var KEY = "muelle-t1-done-v1";
+  var THEME_KEY = "bdii-cont-theme";
   var view = document.getElementById("view");
   var where = document.getElementById("where");
   var nav = document.getElementById("rail-nav");
   var fill = document.getElementById("progress-fill");
   var meta = document.getElementById("progress-meta");
+  var themeBtn = document.getElementById("themeBtn");
 
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
     catch (e) { return {}; }
   }
   function save(d) {
-    try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* sin storage, sin drama */ }
+    try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* sin storage */ }
   }
   var done = load();
+
+  function applyTheme(t) {
+    document.body.classList.toggle("light", t === "light");
+    if (themeBtn) themeBtn.textContent = t === "light" ? "☀️" : "🌙";
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* ignore */ }
+  }
+  (function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) { /* ignore */ }
+    if (!saved) {
+      try { saved = localStorage.getItem("bdii-hub-theme"); } catch (e) { /* ignore */ }
+    }
+    applyTheme(saved === "light" ? "light" : "dark");
+  })();
+  if (themeBtn) {
+    themeBtn.addEventListener("click", function () {
+      applyTheme(document.body.classList.contains("light") ? "dark" : "light");
+    });
+  }
 
   function topics() { return window.DOCKTOPICS || []; }
 
@@ -38,6 +59,7 @@
       b.className = "rail-link" + (done[t.id] ? " done" : "");
       b.type = "button";
       b.dataset.topic = t.id;
+      b.setAttribute("aria-current", "false");
       b.innerHTML = '<span class="n">' + t.num + (done[t.id] ? " ✓" : "") + "</span>";
       var s = document.createElement("span");
       s.textContent = t.title;
@@ -54,8 +76,18 @@
   function markActive(id) {
     navBtns.forEach(function (b) {
       var isMap = b.dataset.view === "map";
-      b.classList.toggle("active", (id == null && isMap) || (b.dataset.topic === id));
+      var on = (id == null && isMap) || (b.dataset.topic === id);
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-current", on ? "page" : "false");
     });
+  }
+
+  function scrollViewTop() {
+    var main = document.getElementById("main");
+    if (main && typeof main.scrollIntoView === "function") {
+      main.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function showMap() {
@@ -74,7 +106,7 @@
     view.appendChild(lede);
     var call = document.createElement("div");
     call.className = "callout";
-    call.innerHTML = '<p class="lbl">Cómo estudiar acá</p><p>Leé el tema, hacé el taller y marcá la capa como revisada. Los simuladores no corren Docker de verdad: analizan tus archivos y predicen fallos. Si algo dice que no se ejecuta, es a propósito.</p>';
+    call.innerHTML = "<p class=\"lbl\">Cómo estudiar acá</p><p>Leé el tema, hacé el quiz, practicá el taller y marcá la capa como revisada. Los simuladores <strong>no</strong> ejecutan Docker: analizan tu texto y predicen fallos. Si algo dice que no corre de verdad, es a propósito.</p>";
     view.appendChild(call);
     var ul = document.createElement("ul");
     ul.className = "topic-list";
@@ -145,20 +177,28 @@
     else labHost.appendChild(window.DOCKUI.el("p", "note", "Este tema comparte taller con su vecino."));
 
     var row = window.DOCKUI.textButtons();
-    var bar = row.row;
-    view.appendChild(bar);
-    var toggle = row.add(done[t.id] ? "Capa revisada ✓ (desmarcar)" : "Marcar capa como revisada", !done[t.id], function () {
+    view.appendChild(row.row);
+    row.add(done[t.id] ? "Capa revisada ✓ (desmarcar)" : "Marcar capa como revisada", !done[t.id], function () {
       if (done[t.id]) delete done[t.id];
       else done[t.id] = 1;
       save(done);
       renderNav();
       showTopic(id);
     });
-    void toggle;
-    var back = row.add("Volver al mapa", false, function () { location.hash = "#/"; });
-    void back;
+    row.add("Volver al mapa", false, function () { location.hash = "#/"; });
+
+    var idx = topics().findIndex(function (x) { return x.id === id; });
+    if (idx > 0) {
+      var prev = topics()[idx - 1];
+      row.add("← " + prev.num, false, function () { location.hash = "#/t/" + prev.id; });
+    }
+    if (idx >= 0 && idx < topics().length - 1) {
+      var next = topics()[idx + 1];
+      row.add(next.num + " →", false, function () { location.hash = "#/t/" + next.id; });
+    }
+
     markActive(id);
-    document.getElementById("main").scrollIntoView();
+    scrollViewTop();
   }
 
   function route() {
@@ -169,6 +209,7 @@
   }
 
   document.getElementById("btn-reset-progress").addEventListener("click", function () {
+    if (!confirm("¿Borrar el progreso de las 7 capas en este navegador? Los quizzes y talleres no se guardan; solo las marcas de ‘revisada’.")) return;
     done = {};
     save(done);
     renderNav();

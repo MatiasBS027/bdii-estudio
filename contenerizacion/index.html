@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contenerización · Muelle</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500;600&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Contenerización · BDII Estudio</title>
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -15,12 +13,16 @@
   <div class="dock">
     <aside class="rail" aria-label="Temas">
       <div class="rail-brand">
-        <p class="stamp"><a href="../index.html">← Hub</a> · MUELLE</p>
+        <p class="stamp"><a href="../index.html">← Hub</a><span class="sep">·</span>BDII Estudio</p>
         <p class="rail-title">Contenerización</p>
-        <p class="rail-sub">Estudio, no receta</p>
+        <p class="rail-sub">Estudio, no receta · 7 capas</p>
       </div>
       <nav class="rail-nav" id="rail-nav"></nav>
       <div class="rail-foot">
+        <div class="rail-tools">
+          <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+          <button type="button" class="ghost danger" id="btn-reset-progress" title="Borra el progreso de capas en este navegador">Reiniciar</button>
+        </div>
         <p class="progress-label">Capas revisadas</p>
         <div class="progress-track" aria-hidden="true"><span class="progress-fill" id="progress-fill"></span></div>
         <p class="progress-meta" id="progress-meta">0 / 7</p>
@@ -30,7 +32,6 @@
     <main id="main" class="deck">
       <header class="deck-bar">
         <p class="where" id="where">Mapa</p>
-        <button type="button" class="ghost" id="btn-reset-progress">Reiniciar progreso</button>
       </header>
       <div id="view" class="view"></div>
     </main>

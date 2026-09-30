@@ -2,6 +2,8 @@
 (function () {
   "use strict";
 
+  var LETTERS = ["A", "B", "C", "D", "E", "F"];
+
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -25,14 +27,25 @@
     box.appendChild(ul);
   }
 
-  /* Quiz de opción múltiple con explicación que enseña. */
-  function renderQuiz(box, questions, doneKey, onAnswer) {
+  /* Quiz MCQ con letras A–D, feedback inmediato y score chip. */
+  function renderQuiz(box, questions) {
     box.innerHTML = "";
+    if (!questions || !questions.length) {
+      box.appendChild(el("p", "note", "Sin preguntas en este tema."));
+      return;
+    }
     var wrap = el("div", "quiz");
-    var score = 0, answered = 0;
+    var meta = el("div", "quiz-meta");
+    var chip = el("span", "score-chip", "0 / " + questions.length);
+    meta.appendChild(chip);
+    wrap.appendChild(meta);
+
+    var score = 0;
+    var answered = 0;
+
     questions.forEach(function (q, i) {
       var card = el("div", "sheet");
-      card.appendChild(el("p", "kicker", "Pregunta " + (i + 1)));
+      card.appendChild(el("p", "kicker", "Pregunta " + (i + 1) + " / " + questions.length));
       var p = el("p", null, null);
       p.innerHTML = "<strong>" + q.q + "</strong>";
       card.appendChild(p);
@@ -40,16 +53,29 @@
       q.opts.forEach(function (opt, j) {
         var b = el("button", "opt", opt);
         b.type = "button";
+        b.setAttribute("data-letter", LETTERS[j] || String(j + 1));
         b.addEventListener("click", function () {
           if (card.dataset.done) return;
           card.dataset.done = "1";
           answered++;
-          var ok = (j === q.a);
-          if (ok) { score++; b.classList.add("right"); }
-          else { b.classList.add("wrong"); card.querySelectorAll(".opt")[q.a].classList.add("right"); }
-          var ex = el("p", "note", (ok ? "Bien. " : "No. ") + q.why);
-          fb.appendChild(ex);
-          if (onAnswer) onAnswer({ ok: ok, answered: answered, total: questions.length, score: score });
+          var ok = j === q.a;
+          if (ok) {
+            score++;
+            b.classList.add("right");
+          } else {
+            b.classList.add("wrong");
+            var correct = card.querySelectorAll(".opt")[q.a];
+            if (correct) correct.classList.add("right");
+          }
+          card.querySelectorAll(".opt").forEach(function (btn) { btn.disabled = true; });
+          fb.classList.add("show");
+          fb.innerHTML = "";
+          var label = el("span", "why-label", ok ? "Bien. " : "No. ");
+          var why = document.createElement("span");
+          why.textContent = q.why;
+          fb.appendChild(label);
+          fb.appendChild(why);
+          chip.textContent = score + " / " + questions.length + (answered === questions.length ? " · listo" : "");
         });
         card.appendChild(b);
       });
@@ -62,13 +88,12 @@
   function labShell(title, hint) {
     var box = el("section", "sheet");
     box.appendChild(el("p", "kicker", "Taller"));
-    var h = el("h3", null, title);
-    box.appendChild(h);
+    box.appendChild(el("h3", null, title));
     if (hint) box.appendChild(el("p", null, hint));
     return box;
   }
 
-  function textButtons(actions) {
+  function textButtons() {
     var row = el("div", "row-actions");
     return {
       row: row,

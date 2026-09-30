@@ -7,7 +7,7 @@
       id: "dockerfile", num: "01", lab: "dockerfile",
       title: "La imagen no es el contenedor",
       sub: "Dockerfile: capas, base oficial y nada de secretos",
-      lede: "La imagen es la receta congelada; el contenedor es una ejecución descartable de esa receta. Este tema cubre la investigación completa: compilación por etapas, elección de base, cada instrucción del Dockerfile y las prácticas que mantienen la imagen chica, reproducible y sin secretos.",
+      lede: "La imagen es la receta congelada; el contenedor es una ejecución descartable de esa receta. Este tema cubre el material completo: compilación por etapas, elección de base, cada instrucción del Dockerfile y las prácticas que mantienen la imagen chica, reproducible y sin secretos.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p>Un Dockerfile describe <strong>cómo construir una imagen reproducible</strong>: misma receta, misma imagen, en tu máquina y en la del evaluador. La T1 lo califica con lupa porque ahí se juega la reproducibilidad: base oficial, dependencias mínimas, puerto declarado, arranque definido y cero secretos.</p></div>
@@ -54,7 +54,7 @@ docker build --pull --no-cache -t mi-imagen:mi-tag .  # ambas: imagen fresca + b
       id: "compose", num: "02", lab: "compose",
       title: "Tres servicios, una red",
       sub: "Compose: app + Postgres + Keycloak hablándose por nombre",
-      lede: "Compose levanta el sistema entero con un comando a partir de un YAML. Este tema cubre la investigación completa: el modelo (services, networks, volumes, configs, secrets, project), el CLI, el ejemplo webapp+database y todo el networking.",
+      lede: "Compose levanta el sistema entero con un comando a partir de un YAML. Este tema cubre el material completo: el modelo (services, networks, volumes, configs, secrets, project), el CLI, el ejemplo webapp+database y todo el networking.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p>Compose usa un archivo YAML para configurar los servicios y el <strong>Compose CLI</strong> para crearlos e iniciarlos. Es el contrato de “un solo comando” de la T1. El archivo por defecto vive en el directorio de trabajo como <code>compose.yaml</code> o <code>compose.yml</code>.</p></div>
@@ -106,7 +106,7 @@ docker compose ps      # servicios y su estado</pre>
       id: "volumenes", num: "03", lab: "persist",
       title: "Lo que sobrevive al down",
       sub: "Volúmenes: persistencia fuera del ciclo del contenedor",
-      lede: "El contenedor es efímero por diseño. Este tema cubre la investigación completa: qué son los volúmenes, cuándo convienen (y cuándo no), su ciclo de vida, montajes sobre datos existentes, sintaxis --mount/--volume, gestión por CLI y uso en Compose.",
+      lede: "El contenedor es efímero por diseño. Este tema cubre el material completo: qué son los volúmenes, cuándo convienen (y cuándo no), su ciclo de vida, montajes sobre datos existentes, sintaxis --mount/--volume, gestión por CLI y uso en Compose.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p>Un <strong>volumen</strong> es almacenamiento persistente creado y manejado por Docker (<code>docker volume create</code> o creado al usarlo). Vive en un directorio del host Docker que se monta en el contenedor. Parecido al bind mount, pero <strong>gestionado por Docker y aislado del host</strong>.</p></div>
@@ -147,7 +147,7 @@ docker volume prune             # limpiar los sin uso</pre>
       id: "arranque", num: "04", lab: "arranque",
       title: "Corriendo no es lo mismo que listo",
       sub: "Healthchecks y arranque ordenado: /health vs /ready",
-      lede: "Compose no espera a que un servicio esté listo, solo a que corra. Este tema cubre la investigación completa: depends_on y el orden de arranque/apagado, las tres conditions, restart, el healthcheck con sus formatos y su relación con el Dockerfile.",
+      lede: "Compose no espera a que un servicio esté listo, solo a que corra. Este tema cubre el material completo: depends_on y el orden de arranque/apagado, las tres conditions, restart, el healthcheck con sus formatos y su relación con el Dockerfile.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p>Con <code>depends_on</code> controlás el <strong>orden de inicio y apagado</strong> (junto a <code>links</code>, <code>volumes_from</code> y <code>network_mode:service:...</code>). El caso típico: la app necesita la base, pero puede nacer antes y morir buscando la sentencia SQL.</p></div>
@@ -177,7 +177,7 @@ docker volume prune             # limpiar los sin uso</pre>
       id: "auth", num: "05", lab: "auth",
       title: "No firmés tus propios tokens",
       sub: "Keycloak, JWT y la diferencia entre 401 y 403",
-      lede: "Keycloak centraliza quién puede entrar a qué. Este tema cubre la investigación completa: qué es y cómo opera, correrlo en contenedor (build optimizado, puertos, dev, realms), su modelo (realms, clients, roles, JWT), validación en backend con código real y todo el troubleshooting.",
+      lede: "Keycloak centraliza quién puede entrar a qué. Este tema cubre el material completo: qué es y cómo opera, correrlo en contenedor (build optimizado, puertos, dev, realms), su modelo (realms, clients, roles, JWT), validación en backend con código real y todo el troubleshooting.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p><strong>Keycloak</strong> es una plataforma IAM (gestión de identidad y acceso): centraliza autenticación, autorización y usuarios para que tus apps <strong>deleguen</strong> en vez de implementar login a mano. Es la capa transversal entre usuarios, apps y servicios.</p>
@@ -272,7 +272,7 @@ curl -X POST http://localhost:5000/recurso -H "Authorization: Bearer $TOKEN" \\
       id: "kind", num: "06", lab: "k8s",
       title: "El mismo sistema, otro modelo",
       sub: "Kind: Compose traducido a Deployment, Service y PVC",
-      lede: "Kubernetes no construye imágenes ni ordena arranques: declarás el estado deseado y el clúster converge. Este tema cubre la investigación completa: kind de punta a punta, Deployment, Service, almacenamiento (PV/PVC), ConfigMap/Secret, sidecars, probes con todos sus campos y la tabla Compose→K8s.",
+      lede: "Kubernetes no construye imágenes ni ordena arranques: declarás el estado deseado y el clúster converge. Este tema cubre el material completo: kind de punta a punta, Deployment, Service, almacenamiento (PV/PVC), ConfigMap/Secret, sidecars, probes con todos sus campos y la tabla Compose→K8s.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p><strong>kind</strong> (SIG Testing, oficial) corre clústeres K8s locales usando contenedores Docker como nodos: control plane + workers sin VMs pesadas (a diferencia de Minikube). Simula producción para el servicio HTTP + Postgres sin costo de nube, y es donde se aplican Deployment, Service y PVC.</p></div>
@@ -346,7 +346,7 @@ kind load docker-image mi-servicio-http:v1 --name tc1-cluster
       id: "kustomize", num: "07", lab: "k8s",
       title: "Una base, muchos despliegues",
       sub: "Kustomize: base + overlay, sin duplicar manifiestos",
-      lede: "La base dice cómo es el sistema; el overlay dice qué cambia en este entorno. Este tema cubre la investigación completa: filosofía sin plantillas, kustomization.yaml, jerarquía base/overlays, ejemplos reales de la T1 y los generadores y patches.",
+      lede: "La base dice cómo es el sistema; el overlay dice qué cambia en este entorno. Este tema cubre el material completo: filosofía sin plantillas, kustomization.yaml, jerarquía base/overlays, ejemplos reales de la T1 y los generadores y patches.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p><strong>Kustomize</strong> (nativo en kubectl desde 1.14, <code>kubectl apply -k</code>) personaliza YAML puro <strong>sin plantillas</strong> (a diferencia de Helm): la base intacta + capas de personalización. Misma config para dev, pruebas y prod, inyectando solo diferencias.</p></div>
