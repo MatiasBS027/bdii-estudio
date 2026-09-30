@@ -35,7 +35,7 @@
       ta.className = "editor";
       ta.setAttribute("aria-label", "Tu Dockerfile");
       ta.spellcheck = false;
-      ta.value = STARTER;
+      var ed = U.bindEditor(ta, "bdii-cont-lab-dockerfile", STARTER);
       box.appendChild(ta);
 
       var out = U.el("div");
@@ -53,7 +53,7 @@
         P.renderCompare(cmp, P.compareDirectives(ta.value, REFERENCE));
       });
       bar.add("Reiniciar", false, function () {
-        ta.value = STARTER;
+        ed.reset();
         out.innerHTML = "";
         cmp.innerHTML = "";
       });

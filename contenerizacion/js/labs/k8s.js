@@ -113,7 +113,7 @@
       ta.style.minHeight = "160px";
       ta.setAttribute("aria-label", "Tu kustomization.yaml del overlay");
       ta.spellcheck = false;
-      ta.value = OVERLAY_STARTER;
+      var ed = U.bindEditor(ta, "bdii-cont-lab-k8s-overlay", OVERLAY_STARTER);
       box2.appendChild(ta);
       var out = U.el("div");
       box2.appendChild(out);
@@ -122,7 +122,7 @@
         U.renderFindings(out, C.checkOverlay(BASE, ta.value));
       });
       bar2.add("Reiniciar", false, function () {
-        ta.value = OVERLAY_STARTER;
+        ed.reset();
         out.innerHTML = "";
       });
       box2.appendChild(bar2.row);

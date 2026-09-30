@@ -78,7 +78,7 @@ header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1
 .theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
 .theme-btn:hover{border-color:var(--dim);}
 .hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
-.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}
+.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}.suite-stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
 .progress-track{height:3px; background:var(--border-soft);}
 .progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
 
@@ -277,7 +277,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
   table{display:block; overflow-x:auto;}
 }
 @media print{
-  header, .tabs, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
   body{background:#fff;}
   main{max-width:100%; padding:0;}
   .view{display:none !important;}
@@ -296,7 +296,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <body><a class="skip-link" href="#main">Saltar al contenido</a>
 <header>
   <div class="topbar">
-    <a class="hub-link" href="../../index.html">← Hub</a>
+    <a class="hub-link" href="../../index.html">← Hub</a><span class="suite-stamp">BDII Estudio</span>
     <div class="brand">
       <div class="logo">A</div>
       <div>
@@ -312,7 +312,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
       <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
       <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
     </nav>
-    <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 </header>
@@ -877,18 +877,14 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(
 
 /* theme toggle */
 const themeBtn = $('#themeBtn');
-themeBtn.addEventListener('click', ()=>{
-  document.body.classList.toggle('light');
-  themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
-  localStorage.setItem('aurora-theme', document.body.classList.contains('light') ? 'light' : 'dark');
-});
-if(localStorage.getItem('aurora-theme')==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; }
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('aurora-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){}});
+(function(){ let s=null; try{s=localStorage.getItem('aurora-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; } })();
 
 /* ============================================================
    PROGRESO (localStorage)
 ============================================================ */
-let done = JSON.parse(localStorage.getItem('aurora-done')||'{}');
-let quizScores = JSON.parse(localStorage.getItem('aurora-quiz')||'[]');
+let done = (function(){ try{return JSON.parse(localStorage.getItem('aurora-done')||'{}');}catch(e){return {};} })();
+let quizScores = (function(){ try{const a=JSON.parse(localStorage.getItem('aurora-quiz')||'[]'); return Array.isArray(a)?a:[];}catch(e){return [];} })();
 
 function updateProgress(){
   const total = MODULES.length;
@@ -1044,8 +1040,7 @@ const quiz = {
     else msg = '📚 Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
     $('#quizMsg').textContent = msg;
     r.scrollIntoView({behavior:'smooth'});
-    quizScores.push(pct);
-    localStorage.setItem('aurora-quiz', JSON.stringify(quizScores));
+    quizScores.push(pct); if(quizScores.length>20) quizScores=quizScores.slice(-20); try{localStorage.setItem('aurora-quiz', JSON.stringify(quizScores));}catch(e){};
   },
   reset(){
     this.answers = {};

@@ -60,7 +60,7 @@
       ta.style.minHeight = "340px";
       ta.setAttribute("aria-label", "Tu docker-compose.yml");
       ta.spellcheck = false;
-      ta.value = STARTER;
+      var ed = U.bindEditor(ta, "bdii-cont-lab-compose", STARTER);
       box.appendChild(ta);
 
       var out = U.el("div");
@@ -78,7 +78,7 @@
         P.renderCompare(cmp, P.compareDirectives(ta.value, REFERENCE));
       });
       bar.add("Reiniciar", false, function () {
-        ta.value = STARTER;
+        ed.reset();
         out.innerHTML = "";
         cmp.innerHTML = "";
       });
@@ -89,7 +89,7 @@
       ref.appendChild(U.el("pre", "ref-block", REFERENCE));
       box.appendChild(ref);
       box.appendChild(U.el("p", "note",
-        "La referencia es una opción, no la respuesta. Lo que no negocia la T1: tres servicios, nombres de servicio en vez de localhost o IP, volumen para Postgres y healthchecks con arranque ordenado."));
+        "La referencia es una opción, no la respuesta. Lo no negociable: tres servicios, nombres de servicio en vez de localhost o IP, volumen para Postgres y healthchecks con arranque ordenado."));
       host.appendChild(box);
     }
   };

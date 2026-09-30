@@ -34,7 +34,7 @@
       ta.style.minHeight = "120px";
       ta.setAttribute("aria-label", "JWT a inspeccionar");
       ta.spellcheck = false;
-      ta.value = sample;
+      var ed = U.bindEditor(ta, "bdii-cont-lab-auth-jwt", sample);
       box.appendChild(ta);
 
       var out = U.el("div");
@@ -50,7 +50,7 @@
         var pre = U.el("pre", "ref-block",
           "header:  " + JSON.stringify(d.header) + "\n" +
           "payload: " + JSON.stringify(d.payload, null, 1) + "\n" +
-          "firma:   " + d.sig + " (simulada: en la T1 se valida con el JWKS de Keycloak)");
+          "firma:   " + d.sig + " (simulada: en producción se valida con el JWKS de Keycloak)");
         out.appendChild(pre);
         var claims = C.checkJwtClaims(d.payload, { iss: EXPECTED_ISS, aud: EXPECTED_AUD });
         var roles = (d.payload.realm_access && d.payload.realm_access.roles) || [];
@@ -70,6 +70,7 @@
             realm_access: { roles: ["creador"] }
           }) + ".firma-simulada";
         ta.value = broken;
+        ed.saveNow();
         out.innerHTML = "";
         out.appendChild(U.el("p", "note",
           "Cambiamos el iss a localhost (el error clásico dentro de Docker). Ahora dale a Decodificar y validar: el checklist debe marcar FALLA en emisor aunque todo lo demás esté bien."));

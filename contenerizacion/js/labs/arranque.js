@@ -23,20 +23,20 @@
             "Que el healthcheck de la base ya pasó"
           ],
           a: 1,
-          why: "Sin condition: service_healthy, Compose solo ordena la creación. La base puede estar corriendo pero sorda. Por eso la T1 pide healthcheck + estrategia justificada."
+          why: "Sin condition: service_healthy, Compose solo ordena la creación. La base puede estar corriendo pero sorda. Por eso se pide healthcheck + estrategia justificada."
         },
         {
           q: "Tu app reintenta la conexión con espera exponencial aunque Compose no tenga depends_on. ¿Eso vale?",
           opts: [
-            "No, la T1 exige depends_on sí o sí",
+            "No, siempre hay que usar depends_on sí o sí",
             "Sí: reintentos en la app es una estrategia válida, y combinada con depends_on es lo más robusto",
             "Solo si usás Kubernetes",
             "Solo para Keycloak, no para Postgres"
           ],
           a: 1,
-          why: "La T1 deja la estrategia a tu criterio (depends_on con condición, reintentos, o ambos) siempre que la justifiques. Sistemas distribuidos: nadie te promete orden, programá para el desorden."
+          why: "La estrategia queda a tu criterio (depends_on con condición, reintentos, o ambos) siempre que la justifiques. Sistemas distribuidos: nadie te promete orden, programá para el desorden."
         }
-      ]);
+      ], { storeKey: "bdii-cont-quiz-lab-arranque" });
 
       box.appendChild(U.el("h3", null, "Cada ruta a su sonda"));
       var maps = [

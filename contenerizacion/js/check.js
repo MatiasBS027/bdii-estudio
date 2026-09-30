@@ -43,9 +43,9 @@
         out.push(finding("good", "OK", "Base con versión fija", "Versión explícita: la construcción es repetible."));
       }
       if (/(python|node|golang|eclipse-temurin|postgres|quay\.io\/keycloak)/i.test(first)) {
-        out.push(finding("good", "OK", "Base de ecosistema conocido", "Partir de una imagen oficial es lo que la T1 permite y espera."));
+        out.push(finding("good", "OK", "Base de ecosistema conocido", "Partir de una imagen oficial es lo que la evaluación permite y espera."));
       } else {
-        out.push(finding("warn", "OJO", "Base no reconocida", "Si no es oficial (Docker Hub verified u oficial), justificá por qué. La T1 exige base oficial."));
+        out.push(finding("warn", "OJO", "Base no reconocida", "Si no es oficial (Docker Hub verified u oficial), justificá por qué. La evaluación exige base oficial."));
       }
       if (/(alpine|slim|distroless)/i.test(first)) {
         out.push(finding("good", "OK", "Variante liviana", "Alpine o slim achica la imagen y la superficie de ataque."));
@@ -83,12 +83,12 @@
     var hasUser = ls.some(function (l) { return /^user\s+\S+/i.test(l.trim()) && !/^user\s+root/i.test(l.trim()); });
     out.push(hasUser
       ? finding("good", "OK", "USER no-root", "Menor privilegio: si el servicio no necesita root, no lo uses.")
-      : finding("warn", "OJO", "Todo corre como root", "La T1 no lo prohíbe, pero un USER dedicado es la práctica esperada."));
+      : finding("warn", "OJO", "Todo corre como root", "La evaluación no lo prohíbe, pero un USER dedicado es la práctica esperada."));
 
     var hasExpose = ls.some(function (l) { return /^expose\s+\d+/i.test(l.trim()); });
     out.push(hasExpose
       ? finding("good", "OK", "EXPOSE declara el puerto", "Documenta en qué puerto escucha la app. No lo publica solo, pero orienta.")
-      : finding("warn", "OJO", "Sin EXPOSE", "La T1 pide declarar el puerto. Agregalo aunque no publique nada."));
+      : finding("warn", "OJO", "Sin EXPOSE", "La evaluación pide declarar el puerto. Agregalo aunque no publique nada."));
 
     var execForm = ls.some(function (l) { return /^(cmd|entrypoint)\s*\[/i.test(l.trim()); });
     var shellForm = ls.some(function (l) { return /^(cmd|entrypoint)\s+[^[]/i.test(l.trim()); });
@@ -117,7 +117,7 @@
       var label = ["aplicación", "PostgreSQL", "Keycloak"][i];
       out.push(has(new RegExp("^\\s{2}" + name.split("|").join("|") + "\\s*:", "mi")) || has(new RegExp(name, "i"))
         ? finding("good", "OK", "Servicio " + label + " presente", "Los tres servicios levantan con un solo comando.")
-        : finding("bad", "FALLA", "Falta " + label, "La T1 exige app + postgres oficial + keycloak oficial."));
+        : finding("bad", "FALLA", "Falta " + label, "La evaluación exige app + postgres oficial + keycloak oficial."));
     });
 
     var localHit = lines(text).some(function (l) {
@@ -131,7 +131,7 @@
       out.push(finding("good", "OK", "Sin localhost cableado", "Los servicios se resuelven por nombre en la red de Compose."));
     }
     if (/\b\d{1,3}(\.\d{1,3}){3}\b/.test(text)) {
-      out.push(finding("warn", "OJO", "IP fija detectada", "La T1 prohíbe IP fija: usá nombres de servicio."));
+      out.push(finding("warn", "OJO", "IP fija detectada", "La evaluación prohíbe IP fija: usá nombres de servicio."));
     }
 
     if (/depends_on/i.test(text)) {

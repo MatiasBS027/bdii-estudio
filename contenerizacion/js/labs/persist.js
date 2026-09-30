@@ -24,7 +24,7 @@
             "Los datos siguen porque quedan en la caché de build"
           ],
           a: 0,
-          why: "down destruye contenedores, no volúmenes. El volumen es un objeto aparte que sigue existiendo. Por eso la T1 verifica persistencia con down/up."
+          why: "down destruye contenedores, no volúmenes. El volumen es un objeto aparte que sigue existiendo. Por eso se verifica persistencia con down/up."
         },
         {
           q: "Mismo caso pero con docker compose down -v. ¿Qué pasa?",
@@ -37,11 +37,11 @@
           a: 0 + 1,
           why: "-v borra los volúmenes nombrados del proyecto. Es la forma de arrancar de cero, y la trampa clásica antes de la demo."
         }
-      ]);
+      ], { storeKey: "bdii-cont-quiz-lab-persist" });
 
       /* Parte 2: qué montaje para cada caso */
       var cases = [
-        { c: "Datos de Postgres que deben sobrevivir reinicios", answer: "volumen", why: "Gestionado por Docker, portable, con driver de almacenamiento rápido. Es lo que pide la T1." },
+        { c: "Datos de Postgres que deben sobrevivir reinicios", answer: "volumen", why: "Gestionado por Docker, portable, con driver de almacenamiento rápido. Es lo habitual en evaluación." },
         { c: "Editar código en tu máquina y verlo al instante en el contenedor", answer: "bind", why: "Bind monta tu carpeta real: ideal para desarrollo, malo para datos que deben viajar con el proyecto." },
         { c: "Caché temporal que no debe tocar disco nunca", answer: "tmpfs", why: "Vive solo en RAM: rapidísimo y efímero. Perfecto para lo no persistente." }
       ];

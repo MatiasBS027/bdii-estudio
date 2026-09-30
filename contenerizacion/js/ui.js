@@ -11,6 +11,30 @@
     return e;
   }
 
+  function lsGet(key, fallback) {
+    try {
+      var v = localStorage.getItem(key);
+      return v == null ? fallback : v;
+    } catch (e) {
+      return fallback;
+    }
+  }
+  function lsSet(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) { /* ignore */ }
+  }
+  function lsGetJSON(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (raw == null) return fallback;
+      return JSON.parse(raw);
+    } catch (e) {
+      return fallback;
+    }
+  }
+  function lsSetJSON(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+  }
+
   function renderFindings(box, findings) {
     box.innerHTML = "";
     if (!findings.length) {
@@ -27,21 +51,57 @@
     box.appendChild(ul);
   }
 
-  /* Quiz MCQ con letras A–D, feedback inmediato y score chip. */
-  function renderQuiz(box, questions) {
+  /* Quiz MCQ con letras A–D, feedback, score y persistencia opcional. */
+  function renderQuiz(box, questions, opts) {
     box.innerHTML = "";
+    opts = opts || {};
+    var storeKey = opts.storeKey || null;
     if (!questions || !questions.length) {
       box.appendChild(el("p", "note", "Sin preguntas en este tema."));
       return;
     }
+    var saved = storeKey ? (lsGetJSON(storeKey, {}) || {}) : {};
+    if (typeof saved !== "object" || Array.isArray(saved)) saved = {};
+
     var wrap = el("div", "quiz");
     var meta = el("div", "quiz-meta");
     var chip = el("span", "score-chip", "0 / " + questions.length);
+    var resetBtn = el("button", "ghost", "↺ Reiniciar quiz");
+    resetBtn.type = "button";
     meta.appendChild(chip);
+    if (storeKey) meta.appendChild(resetBtn);
     wrap.appendChild(meta);
 
     var score = 0;
     var answered = 0;
+
+    function persist() {
+      if (!storeKey) return;
+      lsSetJSON(storeKey, saved);
+    }
+
+    function updateChip() {
+      chip.textContent = score + " / " + questions.length + (answered === questions.length ? " · listo" : "");
+    }
+
+    function paintCard(card, q, i, choice) {
+      var optsBtns = card.querySelectorAll(".opt");
+      var fb = card.querySelector(".explain");
+      var ok = choice === q.a;
+      optsBtns.forEach(function (btn, j) {
+        btn.disabled = true;
+        btn.classList.remove("right", "wrong");
+        if (j === q.a) btn.classList.add("right");
+        if (j === choice && !ok) btn.classList.add("wrong");
+      });
+      fb.classList.add("show");
+      fb.innerHTML = "";
+      fb.appendChild(el("span", "why-label", ok ? "Bien. " : "No. "));
+      var why = document.createElement("span");
+      why.textContent = q.why;
+      fb.appendChild(why);
+      card.dataset.done = "1";
+    }
 
     questions.forEach(function (q, i) {
       var card = el("div", "sheet");
@@ -56,32 +116,36 @@
         b.setAttribute("data-letter", LETTERS[j] || String(j + 1));
         b.addEventListener("click", function () {
           if (card.dataset.done) return;
-          card.dataset.done = "1";
           answered++;
-          var ok = j === q.a;
-          if (ok) {
-            score++;
-            b.classList.add("right");
-          } else {
-            b.classList.add("wrong");
-            var correct = card.querySelectorAll(".opt")[q.a];
-            if (correct) correct.classList.add("right");
-          }
-          card.querySelectorAll(".opt").forEach(function (btn) { btn.disabled = true; });
-          fb.classList.add("show");
-          fb.innerHTML = "";
-          var label = el("span", "why-label", ok ? "Bien. " : "No. ");
-          var why = document.createElement("span");
-          why.textContent = q.why;
-          fb.appendChild(label);
-          fb.appendChild(why);
-          chip.textContent = score + " / " + questions.length + (answered === questions.length ? " · listo" : "");
+          if (j === q.a) score++;
+          saved[i] = j;
+          persist();
+          paintCard(card, q, i, j);
+          updateChip();
         });
         card.appendChild(b);
       });
       card.appendChild(fb);
       wrap.appendChild(card);
+
+      if (Object.prototype.hasOwnProperty.call(saved, String(i)) || Object.prototype.hasOwnProperty.call(saved, i)) {
+        var choice = saved[i];
+        if (typeof choice === "number") {
+          answered++;
+          if (choice === q.a) score++;
+          paintCard(card, q, i, choice);
+        }
+      }
     });
+    updateChip();
+
+    resetBtn.addEventListener("click", function () {
+      if (!confirm("¿Reiniciar las respuestas de este quiz?")) return;
+      saved = {};
+      persist();
+      renderQuiz(box, questions, opts);
+    });
+
     box.appendChild(wrap);
   }
 
@@ -107,11 +171,54 @@
     };
   }
 
+  function bindEditor(ta, key, starter) {
+    var saved = lsGet(key, null);
+    ta.value = saved != null ? saved : starter;
+    var timer = null;
+    ta.addEventListener("input", function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { lsSet(key, ta.value); }, 200);
+    });
+    return {
+      reset: function () {
+        ta.value = starter;
+        lsSet(key, starter);
+      },
+      saveNow: function () { lsSet(key, ta.value); }
+    };
+  }
+
+  function buildToc(rootEl) {
+    var heads = rootEl.querySelectorAll("h2");
+    if (heads.length < 2) return null;
+    var nav = el("nav", "topic-toc");
+    nav.setAttribute("aria-label", "En esta capa");
+    nav.appendChild(el("p", "topic-toc-label", "En esta capa"));
+    var ol = el("ol", "topic-toc-list");
+    heads.forEach(function (h, i) {
+      if (!h.id) h.id = "sec-" + (i + 1);
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = "#" + h.id;
+      a.textContent = h.textContent.replace(/^\d+\.\s*/, "");
+      li.appendChild(a);
+      ol.appendChild(li);
+    });
+    nav.appendChild(ol);
+    return nav;
+  }
+
   window.DOCKUI = {
     el: el,
+    lsGet: lsGet,
+    lsSet: lsSet,
+    lsGetJSON: lsGetJSON,
+    lsSetJSON: lsSetJSON,
     renderFindings: renderFindings,
     renderQuiz: renderQuiz,
     labShell: labShell,
-    textButtons: textButtons
+    textButtons: textButtons,
+    bindEditor: bindEditor,
+    buildToc: buildToc
   };
 })();

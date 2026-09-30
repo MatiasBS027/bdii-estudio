@@ -78,7 +78,7 @@ header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1
 .theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
 .theme-btn:hover{border-color:var(--dim);}
 .hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
-.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}
+.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}.suite-stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
 .progress-track{height:3px; background:var(--border-soft);}
 .progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
 
@@ -277,7 +277,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
   table{display:block; overflow-x:auto;}
 }
 @media print{
-  header, .tabs, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
   body{background:#fff;}
   main{max-width:100%; padding:0;}
   .view{display:none !important;}
@@ -296,7 +296,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <body><a class="skip-link" href="#main">Saltar al contenido</a>
 <header>
   <div class="topbar">
-    <a class="hub-link" href="../../index.html">← Hub</a>
+    <a class="hub-link" href="../../index.html">← Hub</a><span class="suite-stamp">BDII Estudio</span>
     <div class="brand"><div class="logo">G</div><div><div>GFS Studio</div><small>GFS: The Google File System</small></div></div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
       <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
@@ -306,7 +306,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
       <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
       <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
     </nav>
-    <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 </header>
@@ -579,10 +579,10 @@ function go(view){ document.querySelectorAll('.view').forEach(v=>v.classList.rem
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(t.dataset.view)));
 (function(){ const bar=document.getElementById('tabs'); const sync=()=>document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.classList.contains('active')?'true':'false')); bar.addEventListener('click', ()=>setTimeout(sync,0)); bar.addEventListener('keydown', e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const ts=[...bar.querySelectorAll('.tab')]; let i=ts.indexOf(document.activeElement); if(i<0) return; e.preventDefault(); i=(i+(e.key==='ArrowRight'?1:-1)+ts.length)%ts.length; ts[i].focus(); go(ts[i].dataset.view); sync(); }); sync(); })();
 const themeBtn = $('#themeBtn');
-themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; localStorage.setItem('gfs-theme', document.body.classList.contains('light') ? 'light' : 'dark'); });
-if(localStorage.getItem('gfs-theme')==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; }
-let done = JSON.parse(localStorage.getItem('gfs-done')||'{}');
-let quizScores = JSON.parse(localStorage.getItem('gfs-quiz')||'[]');
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('gfs-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){}});
+(function(){ let s=null; try{s=localStorage.getItem('gfs-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; } })();
+let done = (function(){ try{return JSON.parse(localStorage.getItem('gfs-done')||'{}');}catch(e){return {};} })();
+let quizScores = (function(){ try{const a=JSON.parse(localStorage.getItem('gfs-quiz')||'[]'); return Array.isArray(a)?a:[];}catch(e){return [];} })();
 function updateProgress(){ const total = MODULES.length; const finished = MODULES.filter(m=>done[m.id]).length; $('#progressFill').style.width = Math.round((finished/total)*100) + '%'; }
 function markDone(id){ done[id]=true; localStorage.setItem('gfs-done', JSON.stringify(done)); renderModuleNav(); updateProgress(); }
 function unmarkDone(id){ delete done[id]; localStorage.setItem('gfs-done', JSON.stringify(done)); renderModuleNav(); updateProgress(); }
@@ -597,7 +597,7 @@ const quiz = { rendered:false, answers:{},
 render(){ this.rendered=true; const c=$('#quizContainer'); c.innerHTML=''; QUIZ.forEach((q,qi)=>{ const card=document.createElement('div'); card.className='question-card'; card.id='q'+qi; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--'+q.c+'-soft); color:var(--'+q.c+');">'+q.tag+'</span><span style="color:var(--dim); font-size:13px;">Pregunta '+(qi+1)+' de '+QUIZ.length+'</span></div><div class="qtext">'+q.q+'</div><div class="opts"></div><div class="explain"></div>'; const box=card.querySelector('.opts'); q.opts.forEach((opt,oi)=>{ const b=document.createElement('button'); b.className='opt'; b.innerHTML=opt; b.onclick=()=>this.answer(qi,oi); box.appendChild(b); }); c.appendChild(card); }); this.refreshChip(); },
 answer(qi,oi){ if(this.answers[qi]!==undefined) return; this.answers[qi]=oi; const q=QUIZ[qi]; const card=$('#q'+qi); card.querySelectorAll('.opt').forEach((b,i)=>{ b.disabled=true; if(i===q.a) b.classList.add('correct'); if(i===oi&&oi!==q.a) b.classList.add('wrong'); }); const ex=card.querySelector('.explain'); ex.innerHTML='<span class="why">'+(oi===q.a?'✓ Correcto':'✗ Incorrecto')+'.</span> '+q.why; ex.classList.add('show'); this.refreshChip(); if(Object.keys(this.answers).length===QUIZ.length){ this.finish(); } },
 refreshChip(){ const n=Object.keys(this.answers).length; const ok=Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length; $('#scoreChip').textContent=ok+' / '+n+' correctas ('+QUIZ.length+' totales)'; },
-finish(){ const ok=Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length; const pct=Math.round(ok/QUIZ.length*100); const r=$('#quizResult'); r.classList.add('show'); $('#quizPercent').textContent=pct+'%'; $('#gradeFill').style.width=pct+'%'; let msg; if(pct===100) msg='🏆 ¡Perfecto! Dominas GFS y sus trade-offs.'; else if(pct>=80) msg='🎉 ¡Muy bien! Repasa solo las de trade-off falladas.'; else if(pct>=60) msg='👍 Vas bien. Relee los bloques ⚖️ de los módulos.'; else msg='📚 Vuelve a Aprende: fíjate en citas + trade-offs antes de reintentar.'; $('#quizMsg').textContent=msg; r.scrollIntoView({behavior:'smooth'}); quizScores.push(pct); localStorage.setItem('gfs-quiz', JSON.stringify(quizScores)); },
+finish(){ const ok=Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length; const pct=Math.round(ok/QUIZ.length*100); const r=$('#quizResult'); r.classList.add('show'); $('#quizPercent').textContent=pct+'%'; $('#gradeFill').style.width=pct+'%'; let msg; if(pct===100) msg='🏆 ¡Perfecto! Dominas GFS y sus trade-offs.'; else if(pct>=80) msg='🎉 ¡Muy bien! Repasa solo las de trade-off falladas.'; else if(pct>=60) msg='👍 Vas bien. Relee los bloques ⚖️ de los módulos.'; else msg='📚 Vuelve a Aprende: fíjate en citas + trade-offs antes de reintentar.'; $('#quizMsg').textContent=msg; r.scrollIntoView({behavior:'smooth'}); quizScores.push(pct); if(quizScores.length>20) quizScores=quizScores.slice(-20); try{localStorage.setItem('gfs-quiz', JSON.stringify(quizScores));}catch(e){} },
 reset(){ this.answers={}; this.rendered=false; $('#quizResult').classList.remove('show'); $('#scoreChip').textContent='0 / 0 correctas'; this.render(); window.scrollTo({top:0,behavior:'smooth'}); } };
 function renderCases(){ const c=$('#casesContainer'); c.innerHTML=''; CASES.forEach((cs,i)=>{ const card=document.createElement('div'); card.className='case-card'; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso '+(i+1)+'</span></div><h3 style="margin-top:4px;">'+cs.title+'</h3><div class="case-step">'+cs.prompt+'</div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn ghost small hint-btn">🔍 Pista 1</button><button class="btn ghost small hint-btn">🔍 Pista 2</button></div><div class="explain hint-ex"></div><button class="btn teal small reveal-btn" style="margin-top:8px;">💡 Ver solución</button><div class="explain sol-ex" style="margin-top:12px;"></div>'; const hex=card.querySelector('.hint-ex'); const hbtns=card.querySelectorAll('.hint-btn'); hbtns[0].onclick=()=>{ hex.innerHTML='<span class="why">Pista 1:</span> '+cs.h1; hex.classList.add('show'); hbtns[0].style.display='none'; }; hbtns[1].onclick=()=>{ hex.innerHTML='<span class="why">Pista 2:</span> '+cs.h2; hex.classList.add('show'); hbtns[1].style.display='none'; }; const ex=card.querySelector('.sol-ex'); const btn=card.querySelector('.reveal-btn'); btn.onclick=()=>{ ex.innerHTML='<span class="why">Solución:</span> '+cs.solution+'<br><br><span class="why">📏 '+(cs.rubric||'Rúbrica (5pts): 2 decisión + 2 mecanismo + 1 trade-off.')+'</span>'; ex.classList.add('show'); btn.style.display='none'; }; c.appendChild(card); }); }
 function renderGlossary(filter){ filter=filter||''; const list=$('#glossaryList'); list.innerHTML=''; const f=filter.toLowerCase(); GLOSSARY.filter(function(td){ return td[0].toLowerCase().includes(f)||td[1].toLowerCase().includes(f); }).forEach(function(td){ const div=document.createElement('div'); div.className='gloss-term'; div.innerHTML='<h3><code>'+td[0]+'</code></h3><div class="def">'+td[1]+'</div>'; list.appendChild(div); }); if(!list.children.length){ list.innerHTML='<p>Sin resultados.</p>'; } }

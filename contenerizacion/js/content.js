@@ -10,7 +10,7 @@
       lede: "La imagen es la receta congelada; el contenedor es una ejecución descartable de esa receta. Este tema cubre el material completo: compilación por etapas, elección de base, cada instrucción del Dockerfile y las prácticas que mantienen la imagen chica, reproducible y sin secretos.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
-        <p>Un Dockerfile describe <strong>cómo construir una imagen reproducible</strong>: misma receta, misma imagen, en tu máquina y en la del evaluador. La T1 lo califica con lupa porque ahí se juega la reproducibilidad: base oficial, dependencias mínimas, puerto declarado, arranque definido y cero secretos.</p></div>
+        <p>Un Dockerfile describe <strong>cómo construir una imagen reproducible</strong>: misma receta, misma imagen, en tu máquina y en la del evaluador. La evaluación lo califica con lupa porque ahí se juega la reproducibilidad: base oficial, dependencias mínimas, puerto declarado, arranque definido y cero secretos.</p></div>
 
         <h2>1. Compilación por etapas (multi-stage)</h2>
         <p>Con varios <code>FROM</code> en el mismo Dockerfile, cada uno inicia una etapa nueva con su propia base. Copiás solo el artefacto de una etapa a otra (<code>COPY --from=0</code>) y dejás atrás lo que no ocupés. Solo necesitás ese Dockerfile: <code>docker build</code> y listo.</p>
@@ -57,7 +57,7 @@ docker build --pull --no-cache -t mi-imagen:mi-tag .  # ambas: imagen fresca + b
       lede: "Compose levanta el sistema entero con un comando a partir de un YAML. Este tema cubre el material completo: el modelo (services, networks, volumes, configs, secrets, project), el CLI, el ejemplo webapp+database y todo el networking.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
-        <p>Compose usa un archivo YAML para configurar los servicios y el <strong>Compose CLI</strong> para crearlos e iniciarlos. Es el contrato de “un solo comando” de la T1. El archivo por defecto vive en el directorio de trabajo como <code>compose.yaml</code> o <code>compose.yml</code>.</p></div>
+        <p>Compose usa un archivo YAML para configurar los servicios y el <strong>Compose CLI</strong> para crearlos e iniciarlos. Es el contrato de “un solo comando” de la evaluación. El archivo por defecto vive en el directorio de trabajo como <code>compose.yaml</code> o <code>compose.yml</code>.</p></div>
 
         <h2>1. El modelo: seis piezas</h2>
         <table class="doc"><tr><th>Pieza</th><th>Qué es</th></tr>
@@ -86,7 +86,7 @@ docker compose ps      # servicios y su estado</pre>
         <p>Por defecto Compose crea <strong>una sola red puente</strong> (<code>&lt;proyecto&gt;_default</code>). Cada contenedor se une con su <strong>nombre de servicio</strong> y cada servicio se registra en un DNS interno: los contenedores se alcanzan por nombre y resuelven la IP solos.</p>
         <p>Al recrear un servicio (<code>up</code> tras un cambio), el contenedor nuevo entra con <strong>IP distinta pero mismo nombre</strong>: los demás lo redescubren solos. Las conexiones abiertas al viejo se cierran.</p>
         <p><code>HOST_PORT</code> vs <code>CONTAINER_PORT</code> tienen propósitos distintos (ej. host 8001 → contenedor 5432). Sin <code>network_mode</code>, todo servicio usa el puente del proyecto: es el modo más seguro.</p>
-        <div class="callout bad"><p class="lbl">Error común</p><p><code>DB_HOST=localhost</code> dentro del Compose. localhost es el propio contenedor: usá el nombre del servicio. Misma trampa con IPs fijas: la T1 las prohíbe.</p></div>
+        <div class="callout bad"><p class="lbl">Error común</p><p><code>DB_HOST=localhost</code> dentro del Compose. localhost es el propio contenedor: usá el nombre del servicio. Misma trampa con IPs fijas: la evaluación las prohíbe.</p></div>
 
         <h2>6. network_mode y redes propias</h2>
         <table class="doc"><tr><th>Modo</th><th>Efecto</th></tr>
@@ -94,11 +94,11 @@ docker compose ps      # servicios y su estado</pre>
         <tr><td><strong>none</strong></td><td>Apaga toda la red del contenedor.</td></tr>
         <tr><td><strong>service:{nombre}</strong></td><td>Comparte la red de otro servicio.</td></tr>
         <tr><td><strong>container:{id}</strong></td><td>Comparte la red de un contenedor por ID.</td></tr></table>
-        <p>Se pueden mezclar modos en un proyecto. Y con la llave de alto nivel <code>networks</code> definís topologías propias (drivers, opciones, redes externas): cada servicio lista a cuáles se conecta. Ejemplo de la investigación: <code>proxy</code> aislado de <code>db</code> (sin red común); solo <code>app</code> habla con ambos. También podés fijar <code>ipv4/ipv6</code> estáticas y darles nombre personalizado.</p>`,
+        <p>Se pueden mezclar modos en un proyecto. Y con la llave de alto nivel <code>networks</code> definís topologías propias (drivers, opciones, redes externas): cada servicio lista a cuáles se conecta. Ejemplo del material: <code>proxy</code> aislado de <code>db</code> (sin red común); solo <code>app</code> habla con ambos. También podés fijar <code>ipv4/ipv6</code> estáticas y darles nombre personalizado.</p>`,
       quiz: [
         { q: "La app corre en un contenedor y Postgres en otro. ¿Qué valor lleva DB_HOST?", opts: ["localhost", "127.0.0.1", "El nombre del servicio de la base en el Compose", "La IP que viste con docker inspect ayer"], a: 2, why: "Compose da DNS por nombre de servicio. IP fija se pudre; localhost apunta al propio contenedor." },
         { q: "¿Dónde va la contraseña real de Postgres?", opts: ["En el Dockerfile con ENV", "En el código, como constante", "En .env (ignorado) inyectada como variable; en el repo solo .env.example", "En el nombre de la imagen"], a: 2, why: "Secretos por entorno, nunca en la imagen ni en el repo. La rúbrica lo castiga directo." },
-        { q: "Recreás el contenedor db con up y obtiene otra IP. ¿Se rompe la app?", opts: ["Sí, hay que actualizar la IP en la app", "No: la app resuelve por nombre de servicio vía DNS interno", "Solo si usás network_mode: host", "Solo si borrás los volúmenes"], a: 1, why: "El nombre es estable aunque la IP cambie. Por eso la T1 exige nombres, no IPs." },
+        { q: "Recreás el contenedor db con up y obtiene otra IP. ¿Se rompe la app?", opts: ["Sí, hay que actualizar la IP en la app", "No: la app resuelve por nombre de servicio vía DNS interno", "Solo si usás network_mode: host", "Solo si borrás los volúmenes"], a: 1, why: "El nombre es estable aunque la IP cambie. Por eso la evaluación exige nombres, no IPs." },
         { q: "¿Para qué sirve network_mode: host y cuál es su riesgo?", opts: ["Aislar el contenedor; ningún riesgo", "Dar acceso directo a la red del host (monitoreo); el contenedor ve todo el tráfico y pierde DNS por nombre", "Acelerar los builds", "Persistir datos"], a: 1, why: "Útil para herramientas de sistema, peligroso por defecto. El puente del proyecto es el modo seguro." }
       ]
     },
@@ -118,7 +118,7 @@ docker compose ps      # servicios y su estado</pre>
         <div class="trade"><div class="g"><b>Ganas</b>Persistencia portable y rápida fuera del ciclo del contenedor.</div><div class="p"><b>Pagas</b>Los datos dejan de estar en archivos visibles de tu carpeta.</div></div>
 
         <h2>2. Ciclo de vida</h2>
-        <p>El contenido del volumen <strong>sobrevive a los contenedores</strong>. Un volumen se monta en varios contenedores a la vez; sin uso sigue existiendo y <strong>no se borra solo</strong> (<code>docker volume prune</code> para limpiarlo). Clave de la T1: <code>down</code> conserva volúmenes, <code>down -v</code> los destruye.</p>
+        <p>El contenido del volumen <strong>sobrevive a los contenedores</strong>. Un volumen se monta en varios contenedores a la vez; sin uso sigue existiendo y <strong>no se borra solo</strong> (<code>docker volume prune</code> para limpiarlo). Clave de la evaluación: <code>down</code> conserva volúmenes, <code>down -v</code> los destruye.</p>
 
         <h2>3. Montar sobre datos existentes</h2>
         <p>Montar un volumen <strong>no vacío</strong> sobre un directorio con archivos los <strong>oculta</strong> (sin forma de revelar los originales: recreá sin el montaje). Montar uno <strong>vacío</strong> prellena el volumen con el contenido del directorio: buena forma de pasar datos a otro contenedor. Para evitar el prellenado: <code>volume-nocopy</code>.</p>
@@ -138,7 +138,7 @@ docker volume prune             # limpiar los sin uso</pre>
         <p>El primer <code>up</code> crea el volumen; los siguientes lo <strong>reusan</strong>. También podés crearlo fuera (<code>docker volume create</code>) y referenciarlo en el YAML.</p>
         <div class="callout warn"><p class="lbl">Error común</p><p>Correr <code>down -v</code> antes de la demo y perder los datos de prueba. Y montar sobre datos existentes sin esperar el ocultamiento.</p></div>`,
       quiz: [
-        { q: "¿Por qué los datos no van dentro del contenedor?", opts: ["Porque no hay espacio", "Porque el contenedor es efímero: al recrearlo, lo no montado en volumen se pierde", "Porque Postgres no lo permite", "Porque es más lento siempre"], a: 1, why: "El ciclo del contenedor es descartable; el volumen es el que persiste. Esa es la prueba down/up de la T1." },
+        { q: "¿Por qué los datos no van dentro del contenedor?", opts: ["Porque no hay espacio", "Porque el contenedor es efímero: al recrearlo, lo no montado en volumen se pierde", "Porque Postgres no lo permite", "Porque es más lento siempre"], a: 1, why: "El ciclo del contenedor es descartable; el volumen es el que persiste. Esa es la prueba down/up de la evaluación." },
         { q: "¿Cuándo elegirías bind mount en vez de volumen?", opts: ["Para datos que deben sobrevivir reinicios", "Cuando necesitás acceder a los archivos desde el host (desarrollo)", "Para I/O de alto rendimiento", "Para compartir entre contenedores con seguridad"], a: 1, why: "Bind = tu carpeta real visible. Volumen = gestionado por Docker, invisible desde el host." },
         { q: "Montás un volumen con datos sobre /app (que ya trae archivos). ¿Qué ves?", opts: ["La mezcla de ambos", "Solo el contenido del volumen: los originales quedan ocultos", "Error y el contenedor no arranca", "Se borra el volumen"], a: 1, why: "El montaje oculta lo previo sin remedio. Decisión de montaje = decisión de qué se ve." }
       ]
@@ -158,7 +158,7 @@ docker volume prune             # limpiar los sin uso</pre>
         <tr><td><strong>service_started</strong></td><td>El contenedor corre (sin garantía de que responda).</td></tr>
         <tr><td><strong>service_healthy</strong></td><td>La dependencia está sana según su <code>healthcheck</code>. La app nace cuando la base realmente responde.</td></tr>
         <tr><td><strong>service_completed_successfully</strong></td><td>La dependencia corrió hasta terminar bien (tareas una-vez, migraciones).</td></tr></table>
-        <p>Ejemplo de la investigación: <code>db</code> y <code>redis</code> se crean antes que <code>web</code>; <code>web</code> espera a que <code>db</code> esté sana. El healthcheck de la db usa <code>pg_isready -U \${POSTGRES_USER} -d \${POSTGRES_DB}</code>, reintentando cada 10 segundos hasta 5 veces.</p>
+        <p>Ejemplo del material: <code>db</code> y <code>redis</code> se crean antes que <code>web</code>; <code>web</code> espera a que <code>db</code> esté sana. El healthcheck de la db usa <code>pg_isready -U \${POSTGRES_USER} -d \${POSTGRES_DB}</code>, reintentando cada 10 segundos hasta 5 veces.</p>
 
         <h2>2. Orden también al apagar y reiniciar</h2>
         <p>Compose quita en orden inverso (<code>web</code> antes que <code>db</code> y <code>redis</code>). Y <code>restart: true</code> hace que si la base se reinicia (ej. <code>docker compose restart</code>), la web también se reinicie y restablezca conexiones.</p>
@@ -166,7 +166,7 @@ docker volume prune             # limpiar los sin uso</pre>
         <h2>3. El atributo healthcheck</h2>
         <p>Declara la comprobación de salud del servicio. Funciona igual que la instrucción <code>HEALTHCHECK</code> del Dockerfile y <strong>el Compose puede sobrescribirla</strong>. <code>interval</code>, <code>timeout</code>, <code>start_period</code> y <code>start_interval</code> son duraciones.</p>
         <p><code>test</code> puede ser cadena (equivale a <code>CMD-SHELL</code> + la cadena) o lista cuyo primer ítem es <code>NONE</code>, <code>CMD</code> o <code>CMD-SHELL</code>. <code>CMD-SHELL</code> ejecuta con el intérprete del contenedor. <code>NONE</code> deshabilita el healthcheck (útil para apagar el que trae la imagen).</p>
-        <div class="callout good"><p class="lbl">Estrategia válida</p><p>La T1 acepta depends_on con condición, reintentos con espera en la app, o ambos, siempre justificados. Lo que no acepta es nada.</p></div>`,
+        <div class="callout good"><p class="lbl">Estrategia válida</p><p>La evaluación acepta depends_on con condición, reintentos con espera en la app, o ambos, siempre justificados. Lo que no acepta es nada.</p></div>`,
       quiz: [
         { q: "/health responde 200 pero /ready da 503. ¿Qué significa?", opts: ["Todo está bien", "El proceso vive pero la base no acepta consultas: la app no está lista", "Hay que borrar los volúmenes", "El token es inválido"], a: 1, why: "Liveness vs readiness: vivo no es listo. Esa distinción es la que sostiene el arranque ordenado." },
         { q: "¿Qué aporta condition: service_healthy frente a depends_on a secas?", opts: ["Nada, son lo mismo", "Esperar a que la dependencia pase su healthcheck, no solo a que el contenedor exista", "Reiniciar la app si falla", "Crear la red"], a: 1, why: "A secas solo ordena creación. Con condition, Compose espera salud real." },
@@ -291,11 +291,11 @@ kind load docker-image mi-servicio-http:v1 --name tc1-cluster
 
         <h2>3. Deployment: nunca pods desnudos</h2>
         <p>El Pod es efímero: si muere, no resucita. El <strong>Deployment</strong> declara el estado deseado (“2 réplicas de v1”) y el controller converge. Por debajo crea un <strong>ReplicaSet</strong>; al actualizar imagen crea uno nuevo y migra gradual (<strong>RollingUpdate</strong>, cero downtime esperando readiness); si falla (CrashLoopBackOff), <strong>rollback</strong> al historial.</p>
-        <p>Anatomía: <code>selector.matchLabels</code> debe coincidir con <code>template.metadata.labels</code> (ese es el vínculo). Tres Deployments en la T1: app, Postgres, Keycloak.</p>
+        <p>Anatomía: <code>selector.matchLabels</code> debe coincidir con <code>template.metadata.labels</code> (ese es el vínculo). Tres Deployments en la evaluación: app, Postgres, Keycloak.</p>
 
         <h2>4. Service: nombre estable, pods volátiles</h2>
         <p>Cada Pod nace con IP nueva: conectarse por IP se rompe al reiniciar. El <strong>Service</strong> da IP + DNS persistentes y balancea vía kube-proxy/EndpointSlice. Solo conoce pods por <strong>selectores de labels</strong>.</p>
-        <table class="doc"><tr><th>Tipo</th><th>Uso en la T1</th></tr>
+        <table class="doc"><tr><th>Tipo</th><th>Uso en la evaluación</th></tr>
         <tr><td><strong>ClusterIP</strong> (default)</td><td>Solo dentro del clúster. Ideal para Postgres: nada justifica exponerla.</td></tr>
         <tr><td><strong>NodePort</strong> (30000–32767)</td><td>API y Keycloak consumibles desde Postman/curl vía el puerto del contenedor kind.</td></tr>
         <tr><td><strong>LoadBalancer</strong></td><td>No aplica en kind: queda Pending sin MetalLB.</td></tr></table>
@@ -305,7 +305,7 @@ kind load docker-image mi-servicio-http:v1 --name tc1-cluster
         <p>El filesystem del Pod es volátil. K8s separa <strong>suministro</strong> de <strong>consumo</strong>:</p>
         <table class="doc"><tr><th>Recurso</th><th>Rol</th></tr>
         <tr><td><strong>PV</strong></td><td>Disco real (admin o StorageClass). En kind se crea solo.</td></tr>
-        <tr><td><strong>PVC</strong></td><td>Tu reclamo: tamaño, accesos, clase. Lo que escribís en la T1.</td></tr>
+        <tr><td><strong>PVC</strong></td><td>Tu reclamo: tamaño, accesos, clase. Lo que escribís en la evaluación.</td></tr>
         <tr><td><strong>StorageClass</strong></td><td>El “tipo” + provisioner. kind trae <code>standard</code> por defecto.</td></tr></table>
         <p>Ciclo: PVC (piden 1Gi) → la SC reserva en el nodo y crea el PV → <strong>Binding</strong> 1:1 (Pending→Bound) → el Pod monta en <code>/var/lib/postgresql/data</code>. <strong>Reclaim</strong>: <code>Retain</code> conserva (limpieza manual); <code>Delete</code> (default dinámico) borra todo si eliminás el PVC. Accesos: <strong>RWO</strong> (obligatorio para Postgres: un nodo, file locks), <strong>ROX</strong> (estáticos), <strong>RWX</strong> (NFS/Ceph; jamás Postgres clásico).</p>
         <p>Compose (4 líneas: servicio + <code>postgres_data:/var/lib/…</code> + declaración) se vuelve dos recursos: <strong>PVC</strong> (<code>ReadWriteOnce</code>, 1Gi) + <strong>Deployment</strong> con <code>volumeMounts</code> → <code>volumes.persistentVolumeClaim.claimName</code>.</p>
@@ -346,7 +346,7 @@ kind load docker-image mi-servicio-http:v1 --name tc1-cluster
       id: "kustomize", num: "07", lab: "k8s",
       title: "Una base, muchos despliegues",
       sub: "Kustomize: base + overlay, sin duplicar manifiestos",
-      lede: "La base dice cómo es el sistema; el overlay dice qué cambia en este entorno. Este tema cubre el material completo: filosofía sin plantillas, kustomization.yaml, jerarquía base/overlays, ejemplos reales de la T1 y los generadores y patches.",
+      lede: "La base dice cómo es el sistema; el overlay dice qué cambia en este entorno. Este tema cubre el material completo: filosofía sin plantillas, kustomization.yaml, jerarquía base/overlays, ejemplos reales de la evaluación y los generadores y patches.",
       body: `
         <div class="sheet"><p class="kicker">Para qué sirve</p>
         <p><strong>Kustomize</strong> (nativo en kubectl desde 1.14, <code>kubectl apply -k</code>) personaliza YAML puro <strong>sin plantillas</strong> (a diferencia de Helm): la base intacta + capas de personalización. Misma config para dev, pruebas y prod, inyectando solo diferencias.</p></div>
