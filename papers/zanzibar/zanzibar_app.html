@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zanzibar · Aprende & Practica — Google's Authorization System</title>
+<style>
+/* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
+   Tesis: apuntes de curso compuestos como página editorial — titulares serif,
+   datelines mono, reglas finas en vez de tarjetas, examen numerado, un solo
+   azul tinta reservado a la acción. Ejes: density media · warmth cálida ·
+   formality media-baja · energy quieta · ornament estructural · contrast alto.
+   Offline: Georgia + sans/mono nativos (sin fuentes bloqueantes). Clases e ids
+   intactos: el JS no cambia salvo iconos de módulo y flechas en tabs. */
+:root{
+  --bg:#131110; --bg2:#171514; --surface:#1b1917; --surface2:#221f1c; --surface3:#2a2622;
+  --border:#322d27; --border-soft:#25211d;
+  --text:#ece7dc; --muted:#a8a196; --dim:#6f6a61;
+  --blue:#8ba3c7; --blue-soft:rgba(139,163,199,.12);
+  --teal:#6fae9d; --teal-soft:rgba(111,174,157,.11);
+  --orange:#c08d5c; --orange-soft:rgba(192,141,92,.11);
+  --purple:#9d8ab8; --purple-soft:rgba(157,138,184,.11);
+  --gold:#c2a05e; --gold-soft:rgba(194,160,94,.11);
+  --pink:#b08396; --pink-soft:rgba(176,131,150,.11);
+  --good:#74b18f; --bad:#c07f8c;
+  --brand1:#8ba3c7; --brand2:#8ba3c7;
+  --display:Georgia,'Palatino Linotype','Book Antiqua',Palatino,serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --shadow:none;
+  --shadow-sm:none;
+  --radius:8px; --radius-sm:6px; --radius-xs:4px;
+  --ring:0 0 0 2px rgba(139,163,199,.45);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; color:var(--text);
+  font-family:var(--sans); line-height:1.7; font-size:16px;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+body.light{
+  --bg:#f4f1e9; --bg2:#ece6d5; --surface:#fbf9f2; --surface2:#f0e9d6; --surface3:#e3d8bf;
+  --border:#d2c7a9; --border-soft:#e0d6bc;
+  --text:#26241f; --muted:#5e594e; --dim:#948d7d;
+  --blue:#3c5a86; --blue-soft:rgba(60,90,134,.09);
+  --teal:#337065; --teal-soft:rgba(51,112,101,.09);
+  --orange:#8f5f2b; --orange-soft:rgba(143,95,43,.09);
+  --purple:#635183; --purple-soft:rgba(99,81,131,.09);
+  --gold:#7d6a2e; --gold-soft:rgba(125,106,46,.10);
+  --pink:#8f4f68; --pink-soft:rgba(143,79,104,.09);
+  --good:#3c7a5d; --bad:#9c4a59;
+  --shadow:0 1px 2px rgba(60,50,25,.08);
+  --shadow-sm:0 1px 2px rgba(60,50,25,.06);
+  background:var(--bg);
+}
+::selection{background:var(--border); color:var(--text);}
+a{color:var(--blue); text-decoration:none; border-radius:3px;}
+a:hover{text-decoration:underline;}
+a:focus-visible, button:focus-visible, input:focus-visible{outline:none; box-shadow:var(--ring);}
+::-webkit-scrollbar{width:11px; height:11px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:8px; border:3px solid var(--bg);}
+::-webkit-scrollbar-track{background:transparent;}
+.skip-link{position:absolute; left:12px; top:-48px; z-index:100; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px 14px; font-size:14px; font-weight:600; transition:top .15s ease; text-decoration:none;}
+.skip-link:focus{top:12px;}
+
+/* ============ HEADER / NAV ============ */
+header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border-soft);}
+.topbar{max-width:1200px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:11px; font-weight:650; letter-spacing:-.01em; font-size:16px;}
+.brand .logo{width:34px; height:34px; border-radius:6px; flex:0 0 auto; background:var(--surface3); border:1px solid var(--border); display:grid; place-items:center; font-weight:700; font-family:var(--display); font-size:17px; color:var(--text);}
+.brand small{display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em;}
+.tabs{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border-soft); border-radius:8px; padding:3px;}
+.tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; padding:7px 13px; border-radius:6px; cursor:pointer;}
+.tab:hover{color:var(--text); background:var(--surface2);}
+.tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
+.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
+.theme-btn:hover{border-color:var(--dim);}
+.hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
+.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}
+.progress-track{height:3px; background:var(--border-soft);}
+.progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+
+/* ============ LAYOUT / TYPE — escala 12 / 14 / 16 / 18 / 24 / 40 ============ */
+main{max-width:1200px; margin:0 auto; padding:32px 20px 110px;}
+.view{display:none;}
+.view.active{display:block; animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;}to{opacity:1;}}
+@keyframes pop{from{opacity:0;}to{opacity:1;}}
+@keyframes animPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+h1.title{font-family:var(--display); font-weight:700; font-size:clamp(2rem,4.4vw,2.75rem); margin:12px 0 12px; letter-spacing:0; line-height:1.12; text-wrap:balance;}
+h1.title em{font-style:italic;}
+h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0 0 12px; letter-spacing:0; line-height:1.25; text-wrap:balance;}
+h3{font-family:var(--display); font-weight:700; font-size:1.15rem; margin:30px 0 10px; line-height:1.3;}
+p{max-width:68ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
+p strong, li strong, td strong{color:var(--text);}
+ul, ol{color:var(--muted);}
+.lede{font-size:1.125rem; color:var(--muted); max-width:64ch; line-height:1.65;}
+.dateline{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--dim); margin:0 0 4px;}
+.dateline::before{content:""; width:26px; height:1px; background:var(--dim);}
+.dateline cite{font-style:normal; color:var(--muted);}
+.kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-weight:700;}
+.kicker::before{content:""; width:18px; height:1px; background:var(--dim);}
+
+.card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
+.card.accent-blue, .card.accent-teal, .card.accent-orange, .card.accent-purple, .card.accent-gold, .card.accent-pink{border-left:1px solid var(--border-soft);}
+.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:72ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
+.callout::before{display:grid; place-items:center; width:24px; height:24px; border-radius:6px; position:absolute; left:12px; top:13px; font-size:13px; font-weight:700; background:var(--surface3); border:1px solid var(--border);}
+.callout .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; font-weight:700; color:var(--dim);}
+.callout.info{border-left-color:var(--blue);} .callout.info .lbl{color:var(--blue);} .callout.info::before{content:"i"; color:var(--blue); font-family:var(--sans); font-style:normal;}
+.callout.tip{border-left-color:var(--teal);} .callout.tip .lbl{color:var(--teal);} .callout.tip::before{content:"✓"; color:var(--teal);}
+.callout.warn{border-left-color:var(--orange);} .callout.warn .lbl{color:var(--orange);} .callout.warn::before{content:"!"; color:var(--orange);}
+.callout.err{border-left-color:var(--bad);} .callout.err .lbl{color:var(--bad);} .callout.err::before{content:"×"; color:var(--bad);}
+.callout.dark{background:var(--surface2);}
+.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:72ch; color:var(--muted);}
+.trade b{color:var(--text);}
+.trade b:first-child{color:var(--text);}
+
+code{font-family:var(--mono); font-size:.85em; background:var(--surface2); border:1px solid var(--border-soft); padding:1px 5px; border-radius:4px; color:var(--text);}
+pre{background:#100f0e; color:#d8d5cf; padding:16px 18px; border-radius:4px; overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.7; max-width:100%; border:1px solid var(--border-soft);}
+body.light pre{background:#26241f; color:#e2ded6;}
+pre code{background:none; border:0; padding:0; color:inherit; font-size:inherit;}
+.kw{color:#c8b88a;} .str{color:#93b898;} .cmt{color:#6e6e76;} .fn{color:#9db4d0;} .op{color:#b39ec4;}
+
+table{border-collapse:separate; border-spacing:0; width:100%; margin:14px 0; font-size:13.5px; border:1px solid var(--border-soft); border-radius:4px; overflow:hidden;}
+th,td{padding:9px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--border-soft);}
+th{background:var(--surface2); font-weight:650; color:var(--text); font-size:12.5px; position:sticky; top:0;}
+tr:last-child th, tr:last-child td{border-bottom:0;}
+tbody tr:hover td{background:var(--surface2);}
+tr:nth-child(even) td{background:color-mix(in srgb, var(--surface2) 50%, transparent);}
+table, .score-chip, .step-counter{font-variant-numeric:tabular-nums;}
+
+.pill{display:inline-block; padding:2px 10px; border-radius:999px; font-size:11.5px; font-weight:650; font-family:var(--mono); border:1px solid var(--border);}
+.pill.blue{background:var(--blue-soft); color:var(--blue); border-color:transparent;}
+.pill.teal{background:var(--teal-soft); color:var(--teal); border-color:transparent;}
+.pill.orange{background:var(--orange-soft); color:var(--orange); border-color:transparent;}
+.pill.purple{background:var(--purple-soft); color:var(--purple); border-color:transparent;}
+.pill.gold{background:var(--gold-soft); color:var(--gold); border-color:transparent;}
+
+.btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); cursor:pointer; background:var(--surface3); color:var(--text); font-weight:600; font-size:14px; font-family:var(--sans); padding:9px 17px; border-radius:var(--radius-sm);}
+.btn:hover{border-color:var(--dim); filter:brightness(1.1);}
+.btn:active{transform:none;}
+.btn:disabled{opacity:.45; cursor:default;}
+.btn.ghost{background:var(--surface2); color:var(--text); border-color:var(--border-soft);}
+.btn.ghost:hover{border-color:var(--dim);}
+.btn.teal{background:var(--teal); border-color:transparent; color:#10201c;}
+body.light .btn.teal{color:#fbf9f3;}
+.btn.teal:hover{filter:brightness(.94);}
+.btn.playing{background:var(--gold); border-color:transparent; color:#1a1408;}
+.btn.small{padding:6px 12px; font-size:13px;}
+.linklike{background:none; border:0; padding:9px 4px; cursor:pointer; color:var(--blue); font-family:var(--sans); font-size:14px; font-weight:600; text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px;}
+.linklike:hover{filter:brightness(1.15);}
+.controls .btn.seg-on{border-color:var(--teal); color:var(--teal);}
+
+/* ============ HERO (editorial: dateline, titular, una acción) ============ */
+.hero{display:grid; grid-template-columns:1.5fr 1fr; gap:32px; align-items:start; padding:20px 0 8px; border-bottom:1px solid var(--border-soft); padding-bottom:28px;}
+.hero-cards{display:grid; gap:12px;}
+.hero-cta{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:20px;}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:24px 0;}
+.stat{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 14px 14px; text-align:left;}
+.stat .n{font-family:var(--display); font-size:1.7rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1.1;}
+.stat .l{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5;}
+.path{list-style:none; margin:18px 0; padding:0; border-top:1px solid var(--border-soft);}
+.path li{border-bottom:1px solid var(--border-soft);}
+.path-step{display:flex; gap:18px; align-items:baseline; width:100%; text-align:left; background:none; border:0; padding:16px 4px; cursor:pointer; color:var(--text); font-family:var(--sans);}
+.path-step:hover .path-t{color:var(--blue);}
+.path-n{font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--dim); min-width:44px;}
+.path-step:hover .path-n{color:var(--blue);}
+.path-t{display:block; font-size:16px; font-weight:650; color:var(--text);}
+.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:62ch;}
+
+/* ============ APRENDE ============ */
+.aprende-layout{display:grid; grid-template-columns:250px 1fr; gap:24px; align-items:start;}
+.module-nav{position:sticky; top:78px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:6px;}
+.module-link{display:flex; align-items:center; gap:10px; text-align:left; cursor:pointer; background:transparent; border:0; border-radius:6px; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:8px 11px; border-left:2px solid transparent;}
+.module-link:hover{background:var(--surface2); color:var(--text);}
+.module-link.active{background:var(--surface2); color:var(--text); border-left-color:var(--blue);}
+.module-link .idx{font-family:var(--mono); font-size:11px; color:var(--dim);}
+.module-link.done .check{margin-left:auto; color:var(--good); font-size:13px; font-weight:700;}
+.module-content{min-width:0;}
+.module-content > h2{margin-top:4px;}
+.done-banner{display:none; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--good); border-radius:6px; padding:9px 14px; margin-bottom:14px; color:var(--text); font-weight:600; font-size:14px;}
+.module-pager{display:flex; justify-content:space-between; gap:12px; margin-top:24px; flex-wrap:wrap;}
+.legend{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;}
+
+/* ============ SVG figures ============ */
+figure{margin:20px 0;}
+figure svg{width:100%; height:auto; display:block; background:var(--surface); border:1px solid var(--border-soft); border-radius:4px;}
+figure figcaption{font-size:14px; color:var(--muted); background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:9px 13px; margin-top:8px; font-family:var(--sans);}
+figure figcaption span{color:var(--text);}
+.tnode{font:600 13px var(--sans); fill:var(--text);}
+.tedge{font:400 11px var(--mono); fill:var(--muted);}
+svg text.svgcap{font:700 14px var(--sans); fill:var(--gold);}
+svg .flow{stroke-dasharray:7 5; animation:dashmove 0.9s linear infinite;}
+@keyframes dashmove{to{stroke-dashoffset:-12;}}
+.controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:12px 0;}
+.controls label{cursor:pointer;}
+input[type="checkbox"]{accent-color:var(--blue);}
+input[type="range"]{-webkit-appearance:none; appearance:none; height:4px; border-radius:99px; background:var(--border); outline-offset:4px;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+input[type="range"]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+
+/* ============ ANIM feedback ============ */
+.anim-status{display:flex; align-items:center; gap:12px; margin:14px 0 4px; flex-wrap:wrap;}
+.status-badge{font-family:var(--mono); font-size:11.5px; font-weight:700; padding:3px 11px; border-radius:999px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;}
+.status-badge.playing{color:var(--teal); border-color:var(--teal); animation:animPulse 1.4s ease-in-out infinite;}
+.status-badge.paused{color:var(--gold); border-color:var(--gold);}
+.status-badge.done{color:var(--good); border-color:var(--good);}
+.anim-progress{flex:1; min-width:140px; height:6px; border-radius:999px; background:var(--surface2); overflow:hidden; border:1px solid var(--border-soft);}
+.anim-progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+.step-counter{font-family:var(--mono); font-size:12px; color:var(--dim); min-width:52px; text-align:right;}
+.narrator{background:var(--surface); border:1px solid var(--border-soft); border-left:3px solid var(--blue); border-radius:6px; padding:11px 15px; margin:10px 0; font-size:15px; line-height:1.65; color:var(--text); min-height:52px;}
+.narrator b{color:var(--text);}
+
+/* ============ QUIZ (examen numerado) ============ */
+.quiz-toolbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:14px 0;}
+.score-chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-weight:650; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums;}
+.question-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:16px 0; scroll-margin-top:90px;}
+.qmeta{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+.qmeta .qnum{font-family:var(--display); font-style:italic; font-size:15px; color:var(--dim);}
+.qtag{font-family:var(--mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; border:1px solid transparent;}
+.qtext{font-size:16.5px; font-weight:650; margin-bottom:12px; color:var(--text); line-height:1.6;}
+.opts{counter-reset:qa;}
+.opt{position:relative; display:block; width:100%; text-align:left; cursor:pointer; font-family:var(--sans); background:var(--surface); border:1px solid var(--border-soft); color:var(--text); border-radius:6px; padding:10px 13px 10px 50px; margin:7px 0; font-size:14px; line-height:1.55;}
+.opt::before{counter-increment:qa; content:counter(qa,upper-alpha); position:absolute; left:11px; top:50%; transform:translateY(-50%); width:26px; height:26px; display:grid; place-items:center; border-radius:6px; background:var(--surface2); border:1px solid var(--border); font-family:var(--mono); font-size:12px; font-weight:700; color:var(--dim);}
+.opt:hover{border-color:var(--dim);}
+.opt:hover::before{color:var(--text); border-color:var(--dim);}
+.opt.correct{border-color:var(--good);}
+.opt.correct::before{background:var(--good); border-color:var(--good); color:#0e1512;}
+.opt.wrong{border-color:var(--bad);}
+.opt.wrong::before{background:var(--bad); border-color:var(--bad); color:#fff;}
+.opt:disabled{cursor:default;}
+.opt:disabled:not(.correct):not(.wrong){opacity:.7;}
+.explain{display:none; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--teal); border-radius:0 6px 6px 0; padding:13px 15px; margin-top:11px; font-size:13.5px; color:var(--muted);}
+.explain.show{display:block; animation:pop .2s ease;}
+.explain .why{font-weight:700; color:var(--text);}
+.quiz-result{display:none; text-align:center; padding:30px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border-soft); margin:20px 0;}
+.quiz-result.show{display:block; animation:pop .25s ease;}
+.big-score{font-family:var(--display); font-size:3.2rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1;}
+.grade-bar{height:10px; border-radius:999px; background:var(--surface2); border:1px solid var(--border-soft); overflow:hidden; margin:14px auto; max-width:420px;}
+.grade-fill{height:100%; width:0; border-radius:999px; background:var(--blue); transition:width .6s ease;}
+.case-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:18px 0; scroll-margin-top:90px;}
+.case-card h3{margin-top:6px;}
+.case-step{background:var(--surface2); border:1px solid var(--border-soft); border-radius:6px; padding:12px 15px; margin:10px 0; font-size:14px;}
+.hint-btn{font-family:var(--mono); font-size:12.5px;}
+.reveal-btn{margin-top:6px;}
+
+/* ============ GLOSARIO ============ */
+.glossary-search{width:100%; max-width:480px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:var(--sans); font-size:14.5px; padding:11px 15px 11px 40px; border-radius:6px; margin:12px 0 8px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236f6a61' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:13px center;}
+.glossary-search:focus{border-color:var(--blue); box-shadow:var(--ring); outline:none;}
+.glossary-search::placeholder{color:var(--dim);}
+.gloss-term{background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:15px 17px; margin:10px 0; border-left:2px solid transparent;}
+.gloss-term:hover{border-left-color:var(--dim);}
+.gloss-term h3{margin:0 0 5px; font-size:15.5px;}
+.gloss-term .def{color:var(--muted); font-size:14px;}
+
+/* ============ CHEATSHEET ============ */
+#cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:0 14px; align-items:start;}
+#cheatsheetContent .card{margin:7px 0;}
+#cheatsheetContent .card:first-child{grid-column:1 / -1;}
+
+footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-soft); text-align:center; color:var(--dim); font-size:12.5px;}
+
+@media(max-width:860px){
+  body{font-size:15.5px;}
+  .hero{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .path-step{padding:14px 2px;}
+  #cheatsheetContent{grid-template-columns:1fr;}
+  .aprende-layout{grid-template-columns:1fr;}
+  .module-nav{position:static; flex-direction:row; overflow-x:auto; padding:6px; scrollbar-width:thin;}
+  .module-link{white-space:nowrap; border-left:0; border-bottom:2px solid transparent; border-radius:0;}
+  .module-link.active{border-bottom-color:var(--blue);}
+  h1.title{font-size:1.7rem;}
+  .tabs{margin-left:0;}
+  table{display:block; overflow-x:auto;}
+}
+@media print{
+  header, .tabs, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  body{background:#fff;}
+  main{max-width:100%; padding:0;}
+  .view{display:none !important;}
+  #view-cheatsheet{display:block !important;}
+  #cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  #cheatsheetContent .card{box-shadow:none; break-inside:avoid; border:1px solid #999; margin:4px 0; padding:10px 12px;}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *, *::before, *::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+  svg .flow{animation:none;}
+}
+
+</style>
+</head>
+<body><a class="skip-link" href="#main">Saltar al contenido</a>
+<header>
+  <div class="topbar">
+    <a class="hub-link" href="../../index.html">← Hub</a>
+    <div class="brand">
+      <div class="logo">Z</div>
+      <div>
+        <div>Zanzibar Studio</div>
+        <small>Google's Consistent, Global Authorization System</small>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
+      <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="aprende">Aprende</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="animaciones">Animaciones</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="quiz">Quiz & Casos</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
+    </nav>
+    <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<main id="main">
+
+<!-- ===================== INICIO ===================== -->
+<section id="view-inicio" class="view active">
+  <div class="hero">
+    <div>
+      <p class="dateline">Apuntes de estudio · Basado en <cite>Zanzibar: Google's Consistent, Global Authorization System</cite> · Pang et al., USENIX ATC 2019</p>
+      <h1 class="title">¿Puede <em>este</em> usuario hacer <em>esto</em>?</h1>
+      <p class="lede">Esa es la única pregunta que responde Zanzibar. Es el sistema interno con el que Google decide —para <strong>Drive, Calendar, YouTube, Maps, Photos, Cloud</strong> y más— quién tiene permiso de ver, editar o compartir cada cosa, <strong>a escala global</strong> y de forma <strong>consistente</strong>.</p>
+      <p>Esta app te lleva desde cero (¿qué es una tupla?) hasta los detalles finos (zookies, TrueTime, Leopard), con <strong>animaciones interactivas</strong>, <strong>guías paso a paso</strong> y un <strong>quiz con casos</strong> para comprobar lo que aprendiste.</p>
+      <div class="hero-cta">
+        <button class="btn" onclick="go('aprende')">Comenzar a aprender →</button>
+        <button class="linklike" onclick="go('quiz')">Ir directo al quiz →</button>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="card accent-blue" style="margin:0;">
+        <div class="kicker">Autenticación ≠ Autorización</div>
+        <p style="margin:6px 0 0; font-size:14.5px;"><strong>Autenticación</strong> = quién eres (login). <strong>Autorización</strong> = qué puedes hacer. Zanzibar solo hace lo segundo.</p>
+      </div>
+      <div class="card accent-teal" style="margin:0;">
+        <div class="kicker">La idea central en 1 línea</div>
+        <p style="margin:6px 0 0; font-size:14.5px;">Todo permiso se guarda como una <strong>tupla</strong>: <code>objeto#relación@usuario</code>. El resto son reglas para <em>derivar</em> más permisos.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="n">&gt;2B</div><div class="l">ACLs (tuplas) guardadas</div></div>
+    <div class="stat"><div class="n">&gt;10M</div><div class="l">consultas por segundo</div></div>
+    <div class="stat"><div class="n">&gt;1.500</div><div class="l">namespaces (tipos)</div></div>
+    <div class="stat"><div class="n">99.999%</div><div class="l">disponibilidad (3 años)</div></div>
+  </div>
+
+  <h2>¿Cómo usar esta app?</h2>
+  <p class="lede">Tres pasos, en orden. Cada uno prepara el siguiente.</p>
+  <ol class="path">
+    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">6 módulos progresivos, de novato a nivel de paper. Cada uno con ejemplos y mini-checks.</span></span></button></li>
+    <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">Visualiza el grafo de tuplas, la evaluación de un Check, el "new enemy problem" y más.</span></span></button></li>
+    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">18 preguntas técnicas con explicación + casos prácticos con solución paso a paso.</span></span></button></li>
+  </ol>
+</section>
+
+<!-- ===================== APRENDE ===================== -->
+<section id="view-aprende" class="view">
+  <span class="kicker">Ruta de aprendizaje</span>
+  <h2>📚 Aprende Zanzibar desde cero</h2>
+  <p class="lede">Sigue los módulos en orden. Cada uno construye sobre el anterior. Marca "completado" para llevar tu progreso.</p>
+
+  <div class="aprende-layout">
+    <nav class="module-nav" id="moduleNav"></nav>
+    <div class="module-content" id="moduleContent"></div>
+  </div>
+</section>
+
+<!-- ===================== ANIMACIONES ===================== -->
+<section id="view-animaciones" class="view">
+  <span class="kicker">Laboratorio visual</span>
+  <h2>🎬 Animaciones interactivas</h2>
+  <p class="lede">Pulsa los botones y observa cómo se comporta el sistema. Estas son las mismas ideas de los módulos, pero en movimiento.</p>
+
+  <div class="card accent-blue" id="anim1">
+    <h3>1 · El grafo de tuplas</h3>
+    <p style="font-size:14px;">Cada tupla es una <strong>arista</strong> dirigida entre objetos/usuarios. Añade tuplas y luego ejecuta un Check para ver el recorrido.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animGraph.add('owner','10')">+ doc#owner@10</button>
+      <button class="btn small" onclick="animGraph.add('member','11')">+ group#member@11</button>
+      <button class="btn small" onclick="animGraph.add('viewer','group:eng#member')">+ doc#viewer@eng#member</button>
+      <button class="btn small" onclick="animGraph.add('parent','folder:A')">+ doc#parent@folder:A</button>
+      <button class="btn small ghost" onclick="animGraph.reset()">Reiniciar</button>
+      <button class="btn teal small" onclick="animGraph.check()">▶ Check: ¿es 11 viewer?</button>
+    </div>
+    <figure>
+      <svg id="svgGraph" viewBox="0 0 720 320" role="img" aria-label="Grafo de tuplas interactivo"></svg>
+      <figcaption>Fig A · <span id="graphCaption">Las tuplas forman un grafo dirigido. Pulsa los botones.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-purple" id="anim2">
+    <h3>2 · Evaluación de un Check (árbol de decisión)</h3>
+    <p style="font-size:14px;">Zanzibar evalúa la relación <code>viewer</code> como una <strong>unión</strong> de ramas, en paralelo. Aquí se recorre paso a paso.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animCheck.step()">Siguiente paso →</button>
+      <button class="btn small ghost" onclick="animCheck.play()">▶ Reproducir</button>
+      <button class="btn small ghost" onclick="animCheck.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgCheck" viewBox="0 0 720 360" role="img" aria-label="Árbol de evaluación de un Check"></svg>
+      <figcaption>Fig B · <span id="checkCaption">Pulsa "Siguiente paso" para evaluar cada rama.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-teal" id="anim3">
+    <h3>3 · El "new enemy problem"</h3>
+    <p style="font-size:14px;">¿Por qué la consistencia importa? Mira qué pasa si un Check lee datos <em>atrasados</em> después de que alguien fue removido.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animEnemy.play()">▶ Reproducir historia</button>
+      <button class="btn small ghost" onclick="animEnemy.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgEnemy" viewBox="0 0 720 300" role="img" aria-label="Línea de tiempo del new enemy problem"></svg>
+      <figcaption>Fig C · <span id="enemyCaption">Alice quita a Bob; Charlie (aún miembro) mueve el documento.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-orange" id="anim4">
+    <h3>4 · Ciclo de vida del zookie</h3>
+    <p style="font-size:14px;">El zookie es un <strong>token de frescura</strong> que viaja con el contenido y se reenvía en futuros Checks.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animZookie.play()">▶ Reproducir</button>
+      <button class="btn small ghost" onclick="animZookie.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgZookie" viewBox="0 0 720 340" role="img" aria-label="Ciclo de vida del zookie"></svg>
+      <figcaption>Fig D · <span id="zookieCaption">Pulsa reproducir.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-gold" id="anim5">
+    <h3>5 · Arquitectura en movimiento</h3>
+    <p style="font-size:14px;">Así fluye un Check: cliente → aclserver → (fan-out) → Spanner → respuesta.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animArch.play()">▶ Animar flujo</button>
+      <button class="btn small ghost" onclick="animArch.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgArch" viewBox="0 0 720 360" role="img" aria-label="Arquitectura de Zanzibar"></svg>
+      <figcaption>Fig E · <span id="archCaption">Pulsa "Animar flujo".</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="view-quiz" class="view">
+  <span class="kicker">Comprueba tu aprendizaje</span>
+  <h2>📝 Quiz técnico</h2>
+  <p class="lede">Responde y recibe la explicación al instante. Puedes reintentar las veces que quieras. Después pasa a los <strong>casos prácticos</strong>.</p>
+
+  <div class="quiz-toolbar">
+    <span class="score-chip" id="scoreChip">0 / 0 correctas</span>
+    <button class="btn ghost small" onclick="quiz.reset()">↺ Reiniciar quiz</button>
+  </div>
+  <div id="quizContainer"></div>
+  <div class="quiz-result" id="quizResult">
+    <div class="big-score" id="quizPercent">0%</div>
+    <div class="grade-bar"><div class="grade-fill" id="gradeFill"></div></div>
+    <p id="quizMsg" style="text-align:center; margin:0 auto;"></p>
+  </div>
+
+  <hr style="border:none; border-top:1px solid var(--border-soft); margin:40px 0;">
+
+  <h2>🧩 Casos prácticos (ejercicios)</h2>
+  <p class="lede">Aplica lo aprendido. Intenta resolver cada caso <em>antes</em> de pulsar "Ver solución".</p>
+  <div id="casesContainer"></div>
+</section>
+
+<!-- ===================== GLOSARIO ===================== -->
+<section id="view-glosario" class="view">
+  <span class="kicker">Referencia rápida</span>
+  <h2>📖 Glosario</h2>
+  <p class="lede">Todos los términos del paper en un solo lugar. Escribe para filtrar.</p>
+  <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: zookie, userset, rewrite)…">
+  <div id="glossaryList"></div>
+</section>
+
+<!-- ===================== CHEATSHEET ===================== -->
+<section id="view-cheatsheet" class="view">
+  <span class="kicker">Repaso de último minuto</span>
+  <h2>⚡ Cheatsheet</h2>
+  <p class="lede">Todo lo esencial en una página, ideal para repasar antes del quiz o el examen.</p>
+  <div id="cheatsheetContent"></div>
+</section>
+
+</main>
+
+<footer>
+  Herramienta de estudio autogenerada sobre el paper "Zanzibar: Google's Consistent, Global Authorization System".
+  Pensada para aprender a tu ritmo: leer → animar → practicar.
+</footer>
+
+<script>
+/* ============================================================
+   DATOS DE CONTENIDO
+============================================================ */
+const MODULES = [
+  {
+    id:'m0', icon:'🧭', tag:'Módulo 0', accent:'gold', title:'El problema que resuelve Zanzibar',
+    summary:'Autorización vs autenticación, y por qué Google necesitó un sistema unificado.',
+    html:`
+    <p class="lede">Antes de hablar de tuplas y zookies, entiende <strong>qué problema</strong> resuelve Zanzibar. Sin esto, todo lo demás parece magia.</p>
+
+    <h3>Autenticación vs Autorización</h3>
+    <div class="callout info"><div class="lbl">La distinción clave</div>
+      <strong>Autenticación</strong> responde "¿quién eres?" (tu usuario y contraseña, tu sesión).<br>
+      <strong>Autorización</strong> responde "¿tienes permiso para esto?" (¿puedes abrir este documento?).
+      <br><br>Zanzibar <strong>NO</strong> hace login. Asume que ya sabemos quién eres (un <em>user id</em>) y solo decide permisos.
+    </div>
+
+    <h3>El problema: permisos por todas partes</h3>
+    <p>Google tiene muchos productos: Drive, Calendar, YouTube, Maps, Photos, Cloud, Hangouts… Cada uno necesita responder preguntas como:</p>
+    <ul style="color:var(--muted);">
+      <li>¿Puede Ana <em>ver</em> este documento?</li>
+      <li>¿Puede Bob <em>editar</em> esta carpeta?</li>
+      <li>¿Puede este grupo <em>compartir</em> este video?</li>
+    </ul>
+    <p>Sin un sistema común, cada producto implementaría sus propias reglas de permisos. Eso genera <strong>duplicación, inconsistencias, bugs de seguridad y dolor de cabeza</strong> para auditar.</p>
+
+    <h3>La solución: un sistema unificado</h3>
+    <div class="callout tip"><div class="lbl">Idea fuerza</div>
+      Zanzibar es <strong>un solo servicio global</strong> que todos los productos usan para guardar sus listas de control de acceso (ACLs) y para consultar "¿tiene permiso X?". Un modelo de datos único, un lenguaje de configuración único, una sola fuente de verdad.
+    </div>
+
+    <h3>Tres requisitos de diseño</h3>
+    <table>
+      <tr><th>Requisito</th><th>Qué significa</th></tr>
+      <tr><td><strong>Correctitud</strong></td><td>Las respuestas deben respetar el orden causal de los cambios (nada de ver contenido que ya no deberías ver).</td></tr>
+      <tr><td><strong>Flexibilidad</strong></td><td>Un modelo lo bastante expresivo para representar ACLs de productos muy distintos.</td></tr>
+      <tr><td><strong>Escala y latencia</strong></td><td>Miles de millones de datos, millones de consultas/seg, con milisegundos de respuesta.</td></tr>
+    </table>
+
+    <h3>La magnitud del problema</h3>
+    <p>En producción, Zanzibar guarda <strong>más de 2 billones (trillions) de ACLs</strong> (~100 TB), sirve <strong>&gt;10 millones de consultas por segundo</strong> y mantiene <strong>99.999% de disponibilidad</strong> durante años. Es, literalmente, uno de los sistemas de autorización más grandes del mundo.</p>
+
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Confundir "autorización" con "autenticación". En el quiz, si ves una pregunta sobre qué hace Zanzibar, recuerda: <strong>decide permisos, no identidades</strong>.</div>
+    `,
+    mini: { q:'¿Cuál es la misión de Zanzibar?', opts:['Autenticar usuarios','Decidir si un usuario tiene permiso para algo','Guardar contraseñas','Encriptar documentos'], a:1, why:'Zanzibar es autorización: responde "¿puede este usuario hacer esto?". La autenticación (quién eres) es un problema aparte.' }
+  },
+  {
+    id:'m1', icon:'🧱', tag:'Módulo 1', accent:'blue', title:'Modelo de datos: la tupla de relación',
+    summary:'objeto#relación@usuario — la pieza con la que se expresa TODO permiso.',
+    html:`
+    <p class="lede">Todo el poder de Zanzibar descansa en una estructura diminuta y elegante: la <strong>tupla de relación</strong>.</p>
+
+    <pre><code>⟨tupla⟩     ::= ⟨objeto⟩ '#' ⟨relación⟩ '@' ⟨usuario⟩
+⟨objeto⟩    ::= ⟨namespace⟩ ':' ⟨object_id⟩
+⟨usuario⟩   ::= ⟨user_id⟩  |  ⟨userset⟩
+⟨userset⟩   ::= ⟨objeto⟩ '#' ⟨relación⟩</code></pre>
+
+    <h3>Desglosando cada parte</h3>
+    <table>
+      <tr><th>Término</th><th>Qué es</th><th>Ejemplo</th></tr>
+      <tr><td><code>namespace</code></td><td>El <strong>tipo</strong> de objeto (como una "clase").</td><td><code>doc</code>, <code>group</code>, <code>folder</code>, <code>video</code></td></tr>
+      <tr><td><code>object_id</code></td><td>Una instancia concreta de ese tipo.</td><td><code>readme</code>, <code>eng</code></td></tr>
+      <tr><td><code>relación</code></td><td>El <strong>rol</strong> que conecta objeto y usuario.</td><td><code>owner</code>, <code>editor</code>, <code>viewer</code>, <code>member</code>, <code>parent</code></td></tr>
+      <tr><td><code>user_id</code></td><td>Un usuario concreto (persona).</td><td><code>10</code>, <code>alice@gmail.com</code></td></tr>
+      <tr><td><code>userset</code></td><td>Un <strong>conjunto de usuarios</strong> definido por otra tupla.</td><td><code>group:eng#member</code></td></tr>
+    </table>
+
+    <h3>Leer una tupla en voz alta</h3>
+    <pre><code>doc:readme#viewer@group:eng#member
+└──┬──┘ └─┬─┘  └──┬──┘  └────┬────┘ └─┬─┘
+  ns    obj    relación  ns   obj   relación (userset)
+
+<span class="cmt">"Todos los miembros del grupo eng son viewers del doc readme."</span></code></pre>
+
+    <div class="callout info"><div class="lbl">Ejemplos reales</div>
+      <code>doc:readme#owner@10</code> → el usuario 10 es <strong>dueño</strong> de doc:readme.<br>
+      <code>group:eng#member@11</code> → el usuario 11 es <strong>miembro</strong> del grupo eng.<br>
+      <code>doc:readme#parent@folder:A</code> → doc:readme <strong>está dentro</strong> de folder:A.
+    </div>
+
+    <h3>¿Por qué es poderoso el userset?</h3>
+    <p>Fíjate que el lado derecho de una tupla puede ser <strong>otro objeto#relación</strong> en vez de una persona. Eso permite <strong>anidar</strong>: un documento puede dar acceso a "todos los miembros de un grupo", y ese grupo a su vez puede contener a otro grupo. Todo con la <em>misma</em> estructura — sin tablas especiales para grupos, roles ni jerarquías.</p>
+
+    <div class="callout tip"><div class="lbl">Imagen mental</div>
+      Piensa en las tuplas como <strong>aristas de un grafo dirigido</strong>: cada tupla conecta un objeto con un usuario o con otro conjunto de usuarios. Consultar permisos = recorrer ese grafo.</div>
+
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      No confundir el orden. Es <code>objeto#relación@usuario</code>, no al revés. El "<code>#</code>" separa objeto y relación; el "<code>@</code>" separa todo eso del usuario.</div>
+    `,
+    mini: { q:'La tupla group:eng#member@11 significa…', opts:['El grupo 11 es miembro de eng','El usuario 11 es miembro del grupo eng','eng es miembro del usuario 11','11 grupos son miembros'], a:1, why:'objeto=group:eng, relación=member, usuario=11. Se lee: "el usuario 11 es miembro del grupo eng".' }
+  },
+  {
+    id:'m2', icon:'🪆', tag:'Módulo 2', accent:'purple', title:'Userset rewrites: permisos derivados',
+    summary:'Cómo owner ⊂ editor ⊂ viewer se define una sola vez, con union/intersection/difference.',
+    html:`
+    <p class="lede">Guardar cada permiso a mano no escala: si un dueño debería poder editar, no quieres escribir "owner" y "editor" para cada persona. Los <strong>userset rewrites</strong> definen cómo <em>derivar</em> un conjunto de usuarios a partir de otros.</p>
+
+    <h3>Los tres operadores de conjuntos</h3>
+    <table>
+      <tr><th>Operador</th><th>Significado</th><th>Se lee como</th></tr>
+      <tr><td><code>union</code></td><td>Une los hijos</td><td>A o B o C…</td></tr>
+      <tr><td><code>intersection</code></td><td>Intersección de los hijos</td><td>A y B…</td></tr>
+      <tr><td><code>exclusion</code></td><td>Diferencia de conjuntos</td><td>A menos B</td></tr>
+    </table>
+
+    <h3>Los tres tipos de "hijo"</h3>
+    <table>
+      <tr><th>Hijo</th><th>Qué hace</th></tr>
+      <tr><td><code>_this</code></td><td>Las tuplas <strong>directas</strong> de este objeto#relación (ej: los viewers listados explícitamente).</td></tr>
+      <tr><td><code>computed_userset</code></td><td>Otra relación <strong>del mismo objeto</strong> (ej: "los editors también son viewers").</td></tr>
+      <tr><td><code>tuple_to_userset</code></td><td>Sigue una relación hacia <strong>otro objeto</strong> y aplica una relación de ese objeto (ej: "los viewers de la carpeta padre también son viewers del documento").</td></tr>
+    </table>
+
+    <h3>La jerarquía clásica del paper</h3>
+    <p>Para un <code>document</code>:</p>
+    <pre><code><span class="kw">relation</span> { name: <span class="str">"editor"</span>
+  userset_rewrite { union {
+    child { _this {} }                                   <span class="cmt">// editors directos</span>
+    child { computed_userset { relation: <span class="str">"owner"</span> } }   <span class="cmt">// owners también son editors</span>
+  } }
+}
+<span class="kw">relation</span> { name: <span class="str">"viewer"</span>
+  userset_rewrite { union {
+    child { _this {} }                                   <span class="cmt">// viewers directos</span>
+    child { computed_userset { relation: <span class="str">"editor"</span> } }  <span class="cmt">// editors también son viewers</span>
+    child { tuple_to_userset {                           <span class="cmt">// viewers del padre</span>
+      tupleset { relation: <span class="str">"parent"</span> }
+      computed_userset {
+        object: $TUPLE_USERSET_OBJECT
+        relation: <span class="str">"viewer"</span>
+      } } }
+  } }
+}</code></pre>
+
+    <p>Resultado: <strong>owner ⊂ editor ⊂ viewer</strong>. Un dueño es automáticamente editor y viewer; un editor es automáticamente viewer; y heredas de la carpeta padre.</p>
+
+    <h3>Ejemplo de herencia de dos niveles</h3>
+    <pre><code>doc:informe_q3#parent@folder:finanzas
+folder:finanzas#viewer@group:cfo_staff#member
+group:cfo_staff#member@77
+
+<span class="cmt">// ¿es 77 viewer de doc:informe_q3?</span>
+<span class="cmt">// _this          → no hay tupla directa → FALSO</span>
+<span class="cmt">// computed(editor) → no → FALSO</span>
+<span class="cmt">// tuple_to_userset(parent → folder:finanzas):</span>
+<span class="cmt">//   ¿77 viewer de folder:finanzas? → vía group:cfo_staff#member → TRUE</span>
+<span class="kw">resultado</span>: TRUE  <span class="cmt">// heredado a través de carpeta → grupo</span></code></pre>
+
+    <div class="callout tip"><div class="lbl">Dato clave</div>
+      Los rewrites se definen <strong>una sola vez por namespace</strong> (por tipo), no por cada objeto. Un único config describe cómo funciona "viewer" para <em>todos</em> los documentos.</div>
+
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      <code>computed_userset</code> mira una relación <em>del mismo objeto</em>; <code>tuple_to_userset</code> <em>salta a otro objeto</em> a través de una relación como <code>parent</code>. Es la diferencia entre "mis editors" y "los viewers de mi carpeta".</div>
+    `,
+    mini: { q:'¿Qué hace tuple_to_userset en el ejemplo viewer?', opts:['Añade los viewers directos','Añade los owners','Hereda los viewers del objeto padre (parent)','Quita a los editors'], a:2, why:'tuple_to_userset sigue la relación "parent" hacia el objeto padre y aplica "viewer" de ese objeto, logrando herencia por carpetas.' }
+  },
+  {
+    id:'m3', icon:'⏱️', tag:'Módulo 3', accent:'teal', title:'Consistencia: new enemy problem y zookies',
+    summary:'El corazón del paper: por qué un dato atrasado puede ser un fallo de seguridad, y cómo los zookies lo evitan.',
+    html:`
+    <p class="lede">Aquí está la parte más sutil (y más preguntada) del paper. Trata de cómo un sistema <strong>distribuido y gigante</strong> puede responder permisos sin dar respuestas "atrasadas" que comprometan la seguridad.</p>
+
+    <h3>El "new enemy problem"</h3>
+    <p>Imagina esta secuencia:</p>
+    <ol style="color:var(--muted); max-width:70ch;">
+      <li><strong>Alice</strong> quita a <strong>Bob</strong> de un documento (Bob ya no debe verlo).</li>
+      <li><strong>Charlie</strong> (que sí tiene acceso) <strong>edita</strong> el documento y lo guarda como una versión nueva.</li>
+      <li><strong>Bob</strong> abre el documento y descarga la <strong>versión nueva</strong>.</li>
+    </ol>
+    <p>Si el sistema que guarda el <em>contenido</em> ya ve el cambio de Charlie (paso 2), pero el sistema que guarda los <em>permisos</em> todavía muestra a Bob como permitido (paso 1 no propagado), entonces <strong>Bob ve contenido que un humano decidió que no debía ver</strong>. Eso es el new enemy problem.</p>
+
+    <div class="callout err"><div class="lbl">Por qué es grave</div>
+      No es solo un dato "un poco viejo". Es un fallo de <strong>seguridad y privacidad</strong>: alguien ve algo que explícitamente se le revocó. Por eso Zanzibar prioriza la consistencia.</div>
+
+    <h3>La regla de consistencia externa</h3>
+    <pre><code><span class="cmt">// si un cambio x ocurre causalmente antes que y…</span>
+x ≺ y   ⟹   T(x) &lt; T(y)
+
+<span class="cmt">// un snapshot read a tiempo T observa toda actualización u con T(u) ≤ T</span>
+<span class="cmt">// y si observa x, y x ≺ z con T(z) ≤ T, también observa z</span></code></pre>
+
+    <h3>Zookies: el token de frescura</h3>
+    <p>Un <strong>zookie</strong> es un token opaco que <strong>codifica un timestamp</strong> (y un componente aleatorio para unicidad). Se genera cuando un cliente escribe contenido y se <strong>guarda junto a ese contenido</strong>.</p>
+    <pre><code><span class="cmt">// 1. Drive escribe el documento → pide un content-change check a Zanzibar</span>
+<span class="cmt">// 2. Zanzibar devuelve un zookie Z (codifica T = 15042)</span>
+<span class="cmt">// 3. Drive guarda { contenido: doc_v2, zookie: Z } de forma atómica</span>
+
+<span class="cmt">// Más tarde, cuando alguien pide ver el documento:</span>
+Check(usuario, doc#viewer, zookie = Z)
+<span class="cmt">// Zanzibar evalúa en un timestamp T ≥ 15042 → ve todos los cambios ≤ 15042</span></code></pre>
+
+    <div class="callout tip"><div class="lbl">Semántica "at-least-as-fresh"</div>
+      Zanzibar puede evaluar en <strong>cualquier timestamp igual o posterior</strong> al del zookie (nunca antes). Esto le da libertad para optimizar (usar caché, redondear tiempos) sin violar la consistencia.</div>
+
+    <h3>Snapshot reads, Spanner y TrueTime</h3>
+    <p>Zanzibar guarda sus datos en <strong>Spanner</strong>, que ofrece lecturas <em>snapshot</em> a un timestamp. <strong>TrueTime</strong> (el reloj global de Spanner) garantiza que leer a T observa <strong>todos los writes hasta T</strong> — incluso si T está en el futuro, en cuyo caso la lectura <em>espera</em> a que TrueTime avance.</p>
+    <div class="callout info"><div class="lbl">Cita del paper</div>
+      "Rounding up timestamps does not affect Zanzibar's consistency properties, since Spanner ensures that a snapshot read at timestamp T will observe all writes up to T — this holds even if T is in the future, in which case the read will wait until TrueTime has moved past T."</div>
+
+    <h3>Cuantización de timestamps</h3>
+    <p>Para que muchos checks cercanos compartan la <strong>misma entrada de caché</strong>, Zanzibar <strong>redondea hacia arriba</strong> el timestamp de evaluación (granularidad de 1–10 segundos). Es "gratis" gracias a la propiedad de TrueTime que acabamos de ver.</p>
+
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Pensar que el zookie es una credencial o un token de autenticación. No: es solo <strong>frescura</strong>. No dice "quién eres", dice "no respondas con datos más viejos que este momento".</div>
+    `,
+    mini: { q:'¿Qué garantiza un Check que recibe un zookie con T=15042?', opts:['Responde en T exactamente 15042','Responde en T ≥ 15042 (nunca más viejo)','Ignora todos los cambios','Solo usa caché'], a:1, why:'La semántica es "at-least-as-fresh": evalúa en un timestamp igual o posterior al del zookie, para no perder cambios anteriores.' }
+  },
+  {
+    id:'m4', icon:'🔌', tag:'Módulo 4', accent:'orange', title:'La API completa',
+    summary:'Check, Read, Expand, Write y Watch: qué hace cada una y cuándo usarla.',
+    html:`
+    <p class="lede">Zanzibar expone una API pequeña y bien definida. Conocer la <strong>diferencia entre cada método</strong> es material de quiz garantizado.</p>
+
+    <table>
+      <tr><th>API</th><th>¿Resuelve rewrites?</th><th>¿Usa zookie?</th><th>Propósito</th></tr>
+      <tr><td><code>Check</code></td><td>Sí</td><td>Sí (salvo content-change)</td><td>Responder <strong>sí/no</strong>: "¿tiene permiso?"</td></tr>
+      <tr><td><code>Read</code></td><td>No — tuplas literales</td><td>Opcional</td><td>Leer la <strong>lista directa</strong> de un objeto#relación</td></tr>
+      <tr><td><code>Expand</code></td><td>Sí — árbol resuelto</td><td>Opcional</td><td>Ver el <strong>userset efectivo completo</strong></td></tr>
+      <tr><td><code>Write</code></td><td>N/A</td><td>No (usa "lock")</td><td><strong>Crear/borrar</strong> tuplas</td></tr>
+      <tr><td><code>Watch</code></td><td>N/A (stream crudo)</td><td>Sí (desde dónde)</td><td>Recibir un <strong>stream de cambios</strong> (para índices)</td></tr>
+    </table>
+
+    <h3>Check</h3>
+    <pre><code>Check(object, relation, user, zookie?) → boolean
+<span class="cmt">// ¿puede "user" actuar como "relation" sobre "object"?</span>
+<span class="cmt">// Resuelve userset rewrites (sigue grupos, herencia, etc.)</span></code></pre>
+
+    <h3>Read vs Expand (confusión clásica)</h3>
+    <ul style="color:var(--muted);">
+      <li><code>Read(doc:readme, viewer)</code> → devuelve solo las <strong>tuplas directas</strong> (los viewers listados a mano), sin resolver grupos ni herencia.</li>
+      <li><code>Expand(doc:readme, viewer)</code> → devuelve el <strong>árbol completo</strong> resuelto (incluye owners→editors→viewers, heredados de carpetas, etc.).</li>
+    </ul>
+
+    <h3>Write con concurrencia optimista</h3>
+    <pre><code><span class="cmt">// 1. Leer las tuplas del objeto + una tupla "lock"</span>
+tuplas, lock = Read(object)
+<span class="cmt">// 2. Calcular los cambios y enviarlos con una condición sobre el lock</span>
+Write(changes: [...], condition: lock.unchanged_since(lock.version))
+<span class="cmt">// 3. Si la condición falla (alguien más cambió), reintentar desde 1</span></code></pre>
+    <p>El <strong>lock</strong> es una tupla especial por objeto. Si dos escritores intentan modificar a la vez, solo uno gana; el otro reintenta. Esto evita corrupción sin bloquear todo el sistema.</p>
+
+    <h3>Watch</h3>
+    <p>Permite que un cliente reciba un flujo de cambios desde un punto dado (vía zookie). Sirve para que los productos construyan sus <strong>propios índices</strong> o caches fuera de Zanzibar.</p>
+
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      <code>Read</code> NO resuelve grupos ni herencia. Si necesitas saber "quién puede ver esto de verdad", usa <code>Check</code> o <code>Expand</code>.</div>
+    `,
+    mini: { q:'¿Qué API devuelve el userset efectivo completo (árbol resuelto)?', opts:['Read','Check','Expand','Watch'], a:2, why:'Expand devuelve el árbol completo resuelto; Read solo las tuplas literales; Check solo sí/no.' }
+  },
+  {
+    id:'m5', icon:'🏗️', tag:'Módulo 5', accent:'gold', title:'Arquitectura y Leopard',
+    summary:'aclservers, Spanner, watchservers y Leopard: cómo se sirve un Check a escala.',
+    html:`
+    <p class="lede">Ya sabes <em>qué</em> hace Zanzibar. Ahora mira <em>cómo</em> lo hace físicamente para soportar millones de consultas por segundo.</p>
+
+    <h3>Componentes</h3>
+    <table>
+      <tr><th>Componente</th><th>Rol</th></tr>
+      <tr><td><code>aclservers</code></td><td>Reciben las llamadas (Check/Read/Expand/Write), hacen <strong>fan-out</strong> a otros aclservers para sub-checks, y sirven desde caché.</td></tr>
+      <tr><td><code>Spanner</code></td><td>Base de datos global. Guarda: (1) <strong>configs de namespaces</strong>, (2) <strong>tuplas</strong>, (3) el <strong>changelog</strong>.</td></tr>
+      <tr><td><code>watchservers</code></td><td>Leen el changelog y sirven la API <strong>Watch</strong> a clientes.</td></tr>
+      <tr><td><code>Leopard</code></td><td>Sistema de <strong>índices</strong> para responder rápido a membresías de grupos grandes y anidados.</td></tr>
+    </table>
+
+    <h3>Cómo fluye un Check</h3>
+    <p>Un Check puede necesitar recorrer grupos, carpetas y herencia. Zanzibar lo hace <strong>en paralelo</strong>: las ramas del árbol booleano se evalúan concurrentemente; si una rama ya decide la unión, se <strong>cancelan</strong> las demás.</p>
+
+    <h3>Clave primaria de tuplas (multiversionado)</h3>
+    <pre><code>PRIMARY KEY (shard_id, object_id, relation, user, commit_timestamp)
+<span class="cmt">// múltiples filas por (object, relation, user) → distintas versiones en el tiempo
+// permite evaluar checks/reads en cualquier T dentro de la ventana de GC</span></code></pre>
+
+    <h3>Leopard: indexación de sets</h3>
+    <p>Para saber si un usuario pertenece a un grupo con anidamiento arbitrario, Leopard mantiene dos índices:</p>
+    <pre><code>GROUP2GROUP(s)  → {e}   <span class="cmt">// s = grupo ancestro, e = sub-grupo descendiente</span>
+MEMBER2GROUP(s) → {e}   <span class="cmt">// s = usuario, e = grupo donde es miembro directo</span>
+
+<span class="cmt">// ¿pertenece U a G?</span>
+MEMBER2GROUP(U) ∩ GROUP2GROUP(G) ≠ ∅
+<span class="cmt">// costo O(min(|A|,|B|)) usando skip-lists ordenadas</span></code></pre>
+    <p>La pertenencia se resuelve como una <strong>intersección de conjuntos</strong>, no como un recorrido recursivo caro. La capa incremental fusiona los updates nuevos (<code>(t, s, e, tipo, borrado)</code>) sobre el índice offline, filtrando por timestamp.</p>
+
+    <div class="callout tip"><div class="lbl">Imagen mental</div>
+      aclservers = "cerebro de corto plazo" (rápido, con caché). Spanner = "memoria de largo plazo" (la verdad, global). Leopard = "índice especializado" para la pregunta frecuente "¿está X en el grupo Y?".</div>
+    `,
+    mini: { q:'En Leopard, ¿cómo se responde "¿pertenece U al grupo G?"', opts:['Recorriendo el grafo recursivamente','Intersectando MEMBER2GROUP(U) con GROUP2GROUP(G)','Consultando a Spanner por cada subgrupo','Con una tabla de hashes global'], a:1, why:'Se calcula la intersección de dos conjuntos: los grupos donde U es miembro y los subgrupos de G. Si no es vacía, U pertenece a G.' }
+  },
+  {
+    id:'m6', icon:'🚀', tag:'Módulo 6', accent:'pink', title:'Rendimiento: caché y hot spots',
+    summary:'Cómo Zanzibar mantiene latencias de milisegundos: caché, hashing consistente, hedging y más.',
+    html:`
+    <p class="lede">Con &gt;10M consultas/seg, el rendimiento no es opcional. Estas técnicas aparecen en el paper y suelen caer en el quiz.</p>
+
+    <h3>Técnicas de rendimiento</h3>
+    <table>
+      <tr><th>Técnica</th><th>Qué resuelve</th></tr>
+      <tr><td><strong>Consistent hashing</strong></td><td>Enruta checks/reads del <em>mismo objeto</em> siempre al mismo servidor (mejor tasa de acierto de caché).</td></tr>
+      <tr><td><strong>Lock table</strong></td><td>Evita "cache stampede": solo una request procesa una clave; el resto espera.</td></tr>
+      <tr><td><strong>Timestamp cuantizado</strong></td><td>Agrupa checks cercanos bajo la misma entrada de caché.</td></tr>
+      <tr><td><strong>Prefetching</strong></td><td>Para objetos muy calientes, lee y cachea todas sus tuplas de una vez.</td></tr>
+      <tr><td><strong>Request hedging</strong></td><td>Duplica llamadas a Spanner/Leopard si la primera se demora; usa la más rápida.</td></tr>
+      <tr><td><strong>Performance isolation</strong></td><td>Cuotas de CPU/RPCs por cliente para que uno no afecte a los demás.</td></tr>
+    </table>
+
+    <div class="callout info"><div class="lbl">Dato interesante</div>
+      ¿Por qué NO hay hedging <em>entre</em> aclservers? Porque duplicar un Check costoso multiplicaría justo el trabajo más pesado del sistema y empeoraría la latencia global. El hedging se aplica solo a las llamadas <strong>hacia Spanner y Leopard</strong>.</div>
+
+    <h3>Latencia medida en producción</h3>
+    <table>
+      <tr><th>Métrica</th><th>p50</th><th>p95</th><th>p99</th></tr>
+      <tr><td><strong>Check Safe</strong> (zookie &gt;10s)</td><td>3.0 ms</td><td>9.5 ms</td><td>15 ms</td></tr>
+      <tr><td><strong>Check Recent</strong> (zookie reciente)</td><td>2.9 ms</td><td>60 ms</td><td>76 ms</td></tr>
+    </table>
+    <p>Los checks "recientes" pagan el costo de una <strong>ida y vuelta entre regiones</strong> para leer datos frescos; los "safe" (zookie viejo) se sirven desde caché local.</p>
+
+    <h3>Números de producción</h3>
+    <table>
+      <tr><th>Métrica</th><th>Valor</th></tr>
+      <tr><td>Tuplas de relación</td><td>&gt; 2 billones (~100 TB)</td></tr>
+      <tr><td>Namespaces</td><td>&gt; 1.500</td></tr>
+      <tr><td>QPS totales</td><td>&gt; 10 millones</td></tr>
+      <tr><td>Check pico</td><td>≈ 4.2M QPS</td></tr>
+      <tr><td>Disponibilidad</td><td>&gt; 99.999% (3 años)</td></tr>
+    </table>
+
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Creer que "más caché = mejor" sin más. El caché ayuda solo cuando la <strong>frescura</strong> lo permite (por eso el zookie y la cuantización son clave). Datos "recientes" no se pueden servir de caché viejo.</div>
+    `,
+    mini: { q:'¿Por qué NO se usa request hedging entre aclservers?', opts:['Porque no hay red entre ellos','Porque duplicaría el trabajo más costoso del sistema','Porque Spanner lo prohíbe','Porque ya usan hashing consistente'], a:1, why:'Duplicar checks costosos multiplicaría el trabajo más pesado (la evaluación) y empeoraría la latencia global. El hedging se limita a Spanner/Leopard.' }
+  }
+];
+
+const QUIZ = [
+  {tag:'Modelo', c:'blue', q:'¿Cuál es la estructura correcta de una tupla de relación en Zanzibar?', opts:['usuario#relación@objeto','objeto#relación@usuario','namespace@usuario#relación','objeto@relación#usuario'], a:1, why:'La gramática es ⟨objeto⟩#⟨relación⟩@⟨usuario⟩, donde objeto = namespace:object_id.'},
+  {tag:'Modelo', c:'blue', q:'En la tupla group:eng#member@11, ¿qué representa "11"?', opts:['Un namespace','Un userset','Un user_id (persona concreta)','Un object_id'], a:2, why:'El lado derecho es un user_id (usuario individual). Si fuera "group:x#member", sería un userset (un conjunto de usuarios).'},
+  {tag:'Modelo', c:'blue', q:'¿Qué es un "userset"?', opts:['Un conjunto de usuarios definido por un objeto#relación','El nombre de una base de datos','Un tipo de tupla de escritura','El usuario administrador'], a:0, why:'Un userset es el lado derecho de una tupla que apunta a otro objeto#relación (ej. group:eng#member), representando un conjunto de usuarios.'},
+  {tag:'Modelo', c:'blue', q:'¿Dónde se define una relación y su userset rewrite?', opts:['En cada objeto individualmente','Una vez por namespace (por tipo), en el config','En cada tupla','En el cliente'], a:1, why:'La configuración de relaciones y rewrites es por namespace, no por objeto. Un único config describe "viewer" para todos los documentos.'},
+  {tag:'Rewrite', c:'purple', q:'En el ejemplo del paper, la jerarquía correcta es…', opts:['viewer ⊂ editor ⊂ owner','owner ⊂ editor ⊂ viewer','editor ⊂ owner ⊂ viewer','owner ⊂ viewer ⊂ editor'], a:1, why:'owner es subconjunto de editor (todo dueño edita) y editor es subconjunto de viewer (todo editor ve). Por tanto owner ⊂ editor ⊂ viewer.'},
+  {tag:'Rewrite', c:'purple', q:'¿Qué hace computed_userset { relation: "owner" } dentro de "editor"?', opts:['Añade los owners del mismo objeto como editors','Salta al objeto padre','Crea un nuevo namespace','Borra los editors'], a:0, why:'computed_userset aplica otra relación del MISMO objeto: los owners del documento también son editors.'},
+  {tag:'Rewrite', c:'purple', q:'¿Qué hace tuple_to_userset en el ejemplo de "viewer"?', opts:['Añade viewers directos','Añade owners','Sigue la relación "parent" y aplica "viewer" del objeto padre','Hace intersección con editors'], a:2, why:'tuple_to_userset sigue una relación (parent) hacia otro objeto y aplica una relación de ese otro objeto, logrando herencia por carpeta.'},
+  {tag:'Rewrite', c:'purple', q:'¿Cuál NO es un operador de userset rewrite en Zanzibar?', opts:['union','intersection','exclusion','multiplication'], a:3, why:'Los tres operadores son union, intersection y exclusion (diferencia de conjuntos). No existe "multiplication".'},
+  {tag:'Consistencia', c:'teal', q:'¿Qué es el "new enemy problem"?', opts:['Un ataque de phishing','Que un usuario recién removido aún vea contenido por una lectura inconsistente','Un bug de autenticación','La colisión de dos zookies'], a:1, why:'Si el contenido nuevo se lee antes que la remoción del permiso se propague, un usuario removido puede ver contenido que no debería. Es un fallo de seguridad por datos atrasados.'},
+  {tag:'Consistencia', c:'teal', q:'¿Qué es un zookie?', opts:['Una credencial de autenticación','Un token que ancla la frescura mínima de un Check','Un identificador de usuario','Un tipo de tupla'], a:1, why:'El zookie codifica un timestamp; al reenviarlo en un Check, garantiza que la evaluación sea al menos tan fresca como ese momento.'},
+  {tag:'Consistencia', c:'teal', q:'La semántica "at-least-as-fresh" de un zookie significa…', opts:['Evaluar en T exactamente igual al zookie','Evaluar en T ≥ el timestamp del zookie (nunca antes)','Evaluar sin timestamp','Ignorar el zookie'], a:1, why:'Zanzibar puede evaluar en cualquier timestamp IGUAL O POSTERIOR al del zookie, lo que le da libertad para optimizar sin romper consistencia.'},
+  {tag:'Consistencia', c:'teal', q:'¿Qué garantiza un snapshot read a timestamp T en Spanner?', opts:['Solo los writes posteriores a T','Observa todos los writes ≤ T (incluso si T es futuro, espera a TrueTime)','Nada en particular','Solo datos en caché'], a:1, why:'Spanner garantiza que leer a T observa todos los writes hasta T; si T está en el futuro, la lectura espera a que TrueTime avance.'},
+  {tag:'Consistencia', c:'teal', q:'¿Por qué es "seguro" redondear timestamps hacia arriba (cuantización)?', opts:['Porque se pierde algo de precisión aceptable','Porque Spanner garantiza leer a T observa todos los writes ≤ T, incluso si T es futuro','Porque TrueTime no existe','Porque los zookies no importan'], a:1, why:'Redondear hacia arriba equivale a leer en el futuro; Spanner espera a TrueTime y sigue observando todo ≤ T. Así, agrupar checks en caché no rompe consistencia.'},
+  {tag:'API', c:'orange', q:'¿Qué API responde sí/no y resuelve userset rewrites?', opts:['Read','Expand','Check','Watch'], a:2, why:'Check es la pregunta "¿tiene permiso?" y resuelve groups/herencia. Read no resuelve rewrites; Expand da el árbol; Watch es un stream.'},
+  {tag:'API', c:'orange', q:'¿Qué API devuelve las tuplas literales SIN resolver rewrites?', opts:['Check','Expand','Read','Write'], a:2, why:'Read devuelve solo las tuplas directas de un objeto#relación, sin seguir grupos ni herencia.'},
+  {tag:'API', c:'orange', q:'¿Qué API devuelve el userset efectivo completo (árbol resuelto)?', opts:['Read','Expand','Check','Watch'], a:1, why:'Expand devuelve el árbol completo resuelto de un objeto#relación.'},
+  {tag:'API', c:'orange', q:'¿Cómo maneja Write la concurrencia?', opts:['Con bloqueos pesados de base de datos','Con concurrencia optimista sobre una tupla "lock"','No la maneja','Con un único escritor global'], a:1, why:'Write lee las tuplas + un lock, envía cambios condicionados a que el lock no cambió; si falla, reintenta. Es concurrencia optimista.'},
+  {tag:'Arquitectura', c:'gold', q:'¿Qué almacena Spanner en Zanzibar?', opts:['Solo logs','Configs de namespaces, tuplas y el changelog','Solo índices de Leopard','Caché de aclservers'], a:1, why:'Spanner guarda: configs de namespaces (relaciones+rewrites), las tuplas (por namespace) y el changelog compartido.'},
+  {tag:'Arquitectura', c:'gold', q:'¿Qué es Leopard?', opts:['Un servidor web','Un sistema de índices para membresías de grupos','Un lenguaje de consulta','Un tipo de zookie'], a:1, why:'Leopard indexa sets (GROUP2GROUP, MEMBER2GROUP) para responder rápido si un usuario pertenece a un grupo anidado.'},
+  {tag:'Arquitectura', c:'gold', q:'En Leopard, "¿pertenece U al grupo G?" se responde con…', opts:['Recorrido recursivo del grafo','MEMBER2GROUP(U) ∩ GROUP2GROUP(G) ≠ ∅','Una consulta a TrueTime','Un join SQL completo'], a:1, why:'Se intersectan los grupos donde U es miembro directo con los subgrupos de G. Costo O(min(|A|,|B|)) con skip-lists.'},
+  {tag:'Rendimiento', c:'pink', q:'¿Qué resuelve la cuantización de timestamps?', opts:['Acelerar la red','Agrupar checks cercanos bajo la misma entrada de caché','Reducir el tamaño de las tuplas','Eliminar zookies'], a:1, why:'Al redondear timestamps hacia arriba (1–10s), muchos checks cercanos comparten entrada de caché, aumentando la tasa de aciertos.'},
+  {tag:'Rendimiento', c:'pink', q:'¿Por qué NO se usa request hedging entre aclservers?', opts:['No hay red entre ellos','Duplicaría el trabajo más costoso del sistema','Spanner lo prohíbe','Ya usan hashing consistente'], a:1, why:'Duplicar un Check costoso multiplicaría la evaluación (el trabajo más pesado) y empeoraría la latencia. El hedging solo aplica a Spanner/Leopard.'},
+  {tag:'Rendimiento', c:'pink', q:'¿Qué evita el "lock table"?', opts:['El new enemy problem','El cache stampede (solo una request procesa una clave)','La pérdida de datos','El fan-out'], a:1, why:'El lock table garantiza que solo una request procese una clave de caché mientras las demás esperan, evitando la estampida.'}
+];
+
+const CASES = [
+  {
+    title:'Caso 1 · ¿Es viewer? (herencia)',
+    prompt:`Dadas estas tuplas:<br>
+    <code>doc:informe#parent@folder:legal</code><br>
+    <code>folder:legal#viewer@group:abogados#member</code><br>
+    <code>group:abogados#member@42</code><br><br>
+    <strong>¿Es el usuario 42 viewer de doc:informe?</strong>`,
+    answer:true,
+    solution:`<strong>Sí.</strong> Recorre el árbol de "viewer":<br>
+    1. <code>_this</code>: ¿hay <code>doc:informe#viewer@42</code> directo? No.<br>
+    2. <code>computed_userset(editor)</code>: no hay editor directo → no.<br>
+    3. <code>tuple_to_userset(parent → folder:legal)</code>: ¿es 42 viewer de folder:legal? → <code>folder:legal#viewer@group:abogados#member</code> apunta a un userset → ¿es 42 miembro de abogados? → <code>group:abogados#member@42</code> existe → <strong>TRUE</strong>.<br><br>
+    La clave: el permiso se hereda <em>a través de la carpeta y del grupo</em>, sin que exista ninguna tupla directa sobre doc:informe.`
+  },
+  {
+    title:'Caso 2 · ¿Ve o no ve? (new enemy problem)',
+    prompt:`Timestamps (TrueTime):<br>
+    <code>T(A1) = 10:00:00.100</code> — Alice quita a Bob de <code>doc:secreto</code><br>
+    <code>T(A2) = 10:00:02.500</code> — Charlie edita y guarda <code>doc:secreto</code> (el cliente recibe un zookie Z que codifica T(A2))<br><br>
+    Bob abre Drive y su cliente hace <code>Check(Bob, doc:secreto#viewer, zookie=Z)</code>.<br>
+    <strong>¿Qué debe responder Zanzibar?</strong>`,
+    answer:false,
+    solution:`<strong>No (false).</strong> El zookie Z obliga a evaluar en <code>T ≥ 10:00:02.500</code>. Como <code>T(A1) &lt; T(A2) ≤ T</code>, la remoción de Bob <em>ya es visible</em> en ese snapshot. Por lo tanto Bob ya no es viewer.<br><br>
+    Si el sistema <em>no</em> respetara el zookie y leyera datos viejos (antes de A1), Bob vería el contenido nuevo de Charlie sin permiso — ese es exactamente el new enemy problem que los zookies evitan.`
+  },
+  {
+    title:'Caso 3 · Pertenencia a grupo (Leopard)',
+    prompt:`Índices de Leopard:<br>
+    <code>MEMBER2GROUP(alice) = {eng, design}</code><br>
+    <code>MEMBER2GROUP(bob) = {design}</code><br>
+    <code>GROUP2GROUP(eng) = {eng, design, ml}</code><br><br>
+    <strong>¿Pertenece alice al grupo eng? ¿Y bob?</strong>`,
+    answer:'ambos pertenecen',
+    solution:`<strong>alice: SÍ.</strong> <code>MEMBER2GROUP(alice) ∩ GROUP2GROUP(eng) = {eng, design} ∩ {eng, design, ml} = {eng, design} ≠ ∅</code> → alice está en eng (además es miembro directo).<br><br>
+    <strong>bob: SÍ (¡la trampa!).</strong> Aunque bob NO es miembro directo de eng, es miembro de <code>design</code>, y <code>design</code> es un subgrupo de eng. <code>MEMBER2GROUP(bob) ∩ GROUP2GROUP(eng) = {design} ∩ {eng, design, ml} = {design} ≠ ∅</code>.<br><br>
+    <strong>Conclusión:</strong> la pertenencia es <strong>transitiva</strong>: bob ∈ design y design ⊆ eng ⟹ bob ∈ eng. Leopard la captura con una simple intersección, sin recorrer el grafo. Ambos pertenecen.`
+  },
+  {
+    title:'Caso 4 · Elige la tupla correcta',
+    prompt:`Quieres expresar: "todos los miembros del grupo <code>staff</code> pueden <strong>editar</strong> el documento <code>doc:plan</code>".<br>
+    <strong>¿Cuál tupla lo expresa correctamente?</strong>`,
+    answer:'doc:plan#editor@group:staff#member',
+    solution:`La correcta es <code>doc:plan#editor@group:staff#member</code>.<br><br>
+    Se lee: objeto <code>doc:plan</code>, relación <code>editor</code>, y como usuario un <em>userset</em> <code>group:staff#member</code> (el conjunto de miembros de staff).<br><br>
+    Errores típicos: poner el grupo del lado del objeto (<code>group:staff#editor@doc:plan</code>), o usar <code>@staff</code> (un user_id) en vez del userset <code>group:staff#member</code>.`
+  },
+  {
+    title:'Caso 5 · Read vs Expand',
+    prompt:`Sobre el doc del Caso 1 (<code>doc:informe</code> con parent <code>folder:legal</code>, que da viewer al grupo <code>abogados</code>):<br><br>
+    <strong>¿<code>Read(doc:informe, viewer)</code> incluirá al grupo abogados? ¿Y <code>Expand(doc:informe, viewer)</code>?</strong>`,
+    answer:'Read no, Expand sí',
+    solution:`<code>Read</code> devuelve solo las <strong>tuplas literales</strong> de <code>doc:informe#viewer</code> — que no existen directamente (el permiso viene por <code>parent</code>). Así que Read NO incluirá a abogados.<br><br>
+    <code>Expand</code> resuelve los rewrites: seguirá <code>parent → folder:legal</code>, luego <code>viewer → group:abogados#member</code>, y devolverá el árbol completo que SÍ incluye a abogados.<br><br>
+    Regla: <code>Read</code> = lista cruda; <code>Expand</code> = conjunto efectivo resuelto.`
+  }
+];
+
+const GLOSSARY = [
+  ['ACL','Access Control List: lista que define quién puede acceder a un recurso. Zanzibar las almacena como tuplas.'],
+  ['aclserver','Servidor sin estado que recibe Check/Read/Expand/Write, hace fan-out para sub-checks y sirve desde caché.'],
+  ['Autenticación','Verificar QUIÉN es un usuario (login). Zanzibar NO hace esto.'],
+  ['Autorización','Decidir QUÉ puede hacer un usuario. Esto es exactamente lo que hace Zanzibar.'],
+  ['Check','API que responde sí/no: "¿tiene este usuario esta relación sobre este objeto?", resolviendo rewrites.'],
+  ['computed_userset','Hijo de un rewrite que aplica otra relación del MISMO objeto (ej: owners también son editors).'],
+  ['Consistencia externa','Propiedad: si un cambio x ocurre causalmente antes que y, entonces T(x) < T(y).'],
+  ['Cuantización de timestamps','Redondear el timestamp de evaluación hacia arriba (1–10s) para agrupar checks en la misma entrada de caché.'],
+  ['exclusion','Operador de userset rewrite: diferencia de conjuntos (A menos B).'],
+  ['Expand','API que devuelve el árbol completo resuelto de un objeto#relación.'],
+  ['fan-out','Cuando un aclserver reparte sub-checks a otros aclservers para evaluar ramas en paralelo.'],
+  ['GROUP2GROUP','Índice de Leopard: mapea un grupo a sus sub-grupos descendientes.'],
+  ['Hedging','Duplicar una llamada si la primera se demora y usar la más rápida. Solo hacia Spanner/Leopard.'],
+  ['intersection','Operador de userset rewrite: intersección de los hijos (A y B).'],
+  ['Leopard','Sistema de índices de Zanzibar para responder rápido a membresías de grupos grandes/anidados.'],
+  ['Lock table','Estructura que evita "cache stampede": solo una request procesa una clave, las demás esperan.'],
+  ['MEMBER2GROUP','Índice de Leopard: mapea un usuario a los grupos donde es miembro directo.'],
+  ['namespace','El TIPO de un objeto (doc, group, folder…). Las relaciones y rewrites se definen por namespace.'],
+  ['New enemy problem','Fallo de seguridad: un usuario recién removido ve contenido porque el permiso se leyó desactualizado.'],
+  ['object_id','Identificador de una instancia dentro de un namespace (ej. "readme" en doc:readme).'],
+  ['Read','API que devuelve las tuplas literales de un objeto#relación SIN resolver rewrites.'],
+  ['Relación','El ROL que conecta objeto y usuario en una tupla (owner, editor, viewer, member, parent…).'],
+  ['Snapshot read','Lectura a un timestamp T que observa todos los writes ≤ T (garantizado por Spanner).'],
+  ['Spanner','Base de datos global de Google. Guarda configs, tuplas y changelog; ofrece TrueTime y snapshot reads.'],
+  ['TrueTime','Reloj global de Spanner que da intervalos de tiempo con error acotado; sustenta la consistencia.'],
+  ['tuple_to_userset','Hijo de un rewrite que sigue una relación (ej. parent) hacia OTRO objeto y aplica su relación.'],
+  ['Tupla de relación','Estructura básica: objeto#relación@usuario. Todo permiso se expresa así.'],
+  ['union','Operador de userset rewrite: unión de los hijos (A o B o C).'],
+  ['userset','Conjunto de usuarios definido por un objeto#relación (ej. group:eng#member).'],
+  ['Userset rewrite','Regla (por namespace) que define cómo derivar el conjunto de usuarios de una relación.'],
+  ['Watch','API que emite un stream de cambios (desde un zookie) para que los clientes construyan índices.'],
+  ['watchserver','Servidor que lee el changelog de Spanner y sirve la API Watch.'],
+  ['Write','API para crear/borrar tuplas, con concurrencia optimista usando una tupla "lock".'],
+  ['Zookie','Token opaco que codifica un timestamp; ancla la frescura mínima de un Check ("at-least-as-fresh").'],
+  ['_this','Hijo de un rewrite que representa las tuplas directas de este objeto#relación.']
+];
+
+const CHEATSHEET = `
+<div class="card accent-blue">
+  <h3 style="margin-top:0;">🧱 Modelo de datos</h3>
+  <pre><code>tupla   ::= objeto '#' relación '@' usuario
+objeto  ::= namespace ':' object_id
+usuario ::= user_id  |  userset
+userset ::= objeto '#' relación</code></pre>
+  <p style="font-size:14px;"><strong>Ejemplos:</strong> <code>doc:readme#owner@10</code> · <code>group:eng#member@11</code> · <code>doc:readme#viewer@group:eng#member</code> · <code>doc:readme#parent@folder:A</code></p>
+</div>
+
+<div class="card accent-purple">
+  <h3 style="margin-top:0;">🪆 Userset rewrites</h3>
+  <p style="font-size:14px;">Operadores: <code>union</code> · <code>intersection</code> · <code>exclusion</code></p>
+  <p style="font-size:14px;">Hijos: <code>_this</code> (directos) · <code>computed_userset</code> (otra relación del MISMO objeto) · <code>tuple_to_userset</code> (salta a OTRO objeto vía parent).</p>
+  <p style="font-size:14px;"><strong>Jerarquía:</strong> owner ⊂ editor ⊂ viewer · definida una vez por namespace.</p>
+</div>
+
+<div class="card accent-teal">
+  <h3 style="margin-top:0;">⏱️ Consistencia</h3>
+  <p style="font-size:14px;"><strong>New enemy problem:</strong> usuario removido aún ve contenido (permiso leído desactualizado).</p>
+  <p style="font-size:14px;"><strong>Zookie:</strong> token con timestamp; un Check con zookie evalúa en T ≥ timestamp ("at-least-as-fresh").</p>
+  <p style="font-size:14px;"><strong>Snapshot read + TrueTime:</strong> leer a T observa todos los writes ≤ T (si T es futuro, espera).</p>
+  <p style="font-size:14px;"><strong>Cuantización:</strong> redondear T hacia arriba agrupa checks en caché sin romper consistencia.</p>
+</div>
+
+<div class="card accent-orange">
+  <h3 style="margin-top:0;">🔌 API</h3>
+  <table>
+    <tr><th>API</th><th>Resuelve rewrites</th><th>Zookie</th><th>Propósito</th></tr>
+    <tr><td><code>Check</code></td><td>Sí</td><td>Sí</td><td>sí/no</td></tr>
+    <tr><td><code>Read</code></td><td>No</td><td>opc.</td><td>tuplas literales</td></tr>
+    <tr><td><code>Expand</code></td><td>Sí</td><td>opc.</td><td>árbol completo</td></tr>
+    <tr><td><code>Write</code></td><td>N/A</td><td>lock</td><td>crear/borrar</td></tr>
+    <tr><td><code>Watch</code></td><td>N/A</td><td>Sí</td><td>stream de cambios</td></tr>
+  </table>
+</div>
+
+<div class="card accent-gold">
+  <h3 style="margin-top:0;">🏗️ Arquitectura</h3>
+  <p style="font-size:14px;"><strong>aclservers</strong> (sirven + fan-out + caché) · <strong>Spanner</strong> (configs + tuplas + changelog) · <strong>watchservers</strong> (Watch) · <strong>Leopard</strong> (índices de grupos).</p>
+  <p style="font-size:14px;"><strong>PK de tuplas:</strong> (shard_id, object_id, relation, user, commit_timestamp) → multiversionado.</p>
+  <p style="font-size:14px;"><strong>Leopard:</strong> MEMBER2GROUP(U) ∩ GROUP2GROUP(G) ≠ ∅ → U ∈ G.</p>
+</div>
+
+<div class="card accent-pink">
+  <h3 style="margin-top:0;">🚀 Rendimiento</h3>
+  <p style="font-size:14px;">Consistent hashing · lock table (anti-stampede) · timestamp cuantizado · prefetching · hedging (solo a Spanner/Leopard) · performance isolation.</p>
+  <p style="font-size:14px;"><strong>Latencia:</strong> Check Safe p50 3ms / p99 15ms · Check Recent p95 60ms / p99 76ms.</p>
+  <p style="font-size:14px;"><strong>Escala:</strong> &gt;2B tuplas · &gt;1.500 namespaces · &gt;10M QPS · 99.999% disponibilidad.</p>
+</div>
+`;
+
+/* ============================================================
+   NAVEGACIÓN
+============================================================ */
+const $ = s => document.querySelector(s);
+const views = ['inicio','aprende','animaciones','quiz','glosario','cheatsheet'];
+
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $('#view-'+view).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===view));
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(view==='quiz' && !quiz.rendered){ quiz.render(); }
+  if(view==='animaciones' && !animsRendered){ initAnims(); }
+  updateProgress();
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(t.dataset.view)));
+(function(){ const bar=document.getElementById('tabs'); const sync=()=>document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.classList.contains('active')?'true':'false')); bar.addEventListener('click', ()=>setTimeout(sync,0)); bar.addEventListener('keydown', e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const ts=[...bar.querySelectorAll('.tab')]; let i=ts.indexOf(document.activeElement); if(i<0) return; e.preventDefault(); i=(i+(e.key==='ArrowRight'?1:-1)+ts.length)%ts.length; ts[i].focus(); go(ts[i].dataset.view); sync(); }); sync(); })();
+
+/* theme toggle */
+const themeBtn = $('#themeBtn');
+themeBtn.addEventListener('click', ()=>{
+  document.body.classList.toggle('light');
+  themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('zanzibar-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+});
+if(localStorage.getItem('zanzibar-theme')==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; }
+
+/* ============================================================
+   PROGRESO (localStorage)
+============================================================ */
+let done = JSON.parse(localStorage.getItem('zanzibar-done')||'{}');
+let quizScores = JSON.parse(localStorage.getItem('zanzibar-quiz')||'[]');
+
+function updateProgress(){
+  const total = MODULES.length;
+  const finished = MODULES.filter(m=>done[m.id]).length;
+  const pct = Math.round((finished/total)*100);
+  $('#progressFill').style.width = pct + '%';
+}
+function markDone(id){
+  done[id] = true;
+  localStorage.setItem('zanzibar-done', JSON.stringify(done));
+  renderModuleNav();
+  updateProgress();
+}
+function unmarkDone(id){
+  delete done[id];
+  localStorage.setItem('zanzibar-done', JSON.stringify(done));
+  renderModuleNav();
+  updateProgress();
+}
+
+/* ============================================================
+   MÓDULOS (Aprende)
+============================================================ */
+let currentModule = 0;
+
+function renderModuleNav(){
+  const nav = $('#moduleNav');
+  nav.innerHTML = '';
+  MODULES.forEach((m,i)=>{
+    const b = document.createElement('button');
+    b.className = 'module-link' + (i===currentModule?' active':'');
+    b.innerHTML = `<span class="idx">${String(i).padStart(2,'0')}</span><span>${m.title}</span>${done[m.id]?'<span class="check">✓</span>':''}`;
+    b.onclick = ()=>{ currentModule=i; renderModuleNav(); renderModule(); };
+    nav.appendChild(b);
+  });
+}
+
+function renderModule(){
+  const m = MODULES[currentModule];
+  const c = $('#moduleContent');
+  c.innerHTML = `
+    <span class="kicker" style="color:var(--${m.accent});">${m.tag}</span>
+    <h2>${m.title}</h2>
+    <p class="lede">${m.summary}</p>
+    <div class="done-banner" id="doneBanner" style="${done[m.id]?'display:flex;':''}">✓ Módulo completado</div>
+    ${m.html}
+    <div class="card accent-${m.accent}" style="margin-top:26px;">
+      <div class="kicker" style="color:var(--${m.accent});">Mini-check rápido</div>
+      <p style="font-weight:600; color:var(--text); margin:8px 0;">${m.mini.q}</p>
+      <div id="miniOpts"></div>
+      <div class="explain" id="miniExplain"></div>
+    </div>
+    <div class="module-pager">
+      <button class="btn ghost" id="prevBtn" ${currentModule===0?'disabled style="opacity:.4;cursor:default;"':''}>← Anterior</button>
+      <button class="btn ${done[m.id]?'ghost':'teal'}" id="doneBtn">${done[m.id]?'↩ Desmarcar':'✓ Marcar como completado'}</button>
+      <button class="btn" id="nextBtn" ${currentModule===MODULES.length-1?'disabled style="opacity:.4;cursor:default;"':''}>Siguiente →</button>
+    </div>`;
+
+  // mini check options
+  const mo = $('#miniOpts');
+  m.mini.opts.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = ()=>{
+      [...mo.children].forEach(x=>x.disabled=true);
+      const ex = $('#miniExplain');
+      if(i===m.mini.a){
+        b.classList.add('correct');
+        ex.innerHTML = `<span class="why">✓ Correcto.</span> ${m.mini.why}`;
+      } else {
+        b.classList.add('wrong');
+        mo.children[m.mini.a].classList.add('correct');
+        ex.innerHTML = `<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> ${m.mini.why}`;
+      }
+      ex.classList.add('show');
+    };
+    mo.appendChild(b);
+  });
+
+  $('#prevBtn').onclick = ()=>{ if(currentModule>0){ currentModule--; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  $('#nextBtn').onclick = ()=>{ if(currentModule<MODULES.length-1){ currentModule++; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  $('#doneBtn').onclick = ()=>{ if(done[m.id]){ unmarkDone(m.id); } else { markDone(m.id); } renderModule(); };
+}
+
+/* ============================================================
+   QUIZ
+============================================================ */
+const quiz = {
+  rendered:false, answers:{},
+  render(){
+    this.rendered = true;
+    const c = $('#quizContainer');
+    c.innerHTML = '';
+    QUIZ.forEach((q,qi)=>{
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.id = 'q'+qi;
+      card.innerHTML = `
+        <div class="qmeta">
+          <span class="qtag" style="background:var(--${q.c}-soft); color:var(--${q.c});">${q.tag}</span>
+          <span style="color:var(--dim); font-size:13px;">Pregunta ${qi+1} de ${QUIZ.length}</span>
+        </div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts"></div>
+        <div class="explain"></div>`;
+      const optsBox = card.querySelector('.opts');
+      q.opts.forEach((opt,oi)=>{
+        const b = document.createElement('button');
+        b.className = 'opt';
+        b.innerHTML = opt;
+        b.onclick = ()=> this.answer(qi, oi);
+        optsBox.appendChild(b);
+      });
+      c.appendChild(card);
+    });
+    this.refreshChip();
+  },
+  answer(qi, oi){
+    if(this.answers[qi]!==undefined) return; // ya respondida
+    this.answers[qi] = oi;
+    const q = QUIZ[qi];
+    const card = $('#q'+qi);
+    const opts = card.querySelectorAll('.opt');
+    opts.forEach((b,i)=>{
+      b.disabled = true;
+      if(i===q.a) b.classList.add('correct');
+      if(i===oi && oi!==q.a) b.classList.add('wrong');
+    });
+    const ex = card.querySelector('.explain');
+    ex.innerHTML = `<span class="why">${oi===q.a?'✓ Correcto':'✗ Incorrecto'}.</span> ${q.why}`;
+    ex.classList.add('show');
+    this.refreshChip();
+    // scroll to result when all answered
+    if(Object.keys(this.answers).length === QUIZ.length){ this.finish(); }
+  },
+  refreshChip(){
+    const n = Object.keys(this.answers).length;
+    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length;
+    $('#scoreChip').textContent = `${correct} / ${n} correctas (${QUIZ.length} totales)`;
+  },
+  finish(){
+    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length;
+    const pct = Math.round(correct/QUIZ.length*100);
+    const r = $('#quizResult');
+    r.classList.add('show');
+    $('#quizPercent').textContent = pct + '%';
+    $('#gradeFill').style.width = pct + '%';
+    let msg;
+    if(pct===100) msg = '🏆 ¡Perfecto! Dominas el paper de Zanzibar.';
+    else if(pct>=80) msg = '🎉 ¡Muy bien! Solo repasa los puntos fallados.';
+    else if(pct>=60) msg = '👍 Vas bien. Relee los módulos de las preguntas que fallaste.';
+    else msg = '📚 Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
+    $('#quizMsg').textContent = msg;
+    r.scrollIntoView({behavior:'smooth'});
+    quizScores.push(pct);
+    localStorage.setItem('zanzibar-quiz', JSON.stringify(quizScores));
+  },
+  reset(){
+    this.answers = {};
+    this.rendered = false;
+    $('#quizResult').classList.remove('show');
+    $('#scoreChip').textContent = '0 / 0 correctas';
+    this.render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+};
+
+/* ============================================================
+   CASOS
+============================================================ */
+function renderCases(){
+  const c = $('#casesContainer');
+  c.innerHTML = '';
+  CASES.forEach((cs,i)=>{
+    const card = document.createElement('div');
+    card.className = 'case-card';
+    card.innerHTML = `
+      <div class="qmeta">
+        <span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso ${i+1}</span>
+      </div>
+      <h3 style="margin-top:4px;">${cs.title}</h3>
+      <div class="case-step">${cs.prompt}</div>
+      <button class="btn teal small reveal-btn">💡 Ver solución</button>
+      <div class="explain" style="margin-top:12px;"></div>`;
+    const ex = card.querySelector('.explain');
+    const btn = card.querySelector('.reveal-btn');
+    btn.onclick = ()=>{
+      ex.innerHTML = `<span class="why">Solución:</span> ${cs.solution}`;
+      ex.classList.add('show');
+      btn.style.display = 'none';
+    };
+    c.appendChild(card);
+  });
+}
+
+/* ============================================================
+   GLOSARIO
+============================================================ */
+function renderGlossary(filter=''){
+  const list = $('#glossaryList');
+  list.innerHTML = '';
+  const f = filter.toLowerCase();
+  GLOSSARY.filter(([t,d])=> t.toLowerCase().includes(f) || d.toLowerCase().includes(f))
+    .forEach(([t,d])=>{
+      const div = document.createElement('div');
+      div.className = 'gloss-term';
+      div.innerHTML = `<h3><code>${t}</code></h3><div class="def">${d}</div>`;
+      list.appendChild(div);
+    });
+  if(list.children.length===0){
+    list.innerHTML = '<p>Sin resultados para ese término.</p>';
+  }
+}
+$('#glossarySearch').addEventListener('input', e=>renderGlossary(e.target.value));
+
+/* ============================================================
+   CHEATSHEET
+============================================================ */
+$('#cheatsheetContent').innerHTML = CHEATSHEET;
+
+/* ============================================================
+   ANIMACIONES (SVG interactivas)
+============================================================ */
+let animsRendered = false;
+
+function initAnims(){
+  if(animsRendered) return;
+  animsRendered = true;
+  animGraph.init();
+  animCheck.init();
+  animEnemy.init();
+  animZookie.init();
+  animArch.init();
+}
+
+/* ---- utilidades SVG ---- */
+function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+const NODE={w:130,h:44,rx:10};
+const cBlue='#5b8cff', cTeal='#2dd4bf', cOrange='#ff9e5e', cPurple='#c084fc', cGold='#fbbf24', cDim='#4a5870', cBg='#1d283c';
+function nodeBox(x,y,label,fill,stroke,txtfill){
+  const g = el('g',{});
+  const r = el('rect',{x:x-NODE.w/2,y:y-NODE.h/2,width:NODE.w,height:NODE.h,rx:NODE.rx,fill:fill,'fill-opacity':0.16,stroke:stroke,'stroke-width':1.2});
+  const tAttrs = {x:x,y:y+4,'text-anchor':'middle',class:'tnode'};
+  if(txtfill) tAttrs.fill = txtfill;
+  const t = el('text',tAttrs);
+  t.textContent = label;
+  g.append(r,t);
+  return g;
+}
+function arrow(g,x1,y1,x2,y2,color,label){
+  const path = el('path',{d:`M ${x1} ${y1} C ${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}`,fill:'none',stroke:color,'stroke-width':1.6});
+  const mark = el('path',{d:'M -2 -4 L 8 0 L -2 4',fill:'none',stroke:color,'stroke-width':1.6,transform:`translate(${x2},${y2}) rotate(${Math.atan2(y2-y1,x2-x1)*180/Math.PI})`});
+  g.append(path,mark);
+  if(label){ const l=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle',class:'tedge'}); l.textContent=label; g.append(l); }
+}
+function flash(node){ node.setAttribute('filter','url(#glow)'); setTimeout(()=>node.removeAttribute('filter'),600); }
+function svgDefs(svg){
+  const defs = el('defs',{});
+  defs.innerHTML = `<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  svg.appendChild(defs);
+}
+
+/* ---- 1. Grafo de tuplas ---- */
+const animGraph = {
+  tuples:[],
+  init(){
+    this.svg = $('#svgGraph');
+    svgDefs(this.svg);
+    this.draw();
+  },
+  add(rel,user){
+    this.tuples.push({rel,user});
+    this.draw();
+  },
+  reset(){ this.tuples=[]; this.draw(); $('#graphCaption').textContent='Las tuplas forman un grafo dirigido. Pulsa los botones.'; },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const nodes={
+      doc:{x:360,y:60,label:'doc:readme',c:cBlue},
+      group:{x:120,y:250,label:'group:eng',c:cPurple},
+      folder:{x:360,y:250,label:'folder:A',c:cGold},
+      u10:{x:560,y:250,label:'usuario 10',c:cDim},
+      u11:{x:600,y:120,label:'usuario 11',c:cDim}
+    };
+    for(const k in nodes){ const n=nodes[k]; s.appendChild(nodeBox(n.x,n.y,n.label,n.c,n.c)); }
+    const edgeMap = {
+      'owner@10': ['doc','u10'],
+      'member@11': ['group','u11'],
+      'viewer@group:eng#member': ['doc','group'],
+      'parent@folder:A': ['doc','folder']
+    };
+    const drawn=new Set();
+    this.tuples.forEach(t=>{
+      const key=t.rel+'@'+t.user;
+      const [a,b]=edgeMap[key]||[];
+      if(!a) return;
+      drawn.add(key);
+      const n1=nodes[a], n2=nodes[b];
+      const dy = Math.sign(n2.y-n1.y);
+      const y1 = n1.y + dy*NODE.h/2, y2 = n2.y - dy*NODE.h/2;
+      arrow(s, n1.x, y1, n2.x, y2, cBlue, '#'+t.rel+'@'+t.user);
+    });
+    if(this.tuples.length===0){
+      $('#graphCaption').textContent='Grafo vacío. Añade tuplas con los botones.';
+    } else {
+      $('#graphCaption').textContent=`${this.tuples.length} tupla(s) añadida(s): `+this.tuples.map(t=>`${t.rel}@${t.user}`).join(', ');
+    }
+  },
+  check(){
+    const hasMember = this.tuples.some(t=>t.rel==='member'&&t.user==='11');
+    const hasViewerGroup = this.tuples.some(t=>t.rel==='viewer'&&t.user==='group:eng#member');
+    $('#graphCaption').textContent = hasMember && hasViewerGroup
+      ? '✓ Check TRUE: 11 es miembro de eng, y eng#member es viewer de doc → 11 es viewer.'
+      : '✗ Check FALSE: falta group:eng#member@11 y/o doc#viewer@group:eng#member. Añade ambas.';
+    if(hasMember && hasViewerGroup){
+      // highlight the path group -> user and doc -> group
+      this.highlightPath();
+    }
+  },
+  highlightPath(){
+    // simple visual pulse on relevant arrows
+    const s=this.svg;
+    const paths=s.querySelectorAll('path');
+    paths.forEach(p=>{ p.setAttribute('stroke-width','3'); setTimeout(()=>p.setAttribute('stroke-width','1.6'),800); });
+  }
+};
+
+/* ---- 2. Árbol de evaluación de un Check ---- */
+const animCheck = {
+  step:0, timer:null,
+  steps:[
+    {c:'El objetivo: ¿es el usuario 42 <b>viewer</b> de <b>doc:contrato</b>?', hl:['root']},
+    {c:'Rama 1 · <b>_this</b>: ¿existe doc:contrato#viewer@42 directo? → <b>NO</b> (falso).', hl:['this'], res:false},
+    {c:'Rama 2 · <b>computed_userset(editor)</b>: ¿es 42 editor? No hay tupla → <b>NO</b>.', hl:['comp'], res:false},
+    {c:'Rama 3 · <b>tuple_to_userset(parent)</b>: salta a <b>folder:legal</b>.', hl:['ttu'], res:null},
+    {c:'Fan-out: ¿es 42 <b>viewer</b> de folder:legal? → viewer@group:abogados#member (es un userset).', hl:['folder'], res:null},
+    {c:'Fan-out: ¿es 42 <b>member</b> de group:abogados? → group:abogados#member@42 <b>EXISTE → TRUE</b>.', hl:['group'], res:true},
+    {c:'TRUE se propaga hacia arriba por la unión. <b>Resultado final: TRUE</b> (42 puede ver doc:contrato).', hl:['root'], res:true}
+  ],
+  init(){
+    this.svg = $('#svgCheck');
+    svgDefs(this.svg);
+    this.draw();
+  },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const union={x:360,y:40,label:'viewer (union)',c:cPurple};
+    s.appendChild(nodeBox(union.x,union.y,union.label,union.c,union.c));
+    const kids=[
+      {x:120,y:150,label:'_this',c:cBlue,id:'this'},
+      {x:360,y:150,label:'computed · editor',c:cBlue,id:'comp'},
+      {x:600,y:150,label:'tuple_to · parent',c:cOrange,id:'ttu'}
+    ];
+    kids.forEach(k=>{ s.appendChild(nodeBox(k.x,k.y,k.label,k.c,k.c)); });
+    // lower nodes
+    s.appendChild(nodeBox(600,260,'folder:legal',cGold,cGold));
+    s.appendChild(nodeBox(600,330,'group:abogados',cTeal,cTeal));
+    // edges
+    arrow(s,union.x,union.y+NODE.h/2,kids[0].x,kids[0].y-NODE.h/2,cDim,'');
+    arrow(s,union.x,union.y+NODE.h/2,kids[1].x,kids[1].y-NODE.h/2,cDim,'');
+    arrow(s,union.x,union.y+NODE.h/2,kids[2].x,kids[2].y-NODE.h/2,cDim,'');
+    arrow(s,600,kids[2].y+NODE.h/2,600,260-NODE.h/2,cDim,'parent →');
+    arrow(s,600,260+NODE.h/2,600,330-NODE.h/2,cDim,'viewer →');
+  },
+  step(){
+    if(this.step>=this.steps.length){ return; }
+    const st=this.steps[this.step];
+    $('#checkCaption').innerHTML = st.c;
+    const s=this.svg;
+    const gs=s.querySelectorAll('g');
+    gs.forEach(g=>g.removeAttribute('filter'));
+    // order of g elements: 0 union, 1 _this, 2 computed, 3 tuple_to, 4 folder, 5 group
+    const idx={root:0,this:1,comp:2,ttu:3,folder:4,group:5};
+    st.hl.forEach(h=>{ const g=gs[idx[h]]; if(g) g.setAttribute('filter','url(#glow)'); });
+    this.step++;
+  },
+  play(){
+    this.reset();
+    this.timer = setInterval(()=>{ if(this.step>=this.steps.length){ clearInterval(this.timer); } else { this.step(); } }, 1100);
+  },
+  reset(){
+    if(this.timer) clearInterval(this.timer);
+    this.step=0;
+    $('#checkCaption').textContent='Pulsa "Siguiente paso" para evaluar cada rama.';
+    const gs=this.svg.querySelectorAll('g'); gs.forEach(g=>g.removeAttribute('filter'));
+  }
+};
+
+/* ---- 3. New enemy problem ---- */
+const animEnemy = {
+  timer:null,
+  init(){
+    this.svg=$('#svgEnemy'); svgDefs(this.svg); this.draw();
+  },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const line=el('line',{x1:40,y1:140,x2:690,y2:140,stroke:cDim,'stroke-width':1.4});
+    const arrowTip=el('path',{d:'M -2 -4 L 8 0 L -2 4',fill:'none',stroke:cDim,'stroke-width':1.4,transform:'translate(690,140)'});
+    s.append(line,arrowTip);
+    const tl=el('text',{x:680,y:160,'text-anchor':'end',class:'tedge'}); tl.textContent='tiempo'; s.append(tl);
+    // A1
+    s.appendChild(nodeBox(150,110,'A1 · Alice quita a Bob',cOrange,cOrange));
+    const d1=el('circle',{cx:150,cy:140,r:6,fill:cOrange}); s.append(d1);
+    const t1=el('text',{x:150,y:180,'text-anchor':'middle',class:'tedge'}); t1.textContent='T(A1) = 10:00:00.100'; s.append(t1);
+    // A2
+    s.appendChild(nodeBox(470,110,'A2 · Charlie edita doc',cBlue,cBlue));
+    const d2=el('circle',{cx:470,cy:140,r:6,fill:cBlue}); s.append(d2);
+    const t2=el('text',{x:470,y:180,'text-anchor':'middle',class:'tedge'}); t2.textContent='T(A2) = 10:00:02.500'; s.append(t2);
+    // check window
+    const win=el('rect',{x:470,y:210,width:190,height:52,rx:10,fill:cTeal,'fill-opacity':0.14,stroke:cTeal,'stroke-width':1.2});
+    const wl=el('text',{x:565,y:232,'text-anchor':'middle',class:'tnode',fill:cTeal}); wl.textContent='Check con T ≥ T(A2)';
+    const wl2=el('text',{x:565,y:250,'text-anchor':'middle',class:'tedge'}); wl2.textContent='observa A1 también ✓';
+    s.append(win,wl,wl2);
+    this.refs={win,wl,wl2};
+  },
+  play(){
+    this.reset();
+    const cap=$('#enemyCaption');
+    const seq=[
+      {t:0, fn:()=>{cap.innerHTML='<b>Paso 1:</b> Alice quita a Bob del documento (A1).';}},
+      {t:1400, fn:()=>{cap.innerHTML='<b>Paso 2:</b> Charlie, que sí tiene acceso, edita y guarda (A2). El cliente recibe un zookie con T(A2).';}},
+      {t:2900, fn:()=>{cap.innerHTML='<b>Paso 3:</b> Bob intenta ver el documento. Su Check lleva el zookie, así que evalúa en T ≥ T(A2).';}},
+      {t:4400, fn:()=>{cap.innerHTML='<b>Resultado:</b> como T ≥ T(A2) &gt; T(A1), la remoción de Bob ya es visible → <span style="color:var(--bad);">denegado ✓</span>.'; this.refs.win.setAttribute('filter','url(#glow)');}},
+      {t:5900, fn:()=>{cap.innerHTML='<b>Sin zookie:</b> si el Check leyera datos viejos (antes de A1), Bob vería el contenido nuevo de Charlie → <span style="color:var(--bad);">new enemy problem</span>.';}}
+    ];
+    seq.forEach(st=>{ this.timer=setTimeout(st.fn, st.t); });
+  },
+  reset(){
+    if(this.timer) clearTimeout(this.timer);
+    $('#enemyCaption').textContent='Alice quita a Bob; Charlie (aún miembro) mueve el documento.';
+    if(this.refs) this.refs.win.removeAttribute('filter');
+  }
+};
+
+/* ---- 4. Zookie ---- */
+const animZookie = {
+  timer:null,
+  init(){
+    this.svg=$('#svgZookie'); svgDefs(this.svg); this.draw();
+  },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const client={x:110,y:50,label:'cliente (Drive)',c:cBlue};
+    const zan={x:360,y:50,label:'Zanzibar',c:cTeal};
+    const store={x:610,y:50,label:'almacén del cliente',c:cGold};
+    s.appendChild(nodeBox(client.x,client.y,client.label,client.c,client.c));
+    s.appendChild(nodeBox(zan.x,zan.y,zan.label,zan.c,zan.c));
+    s.appendChild(nodeBox(store.x,store.y,store.label,store.c,store.c));
+    // doc_v2 box
+    s.appendChild(nodeBox(610,240,'doc_v2 + zookie Z',cGold,cGold));
+    // the moving zookie token
+    const zk=el('circle',{cx:110,cy:130,r:14,fill:cOrange,stroke:cTeal,'stroke-width':2});
+    const zt=el('text',{x:110,y:135,'text-anchor':'middle',class:'tnode',fill:'#fff','font-size':'11'}); zt.textContent='Z';
+    s.append(zk,zt);
+    this.refs={zk,zt};
+    this.cx={client,zan,store};
+  },
+  moveZk(x,y,label,color){
+    const {zk,zt}=this.refs;
+    zk.setAttribute('cx',x); zk.setAttribute('cy',y); zt.setAttribute('x',x); zt.setAttribute('y',y+4);
+    $('#zookieCaption').innerHTML=label;
+  },
+  play(){
+    this.reset();
+    const c=$('#zookieCaption');
+    const steps=[
+      {t:0, x:110,y:130, m:'<b>1.</b> El cliente pide un content-change check a Zanzibar.'},
+      {t:1200, x:360,y:130, m:'<b>2.</b> Zanzibar evalúa y genera un zookie Z (codifica T = 15042).'},
+      {t:2600, x:610,y:130, m:'<b>3.</b> El cliente guarda el contenido + zookie de forma atómica.'},
+      {t:4000, x:610,y:240, m:'<b>4.</b> El zookie queda asociado a doc_v2 en su almacén.'},
+      {t:5200, x:360,y:240, m:'<b>5.</b> Más tarde, un Check(U, doc#viewer, zookie=Z) reenvía el zookie.'},
+      {t:6600, x:610,y:240, m:'<b>6.</b> Zanzibar evalúa en T ≥ 15042 → ve todos los cambios ≤ 15042 → responde sí/no.'}
+    ];
+    steps.forEach(st=>{ this.timer=setTimeout(()=>this.moveZk(st.x,st.y,st.m), st.t); });
+  },
+  reset(){
+    if(this.timer) clearTimeout(this.timer);
+    this.moveZk(110,130,'Pulsa reproducir.');
+  }
+};
+
+/* ---- 5. Arquitectura ---- */
+const animArch = {
+  timer:null,
+  init(){
+    this.svg=$('#svgArch'); svgDefs(this.svg); this.draw();
+  },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    // cluster zanzibar
+    const cluster=el('rect',{x:60,y:90,width:600,height:110,rx:16,fill:'none',stroke:cTeal,'stroke-width':1.2,'stroke-dasharray':'5 4'});
+    const cl=el('text',{x:80,y:112,class:'tnode',fill:cTeal}); cl.textContent='Zanzibar serving cluster';
+    s.append(cluster,cl);
+    const a1=nodeBox(140,150,'aclserver',cBlue,cBlue); const a2=nodeBox(360,150,'aclserver',cBlue,cBlue); const a3=nodeBox(580,150,'aclserver',cBlue,cBlue);
+    s.appendChild(a1); s.appendChild(a2); s.appendChild(a3);
+    arrow(s,140,150+22,360,150+22,cBlue,'fan-out');
+    s.appendChild(nodeBox(360,40,'cliente (Drive)',cGold,cGold));
+    arrow(s,360,40+22,360,150-22,cGold,'Check(U, doc#viewer)');
+    // spanner box
+    s.appendChild(nodeBox(360,280,'Spanner (configs + tuplas + changelog)',cOrange,cOrange));
+    arrow(s,360,150+22,360,280-22,cTeal,'read / write');
+    this.refs={a1,a2,a3};
+  },
+  play(){
+    this.reset();
+    const c=$('#archCaption');
+    const seq=[
+      {t:0, m:'<b>1.</b> El cliente envía Check a un aclserver (hashing consistente lo enruta al mismo servidor del objeto).'},
+      {t:1300, m:'<b>2.</b> El aclserver evalúa: primero mira su caché. Si no está, hace fan-out a otros aclservers para sub-checks (paralelo).'},
+      {t:2800, m:'<b>3.</b> Los aclservers leen/escriben en Spanner (snapshot read a un timestamp, con TrueTime).'},
+      {t:4300, m:'<b>4.</b> Las ramas se resuelven; si una decide la unión, se cancelan las demás.'},
+      {t:5600, m:'<b>5.</b> El resultado se propaga y se devuelve al cliente (sí/no). ✓'}
+    ];
+    seq.forEach(st=>{ this.timer=setTimeout(()=>{ c.innerHTML=st.m; }, st.t); });
+  },
+  reset(){
+    if(this.timer) clearTimeout(this.timer);
+    $('#archCaption').textContent='Pulsa "Animar flujo".';
+  }
+};
+
+/* ============================================================
+   INICIALIZACIÓN
+============================================================ */
+renderModuleNav();
+renderModule();
+renderCases();
+renderGlossary();
+updateProgress();
+</script>
+</body>
+</html>

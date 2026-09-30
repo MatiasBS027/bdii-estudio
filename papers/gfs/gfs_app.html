@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFS · Aprende & Practica — The Google File System</title>
+<style>
+/* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
+   Tesis: apuntes de curso compuestos como página editorial — titulares serif,
+   datelines mono, reglas finas en vez de tarjetas, examen numerado, un solo
+   azul tinta reservado a la acción. Ejes: density media · warmth cálida ·
+   formality media-baja · energy quieta · ornament estructural · contrast alto.
+   Offline: Georgia + sans/mono nativos (sin fuentes bloqueantes). Clases e ids
+   intactos: el JS no cambia salvo iconos de módulo y flechas en tabs. */
+:root{
+  --bg:#131110; --bg2:#171514; --surface:#1b1917; --surface2:#221f1c; --surface3:#2a2622;
+  --border:#322d27; --border-soft:#25211d;
+  --text:#ece7dc; --muted:#a8a196; --dim:#6f6a61;
+  --blue:#8ba3c7; --blue-soft:rgba(139,163,199,.12);
+  --teal:#6fae9d; --teal-soft:rgba(111,174,157,.11);
+  --orange:#c08d5c; --orange-soft:rgba(192,141,92,.11);
+  --purple:#9d8ab8; --purple-soft:rgba(157,138,184,.11);
+  --gold:#c2a05e; --gold-soft:rgba(194,160,94,.11);
+  --pink:#b08396; --pink-soft:rgba(176,131,150,.11);
+  --good:#74b18f; --bad:#c07f8c;
+  --brand1:#8ba3c7; --brand2:#8ba3c7;
+  --display:Georgia,'Palatino Linotype','Book Antiqua',Palatino,serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --shadow:none;
+  --shadow-sm:none;
+  --radius:8px; --radius-sm:6px; --radius-xs:4px;
+  --ring:0 0 0 2px rgba(139,163,199,.45);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; color:var(--text);
+  font-family:var(--sans); line-height:1.7; font-size:16px;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+body.light{
+  --bg:#f4f1e9; --bg2:#ece6d5; --surface:#fbf9f2; --surface2:#f0e9d6; --surface3:#e3d8bf;
+  --border:#d2c7a9; --border-soft:#e0d6bc;
+  --text:#26241f; --muted:#5e594e; --dim:#948d7d;
+  --blue:#3c5a86; --blue-soft:rgba(60,90,134,.09);
+  --teal:#337065; --teal-soft:rgba(51,112,101,.09);
+  --orange:#8f5f2b; --orange-soft:rgba(143,95,43,.09);
+  --purple:#635183; --purple-soft:rgba(99,81,131,.09);
+  --gold:#7d6a2e; --gold-soft:rgba(125,106,46,.10);
+  --pink:#8f4f68; --pink-soft:rgba(143,79,104,.09);
+  --good:#3c7a5d; --bad:#9c4a59;
+  --shadow:0 1px 2px rgba(60,50,25,.08);
+  --shadow-sm:0 1px 2px rgba(60,50,25,.06);
+  background:var(--bg);
+}
+::selection{background:var(--border); color:var(--text);}
+a{color:var(--blue); text-decoration:none; border-radius:3px;}
+a:hover{text-decoration:underline;}
+a:focus-visible, button:focus-visible, input:focus-visible{outline:none; box-shadow:var(--ring);}
+::-webkit-scrollbar{width:11px; height:11px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:8px; border:3px solid var(--bg);}
+::-webkit-scrollbar-track{background:transparent;}
+.skip-link{position:absolute; left:12px; top:-48px; z-index:100; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px 14px; font-size:14px; font-weight:600; transition:top .15s ease; text-decoration:none;}
+.skip-link:focus{top:12px;}
+
+/* ============ HEADER / NAV ============ */
+header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border-soft);}
+.topbar{max-width:1200px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:11px; font-weight:650; letter-spacing:-.01em; font-size:16px;}
+.brand .logo{width:34px; height:34px; border-radius:6px; flex:0 0 auto; background:var(--surface3); border:1px solid var(--border); display:grid; place-items:center; font-weight:700; font-family:var(--display); font-size:17px; color:var(--text);}
+.brand small{display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em;}
+.tabs{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border-soft); border-radius:8px; padding:3px;}
+.tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; padding:7px 13px; border-radius:6px; cursor:pointer;}
+.tab:hover{color:var(--text); background:var(--surface2);}
+.tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
+.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
+.theme-btn:hover{border-color:var(--dim);}
+.hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
+.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}
+.progress-track{height:3px; background:var(--border-soft);}
+.progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+
+/* ============ LAYOUT / TYPE — escala 12 / 14 / 16 / 18 / 24 / 40 ============ */
+main{max-width:1200px; margin:0 auto; padding:32px 20px 110px;}
+.view{display:none;}
+.view.active{display:block; animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;}to{opacity:1;}}
+@keyframes pop{from{opacity:0;}to{opacity:1;}}
+@keyframes animPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+h1.title{font-family:var(--display); font-weight:700; font-size:clamp(2rem,4.4vw,2.75rem); margin:12px 0 12px; letter-spacing:0; line-height:1.12; text-wrap:balance;}
+h1.title em{font-style:italic;}
+h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0 0 12px; letter-spacing:0; line-height:1.25; text-wrap:balance;}
+h3{font-family:var(--display); font-weight:700; font-size:1.15rem; margin:30px 0 10px; line-height:1.3;}
+p{max-width:68ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
+p strong, li strong, td strong{color:var(--text);}
+ul, ol{color:var(--muted);}
+.lede{font-size:1.125rem; color:var(--muted); max-width:64ch; line-height:1.65;}
+.dateline{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--dim); margin:0 0 4px;}
+.dateline::before{content:""; width:26px; height:1px; background:var(--dim);}
+.dateline cite{font-style:normal; color:var(--muted);}
+.kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-weight:700;}
+.kicker::before{content:""; width:18px; height:1px; background:var(--dim);}
+
+.card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
+.card.accent-blue, .card.accent-teal, .card.accent-orange, .card.accent-purple, .card.accent-gold, .card.accent-pink{border-left:1px solid var(--border-soft);}
+.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:72ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
+.callout::before{display:grid; place-items:center; width:24px; height:24px; border-radius:6px; position:absolute; left:12px; top:13px; font-size:13px; font-weight:700; background:var(--surface3); border:1px solid var(--border);}
+.callout .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; font-weight:700; color:var(--dim);}
+.callout.info{border-left-color:var(--blue);} .callout.info .lbl{color:var(--blue);} .callout.info::before{content:"i"; color:var(--blue); font-family:var(--sans); font-style:normal;}
+.callout.tip{border-left-color:var(--teal);} .callout.tip .lbl{color:var(--teal);} .callout.tip::before{content:"✓"; color:var(--teal);}
+.callout.warn{border-left-color:var(--orange);} .callout.warn .lbl{color:var(--orange);} .callout.warn::before{content:"!"; color:var(--orange);}
+.callout.err{border-left-color:var(--bad);} .callout.err .lbl{color:var(--bad);} .callout.err::before{content:"×"; color:var(--bad);}
+.callout.dark{background:var(--surface2);}
+.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:72ch; color:var(--muted);}
+.trade b{color:var(--text);}
+.trade b:first-child{color:var(--text);}
+
+code{font-family:var(--mono); font-size:.85em; background:var(--surface2); border:1px solid var(--border-soft); padding:1px 5px; border-radius:4px; color:var(--text);}
+pre{background:#100f0e; color:#d8d5cf; padding:16px 18px; border-radius:4px; overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.7; max-width:100%; border:1px solid var(--border-soft);}
+body.light pre{background:#26241f; color:#e2ded6;}
+pre code{background:none; border:0; padding:0; color:inherit; font-size:inherit;}
+.kw{color:#c8b88a;} .str{color:#93b898;} .cmt{color:#6e6e76;} .fn{color:#9db4d0;} .op{color:#b39ec4;}
+
+table{border-collapse:separate; border-spacing:0; width:100%; margin:14px 0; font-size:13.5px; border:1px solid var(--border-soft); border-radius:4px; overflow:hidden;}
+th,td{padding:9px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--border-soft);}
+th{background:var(--surface2); font-weight:650; color:var(--text); font-size:12.5px; position:sticky; top:0;}
+tr:last-child th, tr:last-child td{border-bottom:0;}
+tbody tr:hover td{background:var(--surface2);}
+tr:nth-child(even) td{background:color-mix(in srgb, var(--surface2) 50%, transparent);}
+table, .score-chip, .step-counter{font-variant-numeric:tabular-nums;}
+
+.pill{display:inline-block; padding:2px 10px; border-radius:999px; font-size:11.5px; font-weight:650; font-family:var(--mono); border:1px solid var(--border);}
+.pill.blue{background:var(--blue-soft); color:var(--blue); border-color:transparent;}
+.pill.teal{background:var(--teal-soft); color:var(--teal); border-color:transparent;}
+.pill.orange{background:var(--orange-soft); color:var(--orange); border-color:transparent;}
+.pill.purple{background:var(--purple-soft); color:var(--purple); border-color:transparent;}
+.pill.gold{background:var(--gold-soft); color:var(--gold); border-color:transparent;}
+
+.btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); cursor:pointer; background:var(--surface3); color:var(--text); font-weight:600; font-size:14px; font-family:var(--sans); padding:9px 17px; border-radius:var(--radius-sm);}
+.btn:hover{border-color:var(--dim); filter:brightness(1.1);}
+.btn:active{transform:none;}
+.btn:disabled{opacity:.45; cursor:default;}
+.btn.ghost{background:var(--surface2); color:var(--text); border-color:var(--border-soft);}
+.btn.ghost:hover{border-color:var(--dim);}
+.btn.teal{background:var(--teal); border-color:transparent; color:#10201c;}
+body.light .btn.teal{color:#fbf9f3;}
+.btn.teal:hover{filter:brightness(.94);}
+.btn.playing{background:var(--gold); border-color:transparent; color:#1a1408;}
+.btn.small{padding:6px 12px; font-size:13px;}
+.linklike{background:none; border:0; padding:9px 4px; cursor:pointer; color:var(--blue); font-family:var(--sans); font-size:14px; font-weight:600; text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px;}
+.linklike:hover{filter:brightness(1.15);}
+.controls .btn.seg-on{border-color:var(--teal); color:var(--teal);}
+
+/* ============ HERO (editorial: dateline, titular, una acción) ============ */
+.hero{display:grid; grid-template-columns:1.5fr 1fr; gap:32px; align-items:start; padding:20px 0 8px; border-bottom:1px solid var(--border-soft); padding-bottom:28px;}
+.hero-cards{display:grid; gap:12px;}
+.hero-cta{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:20px;}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:24px 0;}
+.stat{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 14px 14px; text-align:left;}
+.stat .n{font-family:var(--display); font-size:1.7rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1.1;}
+.stat .l{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5;}
+.path{list-style:none; margin:18px 0; padding:0; border-top:1px solid var(--border-soft);}
+.path li{border-bottom:1px solid var(--border-soft);}
+.path-step{display:flex; gap:18px; align-items:baseline; width:100%; text-align:left; background:none; border:0; padding:16px 4px; cursor:pointer; color:var(--text); font-family:var(--sans);}
+.path-step:hover .path-t{color:var(--blue);}
+.path-n{font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--dim); min-width:44px;}
+.path-step:hover .path-n{color:var(--blue);}
+.path-t{display:block; font-size:16px; font-weight:650; color:var(--text);}
+.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:62ch;}
+
+/* ============ APRENDE ============ */
+.aprende-layout{display:grid; grid-template-columns:250px 1fr; gap:24px; align-items:start;}
+.module-nav{position:sticky; top:78px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:6px;}
+.module-link{display:flex; align-items:center; gap:10px; text-align:left; cursor:pointer; background:transparent; border:0; border-radius:6px; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:8px 11px; border-left:2px solid transparent;}
+.module-link:hover{background:var(--surface2); color:var(--text);}
+.module-link.active{background:var(--surface2); color:var(--text); border-left-color:var(--blue);}
+.module-link .idx{font-family:var(--mono); font-size:11px; color:var(--dim);}
+.module-link.done .check{margin-left:auto; color:var(--good); font-size:13px; font-weight:700;}
+.module-content{min-width:0;}
+.module-content > h2{margin-top:4px;}
+.done-banner{display:none; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--good); border-radius:6px; padding:9px 14px; margin-bottom:14px; color:var(--text); font-weight:600; font-size:14px;}
+.module-pager{display:flex; justify-content:space-between; gap:12px; margin-top:24px; flex-wrap:wrap;}
+.legend{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;}
+
+/* ============ SVG figures ============ */
+figure{margin:20px 0;}
+figure svg{width:100%; height:auto; display:block; background:var(--surface); border:1px solid var(--border-soft); border-radius:4px;}
+figure figcaption{font-size:14px; color:var(--muted); background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:9px 13px; margin-top:8px; font-family:var(--sans);}
+figure figcaption span{color:var(--text);}
+.tnode{font:600 13px var(--sans); fill:var(--text);}
+.tedge{font:400 11px var(--mono); fill:var(--muted);}
+svg text.svgcap{font:700 14px var(--sans); fill:var(--gold);}
+svg .flow{stroke-dasharray:7 5; animation:dashmove 0.9s linear infinite;}
+@keyframes dashmove{to{stroke-dashoffset:-12;}}
+.controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:12px 0;}
+.controls label{cursor:pointer;}
+input[type="checkbox"]{accent-color:var(--blue);}
+input[type="range"]{-webkit-appearance:none; appearance:none; height:4px; border-radius:99px; background:var(--border); outline-offset:4px;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+input[type="range"]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+
+/* ============ ANIM feedback ============ */
+.anim-status{display:flex; align-items:center; gap:12px; margin:14px 0 4px; flex-wrap:wrap;}
+.status-badge{font-family:var(--mono); font-size:11.5px; font-weight:700; padding:3px 11px; border-radius:999px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;}
+.status-badge.playing{color:var(--teal); border-color:var(--teal); animation:animPulse 1.4s ease-in-out infinite;}
+.status-badge.paused{color:var(--gold); border-color:var(--gold);}
+.status-badge.done{color:var(--good); border-color:var(--good);}
+.anim-progress{flex:1; min-width:140px; height:6px; border-radius:999px; background:var(--surface2); overflow:hidden; border:1px solid var(--border-soft);}
+.anim-progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+.step-counter{font-family:var(--mono); font-size:12px; color:var(--dim); min-width:52px; text-align:right;}
+.narrator{background:var(--surface); border:1px solid var(--border-soft); border-left:3px solid var(--blue); border-radius:6px; padding:11px 15px; margin:10px 0; font-size:15px; line-height:1.65; color:var(--text); min-height:52px;}
+.narrator b{color:var(--text);}
+
+/* ============ QUIZ (examen numerado) ============ */
+.quiz-toolbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:14px 0;}
+.score-chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-weight:650; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums;}
+.question-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:16px 0; scroll-margin-top:90px;}
+.qmeta{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+.qmeta .qnum{font-family:var(--display); font-style:italic; font-size:15px; color:var(--dim);}
+.qtag{font-family:var(--mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; border:1px solid transparent;}
+.qtext{font-size:16.5px; font-weight:650; margin-bottom:12px; color:var(--text); line-height:1.6;}
+.opts{counter-reset:qa;}
+.opt{position:relative; display:block; width:100%; text-align:left; cursor:pointer; font-family:var(--sans); background:var(--surface); border:1px solid var(--border-soft); color:var(--text); border-radius:6px; padding:10px 13px 10px 50px; margin:7px 0; font-size:14px; line-height:1.55;}
+.opt::before{counter-increment:qa; content:counter(qa,upper-alpha); position:absolute; left:11px; top:50%; transform:translateY(-50%); width:26px; height:26px; display:grid; place-items:center; border-radius:6px; background:var(--surface2); border:1px solid var(--border); font-family:var(--mono); font-size:12px; font-weight:700; color:var(--dim);}
+.opt:hover{border-color:var(--dim);}
+.opt:hover::before{color:var(--text); border-color:var(--dim);}
+.opt.correct{border-color:var(--good);}
+.opt.correct::before{background:var(--good); border-color:var(--good); color:#0e1512;}
+.opt.wrong{border-color:var(--bad);}
+.opt.wrong::before{background:var(--bad); border-color:var(--bad); color:#fff;}
+.opt:disabled{cursor:default;}
+.opt:disabled:not(.correct):not(.wrong){opacity:.7;}
+.explain{display:none; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--teal); border-radius:0 6px 6px 0; padding:13px 15px; margin-top:11px; font-size:13.5px; color:var(--muted);}
+.explain.show{display:block; animation:pop .2s ease;}
+.explain .why{font-weight:700; color:var(--text);}
+.quiz-result{display:none; text-align:center; padding:30px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border-soft); margin:20px 0;}
+.quiz-result.show{display:block; animation:pop .25s ease;}
+.big-score{font-family:var(--display); font-size:3.2rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1;}
+.grade-bar{height:10px; border-radius:999px; background:var(--surface2); border:1px solid var(--border-soft); overflow:hidden; margin:14px auto; max-width:420px;}
+.grade-fill{height:100%; width:0; border-radius:999px; background:var(--blue); transition:width .6s ease;}
+.case-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:18px 0; scroll-margin-top:90px;}
+.case-card h3{margin-top:6px;}
+.case-step{background:var(--surface2); border:1px solid var(--border-soft); border-radius:6px; padding:12px 15px; margin:10px 0; font-size:14px;}
+.hint-btn{font-family:var(--mono); font-size:12.5px;}
+.reveal-btn{margin-top:6px;}
+
+/* ============ GLOSARIO ============ */
+.glossary-search{width:100%; max-width:480px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:var(--sans); font-size:14.5px; padding:11px 15px 11px 40px; border-radius:6px; margin:12px 0 8px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236f6a61' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:13px center;}
+.glossary-search:focus{border-color:var(--blue); box-shadow:var(--ring); outline:none;}
+.glossary-search::placeholder{color:var(--dim);}
+.gloss-term{background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:15px 17px; margin:10px 0; border-left:2px solid transparent;}
+.gloss-term:hover{border-left-color:var(--dim);}
+.gloss-term h3{margin:0 0 5px; font-size:15.5px;}
+.gloss-term .def{color:var(--muted); font-size:14px;}
+
+/* ============ CHEATSHEET ============ */
+#cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:0 14px; align-items:start;}
+#cheatsheetContent .card{margin:7px 0;}
+#cheatsheetContent .card:first-child{grid-column:1 / -1;}
+
+footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-soft); text-align:center; color:var(--dim); font-size:12.5px;}
+
+@media(max-width:860px){
+  body{font-size:15.5px;}
+  .hero{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .path-step{padding:14px 2px;}
+  #cheatsheetContent{grid-template-columns:1fr;}
+  .aprende-layout{grid-template-columns:1fr;}
+  .module-nav{position:static; flex-direction:row; overflow-x:auto; padding:6px; scrollbar-width:thin;}
+  .module-link{white-space:nowrap; border-left:0; border-bottom:2px solid transparent; border-radius:0;}
+  .module-link.active{border-bottom-color:var(--blue);}
+  h1.title{font-size:1.7rem;}
+  .tabs{margin-left:0;}
+  table{display:block; overflow-x:auto;}
+}
+@media print{
+  header, .tabs, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  body{background:#fff;}
+  main{max-width:100%; padding:0;}
+  .view{display:none !important;}
+  #view-cheatsheet{display:block !important;}
+  #cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  #cheatsheetContent .card{box-shadow:none; break-inside:avoid; border:1px solid #999; margin:4px 0; padding:10px 12px;}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *, *::before, *::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+  svg .flow{animation:none;}
+}
+
+</style>
+</head>
+<body><a class="skip-link" href="#main">Saltar al contenido</a>
+<header>
+  <div class="topbar">
+    <a class="hub-link" href="../../index.html">← Hub</a>
+    <div class="brand"><div class="logo">G</div><div><div>GFS Studio</div><small>GFS: The Google File System</small></div></div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
+      <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="aprende">Aprende</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="animaciones">Animaciones</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="quiz">Quiz & Casos</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
+    </nav>
+    <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+<main id="main">
+<section id="view-inicio" class="view active">
+  <div class="hero">
+    <div>
+      <p class="dateline">Apuntes de estudio · Basado en <cite>The Google File System</cite> · Ghemawat, Gobioff y Leung, SOSP 2003</p>
+      <h1 class="title">Las fallas son <em>la norma</em>, no la excepción</h1>
+      <p class="lede">Esa es la premisa de GFS: un <strong>sistema de archivos distribuido</strong> sobre hardware commodity barato que asume que <strong>siempre hay algo fallando</strong>, guarda archivos <strong>enormes</strong> que se escriben por <strong>append</strong> y se leen secuencialmente, con <strong>un solo master</strong> que nunca toca los datos.</p>
+      <p>Esta app te lleva desde cero (¿qué es un chunk?) hasta los trade-offs finos que siempre caen en el quiz — <strong>chunks de 64MB, consistencia relajada, record append at-least-once, snapshot copy-on-write</strong> — con citas del paper, explicación didáctica, animaciones y casos. Incluye el <strong>puente GFS ↔ Bigtable</strong>.</p>
+      <div class="hero-cta">
+        <button class="btn" onclick="go('aprende')">Comenzar a aprender →</button>
+        <button class="linklike" onclick="go('quiz')">Ir directo al quiz →</button>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="card accent-blue" style="margin:0;"><div class="kicker">Ancho de banda > latencia</div><p style="margin:6px 0 0; font-size:14.5px;">GFS optimiza <strong>throughput sostenido</strong>, no respuesta individual: procesar TBs en bloque a alta tasa.</p></div>
+      <div class="card accent-teal" style="margin:0;"><div class="kicker">La idea central en 1 línea</div><p style="margin:6px 0 0; font-size:14.5px;">Archivos partidos en <strong>chunks de 64MB ×3 réplicas</strong>; el master solo guarda metadata y <strong>nunca toca los datos</strong>.</p></div>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="n">64 MB</div><div class="l">tamaño de chunk (vs bloques de KB)</div></div>
+    <div class="stat"><div class="n">3×</div><div class="l">réplicas por chunk, entre racks</div></div>
+    <div class="stat"><div class="n">1000+</div><div class="l">nodos, >300 TB en el cluster mayor</div></div>
+    <div class="stat"><div class="n">23 min</div><div class="l">recuperar 600 GB de 1 chunkserver caído</div></div>
+  </div>
+  <h2>¿Cómo usar esta app?</h2>
+  <p class="lede">Tres pasos, en orden. Cada uno prepara el siguiente.</p>
+  <ol class="path">
+    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">8 módulos. Cada término complejo trae cita del paper + explicación en español + su trade-off.</span></span></button></li>
+    <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">Arquitectura, writes en 7 pasos, record append, snapshot y el puente con Bigtable.</span></span></button></li>
+    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">30 preguntas (trade-off estilo quiz + tricky + numéricas + puente) + 5 casos con solución.</span></span></button></li>
+  </ol>
+</section>
+<section id="view-aprende" class="view">
+  <span class="kicker">Ruta de aprendizaje</span>
+  <h2>📚 Aprende GFS desde cero</h2>
+  <p class="lede">Sigue los módulos en orden. Fíjate en los bloques <strong>⚖️ Trade-off</strong>: son los que más caen en el quiz.</p>
+  <div class="aprende-layout"><nav class="module-nav" id="moduleNav"></nav><div class="module-content" id="moduleContent"></div></div>
+</section>
+<section id="view-animaciones" class="view">
+  <span class="kicker">Laboratorio visual</span>
+  <h2>🎬 Animaciones interactivas</h2>
+  <p class="lede">Pulsa los botones y observa el sistema en movimiento. Cada animación muestra su estado (▶/⏸/✓), barra de progreso y narrador paso a paso.</p>
+<div class="card accent-blue"><h3>1 · Arquitectura: quién habla con quién</h3><p style="font-size:14px;">1 master (metadata) + chunkservers (datos) + clientes. Los datos nunca pasan por el master.</p><div class="controls"><button class="btn small" onclick="animGfsArch.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animGfsArch.play()">▶ Reproducir</button><button class="btn small ghost" onclick="animGfsArch.reset()">Reiniciar</button></div><figure><svg id="svgGraph" viewBox="0 0 720 340" role="img" aria-label="Arquitectura GFS"></svg><figcaption>Arquitectura · <span id="graphCaption">Pulsa "Siguiente paso".</span></figcaption></figure></div>
+<div class="card accent-purple"><h3>2 · Write en 7 pasos + pipeline</h3><p style="font-size:14px;">Lease → push → serial → réplicas → ACKs. Datos y control separados; pipeline B/T+R·L.</p><div class="controls"><button class="btn small" onclick="animGfsWrite.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animGfsWrite.play()">▶ Reproducir</button><button class="btn small ghost" onclick="animGfsWrite.reset()">Reiniciar</button></div><figure><svg id="svgCheck" viewBox="0 0 720 360" role="img" aria-label="Write en 7 pasos"></svg><figcaption>Write · <span id="checkCaption">Pulsa "Siguiente paso".</span></figcaption></figure></div>
+<div class="card accent-teal"><h3>3 · Record append at-least-once</h3><p style="font-size:14px;">El primary elige el offset; si no cabe hay pad + retry (≤16MB); la app filtra duplicados.</p><div class="controls"><button class="btn small" onclick="animGfsAppend.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animGfsAppend.play()">▶ Reproducir</button><button class="btn small ghost" onclick="animGfsAppend.reset()">Reiniciar</button></div><figure><svg id="svgEnemy" viewBox="0 0 720 300" role="img" aria-label="Record append"></svg><figcaption>Append · <span id="enemyCaption">Pulsa "Siguiente paso".</span></figcaption></figure></div>
+<div class="card accent-orange"><h3>4 · Snapshot COW + GC perezoso</h3><p style="font-size:14px;">Metadata duplicada al instante; copia física solo al primer write; borrado con red de 3 días.</p><div class="controls"><button class="btn small" onclick="animGfsSnap.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animGfsSnap.play()">▶ Reproducir</button><button class="btn small ghost" onclick="animGfsSnap.reset()">Reiniciar</button></div><figure><svg id="svgZookie" viewBox="0 0 720 340" role="img" aria-label="Snapshot y GC"></svg><figcaption>Snapshot · <span id="zookieCaption">Pulsa "Siguiente paso".</span></figcaption></figure></div>
+<div class="card accent-gold"><h3>5 · Puente: la pila Bigtable-sobre-GFS</h3><p style="font-size:14px;">Apps → Bigtable (log, memtable, SSTable) → GFS (chunks 64MB ×3) → discos. Chubby solo coordina a Bigtable.</p><div class="controls"><button class="btn small" onclick="animBridge.show('gfs')">Ver qué aporta GFS</button><button class="btn small" onclick="animBridge.show('bigtable')">Ver qué aporta Bigtable</button><button class="btn teal small" onclick="animBridge.show('both')">▶ Ver pila completa</button></div><figure><svg id="svgArch" viewBox="0 0 720 360" role="img" aria-label="Pila Bigtable sobre GFS"></svg><figcaption>Puente · <span id="archCaption">Pulsa un botón.</span></figcaption></figure></div>
+</section>
+<section id="view-quiz" class="view">
+  <span class="kicker">Comprueba tu aprendizaje</span>
+  <h2>📝 Quiz técnico (con trade-offs)</h2>
+  <p class="lede">Las marcadas con <span class="pill gold">trade-off</span> preguntan <strong>qué se gana y qué se pierde</strong>, como en tu quiz. Hay de estilo directo y tricky.</p>
+  <div class="quiz-toolbar"><span class="score-chip" id="scoreChip">0 / 0 correctas</span><button class="btn ghost small" onclick="quiz.reset()">↺ Reiniciar quiz</button></div>
+  <div id="quizContainer"></div>
+  <div class="quiz-result" id="quizResult"><div class="big-score" id="quizPercent">0%</div><div class="grade-bar"><div class="grade-fill" id="gradeFill"></div></div><p id="quizMsg" style="text-align:center; margin:0 auto;"></p></div>
+  <hr style="border:none; border-top:1px solid var(--border-soft); margin:40px 0;">
+  <h2>🧩 Casos prácticos</h2>
+  <p class="lede">Intenta resolver antes de ver la solución.</p>
+  <div id="casesContainer"></div>
+</section>
+<section id="view-glosario" class="view">
+  <span class="kicker">Referencia rápida</span>
+  <h2>📖 Glosario bilingüe</h2>
+  <p class="lede">Cita del paper + explicación. Escribe para filtrar (ej: bloom, compaction, locality).</p>
+  <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: chunk, lease, record append)…">
+  <div id="glossaryList"></div>
+</section>
+<section id="view-cheatsheet" class="view">
+  <span class="kicker">Repaso de último minuto</span>
+  <h2>⚡ Cheatsheet</h2>
+  <p class="lede">Todo lo esencial en una página.</p>
+  <div id="cheatsheetContent"></div>
+</section>
+</main>
+<footer>Herramienta de estudio sobre "The Google File System" (SOSP 2003). Leer → animar → practicar.</footer>
+<script>
+const MODULES = [
+{ id:'m0', icon:'🌩️', tag:'Módulo 0', accent:'gold', title:'El problema: fallas como norma, archivos enormes',
+summary:'Por qué Google necesitó GFS y qué supuestos clásicos rompió.',
+html: `
+<p class="lede">Google procesaba datos a escala web con cientos de máquinas commodity baratas. Los sistemas de archivos clásicos asumían hardware confiable y archivos pequeños con overwrites: <strong>todo eso era falso</strong> en Google.</p>
+<div class="callout info"><div class="lbl">Cita del paper · Abstract + §1, p.1</div>"It provides <strong>fault tolerance while running on inexpensive commodity hardware</strong>, and it delivers <strong>high aggregate performance</strong> to a large number of clients." — "our design has been driven by observations ... that reflect a <strong>marked departure from some earlier file system assumptions</strong>."</div>
+<p><strong>Traducción didáctica:</strong> GFS nace de 4 observaciones: (1) <strong>las fallas son la norma</strong> (discos, memoria, red, energía, bugs, errores humanos — con miles de máquinas siempre hay algo caído); (2) <strong>archivos multi-GB</strong> con miles de millones de objetos (manejar miles de millones de archivos de KB es inmanejable); (3) casi todo es <strong>append, no overwrite</strong> (se escribe una vez, se lee muchas veces, a menudo secuencial); (4) <strong>co-diseñar app + FS</strong> da flexibilidad (relajar consistencia + append atómico). Escala real: <strong>1000+ nodos, >300 TB</strong>, cientos de clientes continuos.</p>
+<div class="trade"><b>⚖️ Trade-off 0 · Diseñar para lo gigante.</b> Ganas: un sistema afinado al workload real (TBs, appends, streaming). Pierdes: los archivos pequeños <strong>no se optimizan</strong> (se soportan, nada más). Si tu workload son millones de archivos de 1KB, GFS no es tu sistema.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que GFS busca "baja latencia por operación". No: <strong>high sustained bandwidth > low latency</strong> — importa procesar TBs en bloque a alta tasa, no responder rápido una lectura.</div>
+`,
+mini:{q:'¿Qué workload NO optimiza GFS a propósito?', opts:['Appends secuenciales grandes','Streaming de TBs','Millones de archivos pequeños de KB','Lecturas secuenciales de GBs'], a:2, why:'El paper lo dice explícito (§2.1): archivos pequeños se soportan pero no se optimizan; todo el diseño (chunks 64MB, appends, sin caché) apunta a archivos enormes.'} },
+{ id:'m1', icon:'🧱', tag:'Módulo 1', accent:'blue', title:'Arquitectura: master, chunkservers y clientes',
+summary:'Quién guarda qué: metadata en el master, datos directo entre cliente y chunkservers.',
+html: `
+<p class="lede">Un cluster = <strong>1 master + N chunkservers + N clientes</strong> (Fig.1). Archivos partidos en <strong>chunks fijos</strong>, cada uno con handle de 64 bits, replicado <strong>3× por defecto</strong>.</p>
+<div class="callout info"><div class="lbl">Cita del paper §2.3, p.2–3 · Fig.1, p.3</div>"Clients interact with the master for <strong>metadata operations, but all data-bearing communication goes directly to the chunkservers</strong>." — "For reliability, each chunk is <strong>replicated on multiple chunkservers</strong>. By default, we store <strong>three replicas</strong>."</div>
+<p><strong>Qué significa:</strong> el master guarda <strong>todo el metadata</strong> (namespace, ACLs, archivo→chunks, ubicaciones) y coordina leases, GC y migración vía <strong>HeartBeats</strong>. Los chunkservers guardan chunks como <strong>archivos Linux normales</strong>. El cliente pregunta al master <em>a quién contactar</em>, cachea la respuesta y luego habla <strong>directo</strong> con los chunkservers. Sin POSIX → sin engancharse al vnode de Linux.</p>
+<p><strong>Sin caché de datos:</strong> ni cliente ni chunkserver cachean datos de archivo (los clientes stremean TBs; el buffer cache de Linux ya cubre lo caliente). <strong>Sí cachean metadata.</strong> Menos caché = menos problemas de coherencia.</p>
+<div class="trade"><b>⚖️ Trade-off 1 · Un solo master.</b> Ganas: diseño simple + decisiones globales sofisticadas (placement, replicación). Pierdes: riesgo de bottleneck → mitigado porque el master <strong>nunca toca datos</strong> y el cliente cachea ubicaciones (+ prefetch de chunks siguientes).</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que los datos "pasan por el master". No: el master solo dice <em>dónde está todo</em>; los bytes viajan cliente↔chunkserver.</div>
+`,
+mini:{q:'Un cliente GFS quiere leer 1GB secuencial. ¿Por dónde viajan los datos?', opts:['Cliente→master→chunkserver','Directo entre cliente y chunkservers; el master solo dio metadata','Todo por el operation log','Por Chubby'], a:1, why:'El master solo responde metadata (handle + réplicas); todo lo que lleva datos va directo a los chunkservers. Chubby no existe en GFS.'} },
+{ id:'m2', icon:'🔌', tag:'Módulo 2', accent:'purple', title:'Chunks de 64MB y metadata en memoria',
+summary:'El parámetro clave: por qué tan grande, qué ganas y el hot spot del batch-queue.',
+html: `
+<p class="lede"><strong>64MB por chunk</strong>, contra bloques de KB en filesystems clásicos. Cada réplica = un archivo Linux extendido perezosamente (lazy allocation contra fragmentación interna).</p>
+<div class="callout info"><div class="lbl">Cita del paper §2.5, p.3–4</div>"We have chosen <strong>64 MB</strong>, which is much larger than typical file system block sizes." — Tres ventajas: menos interacción con el master, conexiones TCP persistentes, y <strong>metadata tan pequeña que cabe en memoria</strong> (§2.6.1).</div>
+<p><strong>Las 3 ventajas:</strong> (1) un solo request de ubicación sirve para <strong>muchas operaciones</strong> sobre el mismo chunk (crucial en secuencial; hasta randoms chicos cachean un working set de TBs); (2) <strong>TCP persistente</strong> al chunkserver (menos overhead de red); (3) el master guarda <strong>&lt;64 bytes por chunk</strong> (+ &lt;64B por archivo con prefix compression) → todo en RAM → operaciones rápidas + scans de fondo (GC, re-replicación, migración).</p>
+<div class="trade"><b>⚖️ Trade-off 2 · Chunk gigante.</b> Ganas: poquísimos RPCs al master + metadata en memoria. Pierdes: archivos de 1 chunk = <strong>hot spots</strong> (el caso real: un ejecutable de 1 chunk lanzado en cientos de máquinas saturó sus pocos chunkservers). Fix: más réplicas para esos archivos + arranques escalonados (+ a futuro: leer de otros clientes).</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que chunk grande "desperdicia disco". No: la asignación perezosa extiende el archivo solo según se necesita.</div>
+`,
+mini:{q:'¿Por qué 64MB reduce la carga del master?', opts:['Porque hay menos archivos','Porque un solo lookup de ubicación sirve para muchas operaciones sobre el mismo chunk','Porque el master cachea datos','Porque elimina los HeartBeats'], a:1, why:'Con chunks grandes, un request al master amortiza decenas de operaciones; además la metadata total se achica hasta caber en RAM.'} },
+{ id:'m3', icon:'🧩', tag:'Módulo 3', accent:'teal', title:'Operation log, checkpoints y consistencia relajada',
+summary:'El único dato persistente del master, la línea de tiempo lógica y la Tabla 1.',
+html: `
+<p class="lede">El master guarda 3 metadatas en RAM (namespaces, archivo→chunks, ubicaciones) pero solo persiste 2: el <strong>operation log</strong> es el único registro durable y la <strong>línea de tiempo lógica</strong> que ordena operaciones concurrentes.</p>
+<div class="callout info"><div class="lbl">Cita del paper §2.6.3, p.5</div>"The operation log contains a <strong>historical record of critical metadata changes</strong>." — El master responde al cliente <strong>solo tras flushear local y remoto</strong> (con batching), y se recupera reproduciendo el log desde el último <strong>checkpoint</strong> (B-tree mapeable, ~1 min para millones de archivos, en hilo separado sin pausar mutaciones).</div>
+<p><strong>Ubicaciones no se persisten:</strong> al arrancar, el master <strong>pregunta a los chunkservers</strong> qué tienen (y cuando uno se une). Más simple que sincronizar altas/bajas/renombres/fallas — y el chunkserver siempre tiene la última palabra sobre sus discos.</p>
+<h3>Consistencia relajada: defined vs consistent</h3>
+<div class="callout info"><div class="lbl">Cita del paper §2.7.1, p.5–6 · Tabla 1, p.5</div>"A file region is <strong>consistent</strong> if all clients will always see the same data" — <strong>defined</strong> = consistent + clients see the mutation in its entirety. Concurrente exitoso → <strong>consistent but undefined</strong>; fallido → <strong>inconsistent</strong>.</div>
+<p><strong>Didáctica:</strong> namespace (crear archivo) = <strong>atómico siempre</strong> (locks + orden total del log). Datos: sin contienda y con éxito → defined; concurrentes OK → todos ven lo mismo pero mezclado (undefined); fallo → cada uno puede ver algo distinto. Las apps lo absorben con <strong>appends + checkpoints + records auto-validables</strong> (§2.7.2). Versiones de chunk excluyen réplicas stale de mutaciones y lecturas.</p>
+<div class="trade"><b>⚖️ Trade-off 3 · Relajar la consistencia.</b> Ganas: FS simple y rápido sin coordinación global. Pierdes: la app carga con el costo (append-only, checkpoints, checksums e IDs para filtrar duplicados/padding). Sin esa disciplina del lado app, el modelo no sirve.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Confundir "consistent" con "correcto/definido". Consistent solo dice que todos ven <em>lo mismo</em>; puede ser una mezcla sin sentido de dos escritores.</div>
+`,
+mini:{q:'Dos clientes escriben concurrente a la misma región, ambos con éxito. ¿Qué ve un tercer lector?', opts:['Lo del primer escritor','Lo del segundo escritor','Lo mismo desde cualquier réplica, pero posiblemente mezclado (consistent-undefined)','Error'], a:2, why:'Tabla 1 (§2.7.1): concurrente exitoso = consistente pero indefinida: todos ven lo mismo, sin garantía de que sea lo de uno solo.'} },
+{ id:'m4', icon:'🏗️', tag:'Módulo 4', accent:'orange', title:'Leases y el write en 7 pasos',
+summary:'El primary ordena con serial numbers; datos y control viajan separados.',
+html: `
+<p class="lede">Toda mutación se ejecuta en <strong>todas las réplicas en el mismo orden</strong>. El truco: el master arrienda un <strong>lease (60s, extendible, piggybacked en HeartBeats, revocable)</strong> a una réplica = <strong>primary</strong>, que numera cada mutación.</p>
+<div class="callout info"><div class="lbl">Cita del paper §3.1, p.6–7 · Fig.2, p.7</div>"The primary picks a <strong>serial order for all mutations</strong> to the chunk. All replicas follow this order." — Orden global = orden de leases del master + seriales del primary.</div>
+<h3>Los 7 pasos (Fig.2)</h3>
+<p>(1) cliente pregunta al master quién tiene el lease (+ otorga si no hay); (2) master responde primary + secundarias (el cliente cachea); (3) el cliente empuja los <strong>datos a TODAS</strong> en cualquier orden (buffer LRU; <strong>datos separados del control</strong>); (4) con todos los ACKs, pide el write al primary, que numera y aplica local; (5) el primary reenvía en orden a secundarias; (6) secundarias confirman al primary; (7) el primary responde (reporta errores de cualquiera). Fallo → reintenta pasos 3–7, luego reinicia el write. Región tocada por fallo = inconsistente.</p>
+<h3>Data flow: pipeline lineal</h3>
+<div class="callout info"><div class="lbl">Cita del paper §3.2, p.7–8</div>"Data is pushed <strong>linearly along a chain</strong> of chunkservers." — Cada máquina usa todo su ancho saliente y reenvía a la más <strong>cercana</strong> (por IP) aún no servida. Ideal: <code>B/T + R·L</code> → 1MB a R réplicas en ~80ms (100Mbps, L&lt;1ms).</div>
+<div class="trade"><b>⚖️ Trade-off 4 · Separar control de datos.</b> Ganas: throughput (topología óptima) + orden barato sin 2PC. Pierdes: ante errores, reintentos que dejan regiones inconsistentes y que la app debe tolerar (Tabla 1). El orden es gratis; la certeza, no.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que "el primary recibe los datos primero". No: los datos van a todas en cualquier orden (paso 3); el primary solo pone el <strong>orden</strong> (paso 4).</div>
+`,
+mini:{q:'¿Quién decide el orden global de mutaciones de un chunk?', opts:['El master con timestamps','El primary con serial numbers bajo un lease del master','Votación entre réplicas','El cliente con su reloj'], a:1, why:'Lease (60s) → primary numera en serie; todas aplican ese orden. Orden global = leases + seriales, sin 2PC.'} },
+{ id:'m5', icon:'⚙️', tag:'Módulo 5', accent:'gold', title:'Record append y snapshot copy-on-write',
+summary:'Append at-least-once sin lock manager + copias instantáneas que solo pagan al escribir.',
+html: `
+<p class="lede">Dos operaciones estrella para workloads reales: colas productor-consumidor multi-escritor y branches baratos de datasets de TBs.</p>
+<h3>Record append: como O_APPEND sin carreras</h3>
+<div class="callout info"><div class="lbl">Cita del paper §3.3, p.8</div>"GFS appends it to the file <strong>at least once atomically</strong> (as one continuous sequence of bytes) <strong>at an offset of GFS's choosing</strong>." — El cliente manda solo datos; el primary decide el offset del último chunk (mismo flujo §3.1).</div>
+<p><strong>Mecánica:</strong> si el record no cabe en 64MB → el primary <strong>rellena (pad)</strong> el chunk y el cliente <strong>reintenta en el siguiente</strong> (por eso records ≤ <strong>16MB</strong> = 1/4 del chunk: acota fragmentación). Ante fallo en alguna réplica → reintento → posibles <strong>duplicados</strong> (réplicas no idénticas byte a byte). Garantía mínima suficiente: lo escrito con éxito quedó <strong>contiguo al menos una vez</strong> (todas las réplicas al menos tan largas como el record ⇒ lo siguiente cae más arriba). La app filtra padding/duplicados con checksums e IDs únicos.</p>
+<div class="trade"><b>⚖️ Trade-off 5 · At-least-once.</b> Ganas: cientos de productores concurrentes <strong>sin lock manager distribuido</strong>. Pierdes: duplicados y padding que la app debe filtrar. Exactamente-una-vez costaría coordinación global; GFS elige no pagarla.</div>
+<h3>Snapshot: COW casi instantáneo</h3>
+<div class="callout info"><div class="lbl">Cita del paper §3.4, p.8–9</div>"Like AFS, we use standard <strong>copy-on-write</strong> techniques." — Revoca leases → loguea → <strong>duplica metadata</strong> (el snapshot apunta a los mismos chunks). Al primer write a un chunk compartido (refcount>1): nuevo handle C', <strong>copia local en los mismos servidores</strong> (disco ~3× vs red 100Mb), lease sobre C'.</div>
+<div class="trade"><b>⚖️ Trade-off 6 · COW.</b> Ganas: branches/checkpoints de TBs casi gratis e instantáneos. Pierdes: el <strong>primer write posterior paga la copia</strong> (latencia puntual) + refcounts que rastrear.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que record append es "exactamente una vez". No: es <strong>al menos una vez</strong>; los duplicados son parte del diseño, no un bug.</div>
+`,
+mini:{q:'Un record append reporta éxito. ¿Qué está garantizado?', opts:['Byte a byte idéntico en las 3 réplicas','El record quedó contiguo al menos una vez en todas las réplicas vivas','Offset elegido por el cliente','Cero duplicados'], a:1, why:'At-least-once atómico: contiguo ≥1 vez; pueden existir duplicados/padding que la app filtra. El offset lo elige GFS.'} },
+{ id:'m6', icon:'🚀', tag:'Módulo 6', accent:'pink', title:'Master ops, tolerancia y mediciones',
+summary:'Locks, racks, GC perezoso, checksums, shadows y los números que validan todo.',
+html: `
+<p class="lede">El master hace <strong>todo lo demás</strong>: namespace, placement, réplicas, GC. Y el sistema se cura solo: kill -9 de rutina, checksums en todo, shadows para leer.</p>
+<h3>Namespace, racks y réplicas · §4, p.9–11</h3>
+<div class="callout info"><div class="lbl">Cita del paper §4.1–4.3, p.9–11</div>Locks read-write por nodo en <strong>orden total</strong> (nivel + lexicográfico) → operaciones largas concurrentes sin deadlock. Réplicas entre <strong>máquinas y racks</strong> (sobrevivir un rack caído + ancho multi-rack; las escrituras cruzan racks: <strong>trade-off aceptado</strong>). Re-replicación priorizada (distancia a la meta, archivos vivos, chunks que bloquean clientes) + rebalanceo gradual.</div>
+<h3>GC perezoso + versiones stale</h3>
+<div class="callout info"><div class="lbl">Cita del paper §4.4–4.5, p.11–12</div>Borrar = renombrar a oculto con timestamp (<strong>recuperable ~3 días</strong>); scans limpian expirados + huérfanos vía HeartBeats. <strong>Versión por chunk</strong> que sube en cada lease: al reiniciar, comparar versiones delata réplicas stale (excluidas hasta GC).</div>
+<div class="trade"><b>⚖️ Trade-off 7 · GC perezoso.</b> Ganas: simplicidad ante fallas (sin bookkeeping de resends), batch amortizado en fondo, red de 3 días contra borrados accidentales. Pierdes: storage no reutilizable de inmediato (loops de temp files sufren; mitigado con doble-delete + políticas por namespace).</div>
+<h3>Tolerancia: kill-9, 3×, shadows, checksums · §5, p.12–13</h3>
+<div class="callout info"><div class="lbl">Cita del paper §5.1–5.2, p.12–13</div>"Servers are <strong>routinely shut down just by killing the process</strong>." — Master: log+checkpoints replicados, un solo activo, <strong>shadow masters</strong> read-only ligeramente atrasados. Datos: <strong>checksums 32bit por bloque de 64KB</strong> verificados <strong>antes de servir</strong> (nunca propagan corrupción) + scrubbing de inactivos.</div>
+<div class="trade"><b>⚖️ Trade-off 8 · Verificarlo todo.</b> Ganas: corrupción detectada antes de servirse (discos IDE mentirosos incluidos) + réplicas inactivas saneadas. Pierdes: CPU/memoria de checksums + overwrites que deben releer bordes. Barato porque los reads ya traen varios bloques.</div>
+<h3>Mediciones (candidatos de quiz) · §6, p.13–14, Fig.3, Tabs 2–3</h3>
+<table><tr><th>Medición</th><th>Número</th><th>Por qué</th></tr>
+<tr><td>Reads 1 / 16 clientes</td><td>10 MB/s (80%) → 94 MB/s agregado (75%)</td><td>Límite 125MB/s (1Gbps inter-switch) o 12.5MB/s/cliente; colisiones crecen con N</td></tr>
+<tr><td>Writes 1 / 16</td><td>6.3 → 35 MB/s agregado (~mitad del límite 67MB/s)</td><td>Cada byte va a 3 réplicas; stack de red vs pipelining</td></tr>
+<tr><td>Appends a 1 archivo</td><td>6.0 → 4.8 MB/s (1→16 clientes)</td><td>Atado al ancho de los tenedores del último chunk, sin importar N</td></tr>
+<tr><td>Cluster A / B</td><td>342 serv/72TB y 227 serv/180TB; master 48/60MB</td><td>Metadata en memoria nunca es límite; A sostuvo 580MB/s una semana</td></tr>
+<tr><td>Recovery 600GB</td><td><strong>23.2 min</strong> a 440MB/s (91 clones × 6.25MB/s)</td><td>Clonado throttled para no pisar tráfico; 266 chunks críticos a ≥2× en 2 min</td></tr>
+<tr><td>Master workload</td><td>200-500 ops/s; <strong>FindLocation ~64-66%</strong></td><td>El master nunca es cuello (antes sí: scans de directorios → binary search)</td></tr></table>
+<div class="callout warn"><div class="lbl">Error común</div>Decir que "GFS replica con Chubby" o que "el master guarda los datos". No: replicación por clonado del master + HeartBeats; Chubby no existe en este paper; datos solo en chunkservers.</div>
+`,
+mini:{q:'Matan 1 chunkserver con 600GB en el cluster B. ¿En cuánto se recupera todo?', opts:['Segundos','23.2 minutos a 440MB/s efectivos (clonado throttled)','Horas','Hay que restaurar de backup'], a:1, why:'Medición §6.2.5: 91 clonaciones concurrentes × 6.25MB/s para no pisar tráfico de clientes; lo crítico (266 chunks a 1 réplica) se sube a ≥2× en 2 min.'} },
+{ id:'m7', icon:'🔗', tag:'Módulo 7', accent:'teal', title:'Puente GFS ↔ Bigtable: lo que Bigtable construye encima',
+summary:'La relación que pide el profe, mecanismo por mecanismo: GFS es el suelo de Bigtable.',
+html: `
+<p class="lede">Bigtable no flota en el aire: <strong>sus SSTables y commit logs son archivos que viven en GFS</strong> (§4–5 Bigtable). GFS pone persistencia replicada; Bigtable pone el modelo estructurado encima. Misma filosofía, distinto nivel.</p>
+<table><tr><th>Mecanismo</th><th>En GFS</th><th>En Bigtable</th><th>La relación</th></tr>
+<tr><td><strong>Dónde viven los bytes</strong></td><td>Chunks de 64MB ×3 réplicas en disco (§2.3)</td><td>SSTables + commit logs persistentes (§5.3)</td><td>Todo lo "persistente" de Bigtable <strong>es un archivo GFS</strong>: hereda durabilidad sin reimplementarla</td></tr>
+<tr><td><strong>Master fuera de datos</strong></td><td>Master solo metadata, nunca datos (§2.4)</td><td>Master solo asignación, lightly loaded (§5)</td><td>Misma regla de oro en dos niveles: el master no toca el path caliente</td></tr>
+<tr><td><strong>Orden sin 2PC</strong></td><td>Leases 60s + serial del primary (§3.1)</td><td>Single-row + timestamps; membership vía Chubby (§3, §5.2)</td><td>Mismo patrón, distinta implementación: <strong>GFS no usa Chubby</strong>, tiene leases propios + HeartBeats</td></tr>
+<tr><td><strong>Append > overwrite</strong></td><td>Record append at-least-once, ≤16MB (§3.3)</td><td>Memtable/commit-log append-only, estilo LSM (§5.3–5.4)</td><td>Ambos diseñan alrededor del append secuencial; el overwrite es ciudadano de segunda</td></tr>
+<tr><td><strong>Consistencia</strong></td><td>Relajada: defined vs consistent, Tabla 1 (§2.7)</td><td>Single-row atómico, nada cross-row (§3)</td><td>Dos renuncias distintas al modelo relacional: GFS relaja el read, Bigtable recorta el scope</td></tr>
+<tr><td><strong>Unidad de partición</strong></td><td>Chunk fijo 64MB (§2.5)</td><td>Tablet ~100-200MB; bloques SSTable 64KB (§5, §6)</td><td>Tres granularidades, una idea: unidad fija → metadata pequeña → master en memoria</td></tr>
+<tr><td><strong>Integridad</strong></td><td>Checksums 64KB/32bit antes de servir (§5.2)</td><td>Bloom + versiones + GC (§2, §6)</td><td>GFS detecta corrupción de disco; Bigtable evita seeks inútiles: defensas en capas distintas</td></tr>
+<tr><td><strong>Caché</strong></td><td>Cliente y chunkserver no cachean datos (§2.3)</td><td>Scan/Block caché server-side (§6)</td><td>Mismo principio (no cachear lo que se stremea), aplicado donde sí paga</td></tr></table>
+<div class="trade"><b>⚖️ Puente 1 · Delegar vs controlar.</b> Ganas: Bigtable no reimplementa disco replicado, leases de storage ni checksums (años de ingeniería gratis). Pierdes: hereda sus límites (picos GFS → doble hilo de log; 64KB×1KB → 1212 reads/s). Cuando algo falla abajo, se siente arriba.</div>
+<div class="trade"><b>⚖️ Puente 2 · Misma filosofía, dos scopes.</b> Ganas: razonar una vez (fallas como norma, master fuera de datos, append primero) y aplicarlo en dos niveles. Pierdes: si confundes los niveles (ej. creer que Chubby ordena los writes de GFS), el modelo mental se rompe. Chubby es de Bigtable; GFS se basta con su master.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Decir que "GFS usa Chubby para los leases". No: los leases de 60s son del <strong>propio master GFS</strong> (§3.1 GFS). Chubby lo usa <strong>Bigtable</strong> para elección de master y membership (§4–5 Bigtable). Se relacionan porque uno corre sobre el otro, no porque compartan código.</div>
+`,
+mini:{q:'Un tablet server de Bigtable escribe su commit log. ¿Dónde cae físicamente?', opts:['En Chubby','En un archivo GFS (chunks 64MB ×3 réplicas)','En el master de Bigtable','En el operation log de GFS'], a:1, why:'Todo lo persistente de Bigtable son archivos GFS. El operation log es del master GFS (metadata), no de datos de Bigtable.'} },
+];
+const QUIZ = [
+{tag:'Supuestos', c:'blue', q:'¿Qué asume GFS de las fallas de hardware?', opts:['Que son raras con buen hardware','Que son la norma: siempre hay algo caído (discos, red, bugs, humanos)', 'Que solo fallan los discos','Que el software nunca falla'], a:1, why:'§1, p.1–2: con cientos/miles de máquinas commodity, cantidad y calidad garantizan fallas permanentes (bugs de app y SO, errores humanos, disco, memoria, red, energía). Por eso monitoreo, detección, tolerancia y recovery automático son parte integral del diseño, no parches.'},
+{tag:'Supuestos', c:'blue', q:'¿Qué workload asume GFS?', opts:['Millones de archivos de 1KB con overwrites','Archivos multi-GB que se escriben por append y se leen secuencialmente muchas veces', 'Latencia ultra-baja por operación','Cargas relacionales con joins'], a:1, why:'§1–2.1, p.1–2: multi-GB común, mutación = append, lectura = secuencial repetida; bandwidth sostenido > latencia. Archivos chicos se soportan pero no se optimizan (Trade-off 0 del módulo 0).'},
+{tag:'Arquitectura', c:'teal', q:'Un cluster GFS tiene…', opts:['N masters + 1 chunkserver','1 master + N chunkservers + N clientes (típicamente Linux commodity)', 'Solo chunkservers sin master','1 cliente + 1 disco'], a:1, why:'§2.3, p.3, Fig.1: un master (metadata + coordinación), chunkservers (chunks como archivos Linux normales) y clientes con la lib enlazada. Chunkserver y cliente pueden convivir en la misma máquina si hay recursos.'},
+{tag:'Arquitectura', c:'teal', q:'Réplicas por defecto y chunk handle:', opts:['1 réplica, handle reutilizable','3 réplicas (configurable por región); handle de 64 bits, inmutable y globalmente único', '6 réplicas con quorum','Sin réplicas, con RAID'], a:1, why:'§2.3, p.3: 3× por defecto, aunque regiones del namespace pueden pedir otro nivel; el handle lo asigna el master al crear el chunk. GFS usa solo replicación — más simple que RAID pero más disco crudo (§8).'},
+{tag:'Arquitectura', c:'teal', q:'¿Por dónde viajan los bytes de un read?', opts:['Cliente→master→chunkserver','Directo cliente↔chunkserver; el master solo dio metadata (handle + réplicas)', 'Por el operation log','Por Chubby'], a:1, why:'§2.3–2.4, p.3: metadata por el master (cacheada + prefetch de chunks siguientes), datos directo. Chubby no existe en GFS. Ni cliente ni chunkserver cachean datos: el buffer cache de Linux cubre lo caliente.'},
+{tag:'⚖️ trade-off', c:'gold', q:'Trade-off: un solo master…', opts:['Sin trade-off, es gratis','Ganas simplicidad + decisiones globales; pierdes riesgo de bottleneck, mitigado porque el master nunca toca datos', 'Pierde throughput siempre','Solo sirve para clusters chicos'], a:1, why:'§2.4, p.3: el master decide placement y replicación con conocimiento global, pero los clientes cachean ubicaciones y hablan directo con chunkservers. Ganas diseño simple; pagas vigilancia constante de que el master no entre al path caliente de datos.'},
+{tag:'Chunks', c:'purple', q:'Las 3 ventajas del chunk de 64MB:', opts:['Más archivos, más locks, más seeks','Menos RPCs al master + TCP persistente + metadata que cabe en RAM', 'Menos réplicas y menos disco','Compatibilidad POSIX'], a:1, why:'§2.5, p.3–4: (1) un lookup de ubicación amortiza muchas operaciones (hasta randoms chicos cachean working sets de TBs); (2) conexiones TCP largas, menos overhead; (3) <64B por chunk → todo el metadata en memoria (§2.6.1). Lazy allocation contra la fragmentación interna.'},
+{tag:'🔢 numérica', c:'pink', q:'Numérica: ¿cuánta metadata guarda el master?', opts:['64KB por chunk','Menos de 64 bytes por chunk de 64MB (+ <64B por archivo con prefix compression)', '1MB por archivo','Toda en disco, nada en RAM'], a:1, why:'§2.6.1, p.4: <64B por chunk (casi todos llenos) y namespace compactado por prefijos. Medido en producción: 48–60MB para ~735k archivos (§6.2.2). Por eso la RAM del master nunca limita el sistema.'},
+{tag:'Chunks', c:'purple', q:'El hot spot del batch-queue: causa y fix.', opts:['Chunks muy grandes; partirlos','Ejecutable de 1 chunk lanzado en cientos de máquinas a la vez; fix = más réplicas + arranques escalonados', 'Master lento; poner otro master','Red lenta; más switches'], a:1, why:'§2.5, p.4: archivos de pocos chunks + acceso masivo simultáneo = hot spot real observado en producción. Fix del paper: replicar más esos archivos y escalonar arranques (a futuro: leer de otros clientes). Diseñar para lo gigante tiene este precio.'},
+{tag:'Metadata', c:'blue', q:'¿Qué garantiza el operation log?', opts:['Guarda los datos de usuario','Es el único registro persistente del metadata + la línea de tiempo lógica que ordena operaciones concurrentes', 'Reemplaza a los checkpoints','Solo guarda leases'], a:1, why:'§2.6.3, p.5: sin el log se pierde el FS o las operaciones recientes aunque los chunks sobrevivan. Se replica remoto, se responde solo tras flush local y remoto (con batching), y la recuperación lo reproduce desde el último checkpoint.'},
+{tag:'Consistencia', c:'orange', q:'Tabla 1: dos clientes escriben concurrente a la misma región, ambos con éxito. ¿Qué ve un lector?', opts:['Lo del primer escritor','Lo del segundo escritor','Lo mismo desde cualquier réplica, pero posiblemente mezclado (consistent-undefined)', 'Un error'], a:1, why:'Tabla 1, §2.7.1, p.5: concurrente exitoso = consistente pero indefinida. Todos ven lo mismo (gracias al orden único por réplica), sin garantía de que sea lo de uno solo. Serial exitoso = defined; fallo = inconsistent.'},
+{tag:'⚖️ trade-off', c:'gold', q:'Trade-off: consistencia relajada…', opts:['Sin trade-off','Ganas FS simple y rápido; pierdes que la app debe disciplinarse (append-only, checkpoints, records auto-validables)', 'Pierde atomicidad del namespace','Solo afecta a lecturas'], a:1, why:'§2.7, p.5–6: namespace siempre atómico (locks + orden total del log); datos relajados. Ganas evitar coordinación global; pagas que la app filtra padding/duplicados con checksums e IDs. Sin esa disciplina del lado app, el modelo no sirve.'},
+{tag:'Mutaciones', c:'teal', q:'¿Quién decide el orden global de mutaciones de un chunk?', opts:['El master con timestamps','El primary con serial numbers bajo un lease del master (60s, extendible)', 'Votación entre réplicas','El cliente con su reloj'], a:1, why:'§3.1, p.6: lease (60s inicial, extendible mientras se mute, piggybacked en HeartBeats, revocable) → primary numera en serie; todas aplican ese orden. Orden global = orden de leases + seriales. Sin 2PC ni relojes sincronizados.'},
+{tag:'Mutaciones', c:'teal', q:'En el write de 7 pasos, ¿qué viaja primero?', opts:['El write request al primary','Los datos a TODAS las réplicas (cualquier orden); el control después', 'El ACK al cliente','El lease al master'], a:1, why:'Fig.2, §3.1, p.6–7: paso 3 empuja datos a todas (buffer LRU) y recién en el paso 4 el cliente pide el write al primary citando esos datos. Datos y control desacoplados: la topología manda en los datos, el primary manda en el orden.'},
+{tag:'🔢 numérica', c:'pink', q:'Numérica: 1MB a R réplicas con links de 100Mbps y L<1ms. ¿Tiempo ideal?', opts:['~1 segundo','~80ms según B/T + R·L, por pipeline lineal a la réplica más cercana', '~1ms','Depende del master'], a:1, why:'§3.2, p.7–8: cadena lineal (cada máquina usa todo su ancho saliente) + forward a la más cercana por IP + pipeline TCP full-duplex con inicio inmediato. 1MB ≈ 80ms ideales. Sin congestión, la red manda; el master ni aparece.'},
+{tag:'Mutaciones', c:'orange', q:'¿Qué garantiza un record append exitoso?', opts:['Byte a byte idéntico en las 3 réplicas','El record quedó contiguo al menos una vez; el offset lo elige GFS', 'Offset elegido por el cliente','Cero duplicados jamás'], a:1, why:'§3.3, p.7–8: at-least-once atómico como secuencia contigua, en offset que GFS elige y devuelve (como O_APPEND sin carreras). Réplicas pueden diferir (duplicados parciales); lo exigible es que el éxito implicó mismo offset en todas y longitud mínima posterior.'},
+{tag:'Mutaciones', c:'orange', q:'¿Por qué los records se limitan a 16MB (1/4 del chunk)?', opts:['Por el MTU de red','Para acotar la fragmentación del padding cuando un record no cabe y se rellena el chunk', 'Por el tamaño del HeartBeat','Por POSIX'], a:1, why:'§3.3, p.8: si no cabe, el primary hace pad hasta 64MB y el cliente reintenta en el siguiente chunk. Con records de hasta 1/4, el peor desperdicio por chunk queda acotado. Fragmentación controlada a cambio de un límite.'},
+{tag:'Mutaciones', c:'orange', q:'Snapshot: ¿cuándo ocurre la copia física?', opts:['Al pedir el snapshot (copia todo)','Solo en el primer write posterior a un chunk compartido (refcount>1): nuevo handle C′ con copia local', 'Nunca, todo es metadata','Cada noche en batch'], a:1, why:'§3.4, p.8–9, estilo AFS: revocar leases → loguear → duplicar metadata (mismos chunks). El primer write posterior dispara C′ en los mismos servidores (copia local ~3× vs red 100Mb) + lease nuevo. COW: snapshot instantáneo, la copia la paga quien escribe.'},
+{tag:'Master', c:'purple', q:'Namespace locking: ¿cómo evita deadlocks?', opts:['Un lock global','Orden total: nivel del árbol primero, luego lexicográfico; locks por nodo adquiridos perezosamente', 'Sin locks, todo optimista','Reiniciando el master'], a:1, why:'§4.1, p.8–9: antecesores en read + pathname en read/write; el orden total impide deadlock y las operaciones largas (ej. snapshot) no bloquean al resto. Sin listados por directorio ni links: el namespace es tabla ruta→metadata.'},
+{tag:'Master', c:'purple', q:'Placement: ¿por qué repartir entre racks si encarece los writes?', opts:['No hay razón, es un bug','Sobrevivir un rack caído (switch/energía) + ancho multi-rack de lectura; el costo en writes se acepta', 'Para ahorrar disco','Por Chubby'], a:1, why:'§4.2, p.9: máquinas (fallas + ancho por máquina) y racks (supervivencia + agregado). Trade-off explícito y aceptado: las escrituras cruzan racks. Re-replicación priorizada (distancia a meta, archivos vivos, chunks que bloquean) + rebalanceo gradual.'},
+{tag:'Master', c:'purple', q:'Garbage collection: ¿cómo borra GFS?', opts:['Borrado inmediato y síncrono','Renombra a oculto con timestamp (~3 días recuperable); scans limpian expirados + huérfanos', 'Nunca borra','Compacta como Bigtable'], a:1, why:'§4.4, p.10–11: GC perezoso a dos niveles (namespace + chunks vía HeartBeats). Ganas simplicidad ante fallas (sin bookkeeping de resends), batch amortizado y red de 3 días; pierdes reuso inmediato (loops de temp files sufren; doble-delete lo acelera).'},
+{tag:'Tolerancia', c:'pink', q:'¿Cómo delata el master una réplica stale?', opts:['Comparando bytes con las demás','Por chunk version numbers: cada lease nuevo sube la versión; al reiniciar, versiones viejas = stale', 'Por timeout fijo','No las detecta'], a:1, why:'§4.5, p.11–12: versión por chunk que sube en cada lease grant (persistida en ambos lados) antes de aceptar writes. La caída se pierde el bump; al volver, su versión la delata. Stale = excluida de mutaciones y lecturas hasta GC; versiones viajan en respuestas y clones.'},
+{tag:'Tolerancia', c:'pink', q:'Shadow masters: ¿qué sirven?', opts:['Writes cuando el primario cae','Lecturas tolerantes a staleness (metadata puede laggear fracciones de segundo); el contenido sale de chunkservers', 'Checkpoints','Nada, son backup frío'], a:1, why:'§5.1.3, p.12: siguen el log replicado + sondean chunkservers; dependen del primario solo para altas/bajas de réplicas. Contenido nunca stale (viene de chunkservers); listings/ACLs pueden laggear. Disponibilidad de lectura sin costo de consistencia fuerte.'},
+{tag:'Tolerancia', c:'pink', q:'Checksums: granularidad y momento.', opts:['Por archivo, al cerrar','Bloques de 64KB con checksum de 32 bits, verificados ANTES de servir (nunca propagan corrupción)', 'Por chunk, una vez al día','No hay checksums'], a:1, why:'§5.2, p.12–13: comparar réplicas no sirve (divergencia legal por appends). Verificación previa en reads (a clientes o peers) + mismatch → leer otra réplica + clonar buena + borrar mala. Barato: reads multi-bloque, alineación, I/O solapado, más scrubbing de inactivos.'},
+{tag:'🔢 numérica', c:'pink', q:'Numérica: límites medidos del testbed (16+16, 100Mbps, 1Gbps inter-switch).', opts:['Reads 125MB/s y writes 125MB/s','Reads ~125MB/s agregado (1Gbps) o 12.5MB/s/cliente; writes ~67MB/s (cada byte a 3 réplicas)', 'Appends 125MB/s','Sin límites'], a:1, why:'§6.1, p.12–13, Fig.3: observado 1 cliente 10MB/s (80%), 16 → 94MB/s (75%); writes 6.3 → 35MB/s agregado (~mitad del límite; stack vs pipelining); appends a 1 archivo 6.0→4.8MB/s atados al último chunk. Números que validan el diseño, no marketing.'},
+{tag:'🔢 numérica', c:'pink', q:'Numérica: muere 1 chunkserver con 600GB. ¿Recovery?', opts:['Segundos','23.2 minutos a 440MB/s efectivos (91 clones × 6.25MB/s throttled); lo crítico a ≥2× en 2 min', 'Horas con backup','Pérdida total'], a:1, why:'§6.2.5, p.13: clonado limitado al 40% de servidores para no pisar tráfico. Los 266 chunks a 1 réplica (doble falla) suben a ≥2× en 2 minutos con prioridad alta: primero sobrevivir otra falla, luego completar.'},
+{tag:'Mediciones', c:'blue', q:'Master workload real: ¿qué domina y cuánto?', opts:['Writes 90%','FindLocation ~64-66% (ubicaciones para reads); master a 200-500 ops/s, nunca cuello', 'Snapshots 50%',' checkpoints'], a:1, why:'Tab.6, §6.3.4, p.13: FindLocation (reads) + Open + FindLeaseHolder (mutaciones). El master sobrelleva miles de ops/s tras el fix de binary search en namespaces (antes los scans de directorios gigantes lo atascaban). Diseño validado en producción.'},
+{tag:'Puente', c:'teal', q:'Puente: ¿dónde vive físicamente una SSTable de Bigtable?', opts:['En la memoria del master de Bigtable','En un archivo GFS partido en chunks de 64MB replicados 3×', 'En un archivo Chubby','Solo en el memtable del tablet server'], a:1, why:'§4–5 Bigtable: SSTables y commit logs son archivos persistentes, y todo lo persistente de Bigtable vive en GFS (§2.3 GFS: chunks 64MB ×3). Chubby guarda locks/schemas/elección de master, no datos. Trade-off: Bigtable hereda durabilidad sin reimplementarla, pero hereda sus límites.'},
+{tag:'Puente', c:'teal', q:'Puente: ¿a qué operación de GFS se parece el append al commit log de Bigtable?', opts:['A un overwrite aleatorio de 1KB','Al record append: append secuencial atómico sin lock manager, con reintentos que la capa de arriba filtra', 'Al snapshot copy-on-write','Al checkpoint del operation log'], a:1, why:'§3.3 GFS: record append agrega at-least-once una secuencia contigua en offset que GFS elige; ante fallos se reintenta y la app filtra duplicados. Bigtable hace lo mismo con su commit log + memtable → SSTables. Ambos ponen el append secuencial en el centro.'},
+{tag:'Puente', c:'teal', q:'Puente (tricky): ¿usa GFS Chubby para sus leases de 60s?', opts:['Sí, igual que Bigtable','No: los leases de GFS son del propio master (60s + HeartBeats); Chubby lo usa Bigtable para elección de master y membership', 'Sí, para replicar el operation log','GFS no usa leases'], a:1, why:'§3.1 GFS: el lease lo otorga el master GFS y el primary ordena con serial numbers — sin Chubby en ningún lado. §4–5 Bigtable: Chubby (5 réplicas, Paxos) para master único, bootstrap y membership. Mismo patrón, distinta implementación: se relacionan porque uno corre sobre el otro.'}
+];
+const CASES = [
+{ title:'Caso 1 · Ejecutable de un chunk en 500 máquinas', prompt:`Escribes un binario de 200MB en GFS (4 chunks) y lo lanzas a la vez en 500 máquinas. Los chunkservers se saturan.<br><br><strong>¿Por qué? ¿Qué haces? (piensa en el caso batch-queue del paper)</strong>`, solution:`Pocos chunks + acceso masivo simultáneo = <strong>hot spot</strong>: cientos de clientes contra los mismos chunkservers.<br>Fix del paper (§2.5): subir el <strong>factor de replicación</strong> de esos archivos + <strong>escalonar arranques</strong>. Diseñar para archivos gigantes tiene este precio en archivos chicos calientes.`, h1:`Pista 1: ¿cuántos chunkservers sirven un archivo de 4 chunks? (§2.5)`, h2:`Pista 2: ¿qué dos remedios aplica el paper al caso batch-queue?`, rubric:`Rúbrica (5pts): 2 decisión (replicar + escalonar) + 2 mecanismo (pocos chunks, fan-in masivo) + 1 trade-off (diseño para gigante vs hotspot).`},
+{ title:'Caso 2 · Tabla 1 en acción (writes concurrentes)', prompt:`Dos clientes escriben a la <strong>misma región</strong>, ambos reportan éxito. Un lector abre después.<br><br><strong>¿Qué garantía tiene lo que ve?</strong>`, solution:`Región <strong>consistente pero indefinida</strong> (Tabla 1, §2.7.1): todos ven lo mismo desde cualquier réplica (mismo orden aplicado), pero puede ser mezcla de ambos.<br>Solo un write serial sin contienda deja región <strong>definida</strong>. Si un write hubiera fallado: inconsistente.`, h1:`Pista 1: busca la fila "concurrent successes" de la Tabla 1 (§2.7.1).`, h2:`Pista 2: consistente = todos ven lo mismo; definido = además es lo escrito completo. ¿Cuál aplica?`, rubric:`Rúbrica (5pts): 2 decisión (consistent-undefined) + 2 mecanismo (orden único, mezcla) + 1 trade-off (serial=defined, fallo=inconsistent).`},
+{ title:'Caso 3 · Append con 1 réplica caída', prompt:`100 productores hacen record append al mismo archivo. Una réplica del último chunk está caída y vuelve a mitad.<br><br><strong>¿Se pierde algún record? ¿Qué ve un lector?</strong>`, solution:`No se pierde: el primary ordena con serials en las vivas; la caída <strong>se perdió versiones</strong> → al volver, su version number la delata como <strong>stale</strong> (§4.5) y queda excluida hasta GC.<br>El lector puede ver <strong>duplicados/padding</strong> (reintentos): los filtra con checksums + IDs únicos (§2.7.2). At-least-once, nunca pérdida silenciosa.`, h1:`Pista 1: ¿qué pasa con el version number de una réplica caída durante un lease nuevo? (§4.5)`, h2:`Pista 2: at-least-once + reintentos = ¿qué artefactos ve el lector y con qué los filtra?`, rubric:`Rúbrica (5pts): 2 decisión (nada se pierde, stale excluida) + 2 mecanismo (versiones, duplicados) + 1 trade-off (at-least-once vs filtrado en app).`},
+{ title:'Caso 4 · Snapshot y primer write', prompt:`Haces snapshot de <code>/datos</code> (10TB) y luego escribes 1MB en un chunk cubierto.<br><br><strong>¿Cuánto se copia y cuándo? ¿Por la red?</strong>`, solution:`Al snapshot: <strong>cero bytes</strong> (solo metadata duplicada tras revocar leases). Al primer write a un chunk compartido: se crea <strong>C′ solo de ese chunk</strong>, copiado <strong>local en los mismos servidores</strong> (~3× vs red 100Mb), + lease nuevo (§3.4).<br>COW: el snapshot es instantáneo; la copia la paga quien escribe, pedazo a pedazo.`, h1:`Pista 1: tras revocar leases y duplicar metadata, ¿a qué apuntan los archivos del snapshot? (§3.4)`, h2:`Pista 2: ¿dónde se crea C′ y por qué no viaja por la red?`, rubric:`Rúbrica (5pts): 2 decisión (0 bytes + copia local al escribir) + 2 mecanismo (leases, refcount, C′) + 1 trade-off (gratis ahora, paga el escritor).`},
+{ title:'Caso 5 · Puente: commit log de Bigtable sobre GFS', prompt:`Un tablet server de Bigtable escribe su commit log y una réplica GFS del chunk falla a mitad del write.<br><br><strong>¿Quién ordena, quién reintenta y quién filtra? Dibuja las dos capas.</strong>`, solution:`Capa Bigtable: el tablet server agrega a su log (memtable + SSTables después); su recovery ordena por (tabla,fila,seq).<br>Capa GFS: el write del log es un <strong>write GFS normal</strong> (lease → primary → serial → réplicas); ante fallo, <strong>reintento GFS</strong>; la réplica caída vuelve <strong>stale</strong> (versiones) y se excluye.<br>Orden arriba (serial/seq), orden abajo (lease/serial): dos capas, mismo patrón, cero código compartido.`, h1:`Pista 1: ¿qué es un commit log de Bigtable visto desde GFS? (un archivo más, §2.3 GFS)`, h2:`Pista 2: falla una réplica abajo: ¿quién la detecta y con qué mecanismo? (§4.5)`, rubric:`Rúbrica (5pts): 2 decisión (dos capas, cada una ordena) + 2 mecanismo (log→write GFS, versiones) + 1 trade-off (delegar storage vs heredar sus fallos).`}
+];
+const GLOSSARY = [
+['Append (vs overwrite)','Patrón dominante: escribir agregando al final; overwrites casi inexistentes (<0.0001% bytes en X). Todo el diseño gira alrededor del append. (GFS §1–2.1, p.1–2)'],
+['At-least-once','Garantía del record append: contiguo ≥1 vez; duplicados/padding posibles que la app filtra. Más barato que exactly-once. (GFS §3.3, p.7–8)'],
+['B/T + R·L','Tiempo ideal de distribuir B bytes a R réplicas: throughput + latencia × réplicas. 1MB ≈ 80ms en la red del paper. (GFS §3.2, p.7)'],
+['Checkpoint','Snapshot B-tree del metadata en memoria que acota el operation log (~1 min para millones de archivos, en hilo separado). Recovery = último checkpoint + logs. (GFS §2.6.3, p.5)'],
+['Chunk','Unidad fija de 64MB en que se parten archivos; réplicas como archivos Linux con lazy allocation. Pocos chunks = hot spots. (GFS §2.3, §2.5, p.3–4)'],
+['Chunk handle','ID de 64 bits, inmutable y globalmente único por chunk, asignado por el master al crear. (GFS §2.3, p.3)'],
+['Chunkserver','Guarda chunks en disco local; 3× por defecto entre racks; reporta estado por HeartBeat; puede convivir con clientes. (GFS §2.3, p.3)'],
+['Checksums 64KB/32bit','Integridad por bloque verificada ANTES de servir (nunca propagan corrupción) + scrubbing de inactivos. Barato por reads multi-bloque. (GFS §5.2, p.12–13)'],
+['Consistent vs defined','Consistente = todos ven lo mismo; definida = + ven la mutación completa. Concurrente OK = consistent-undefined; fallo = inconsistent. (GFS §2.7.1, p.5, Tab.1)'],
+['Copy-on-write','Técnica del snapshot: duplicar metadata, copiar datos solo al primer write posterior. (GFS §3.4, p.8–9)'],
+['FindLocation','Request dominante al master (~64-66%): ubicaciones de chunks para reads. El master sobrelleva 200-500 ops/s. (GFS §6.3.4, p.13, Tab.6)'],
+['Garbage collection','Borrado perezoso: renombrar a oculto con timestamp (3 días) + scans de namespace y chunks. Simple, amortizado, con red de seguridad. (GFS §4.4, p.10–11)'],
+['HeartBeat','Ping periódico master↔chunkserver: instrucciones + estado (+ piggyback de leases). Ritmo de la coordinación. (GFS §2.3–3.1, p.3–6)'],
+['Lease / primary','Arriendo de 60s (extendible, revocable) a una réplica = primary; numera mutaciones en serie para orden global sin 2PC. (GFS §3.1, p.6)'],
+['Master (GFS)','Único; todo el metadata en RAM; nunca toca datos; log+checkpoints replicados; un solo activo + shadows de lectura. (GFS §2.4, §2.6, §5.1.3)'],
+['Namespace locks','Read-write lock por nodo del árbol en orden total (nivel + lexicográfico): operaciones largas concurrentes sin deadlock. (GFS §4.1, p.8–9)'],
+['Operation log','Único registro persistente del metadata + línea de tiempo lógica global; batching + flush local y remoto antes de responder. (GFS §2.6.3, p.5)'],
+['Padding (append)','Relleno hasta 64MB cuando un record no cabe; el cliente reintenta en el siguiente chunk. Motiva el límite de 16MB. (GFS §3.3, p.7–8)'],
+['Placement (racks)','Réplicas entre máquinas Y racks: sobrevive un rack caído + ancho multi-rack; writes cruzan racks (aceptado). (GFS §4.2, p.9)'],
+['Record append','Append atómico multi-escritor sin lock manager; offset lo elige GFS; ideal colas productor-consumidor. (GFS §3.3, p.7–8)'],
+['Re-replicación','Reponer réplicas bajo la meta con prioridades (distancia a meta, archivos vivos, chunks que bloquean) + clonado throttled. (GFS §4.3, p.9–10)'],
+['Shadow master','Réplica read-only ligeramente atrasada que sigue el log; sirve lecturas tolerantes sin el primario. (GFS §5.1.3, p.12)'],
+['Snapshot','Copia casi instantánea de archivo/árbol vía COW: revocar leases, duplicar metadata, copiar al primer write. (GFS §3.4, p.8–9)'],
+['Stale replica','Réplica que perdió leases por caída; su version number la delata al volver; excluida hasta GC. (GFS §4.5, p.11–12)']
+];
+const CHEATSHEET = `
+<div class="card accent-blue"><h3 style="margin-top:0;">🧱 Problema</h3><p style="font-size:14px;">Fallas = norma (commodity) · archivos <strong>multi-GB</strong> · casi todo <strong>append</strong>, read secuencial · <strong>bandwidth > latencia</strong>. 1000+ nodos, >300TB. Chicos no optimizados.</p></div>
+<div class="card accent-purple"><h3 style="margin-top:0;">🔌 Arquitectura</h3><p style="font-size:14px;">1 <strong>master</strong> (metadata en RAM) + N <strong>chunkservers</strong> (chunks como archivos Linux) + clientes. <strong>3×</strong> réplicas, handle 64bit. Datos <strong>nunca por el master</strong>; sin caché de datos.</p></div>
+<div class="card accent-teal"><h3 style="margin-top:0;">🧩 Chunks + metadata</h3><p style="font-size:14px;"><strong>64MB</strong> (menos RPCs + TCP persistente + metadata en RAM; hot spots en 1-chunk). <strong>&lt;64B/chunk</strong>. Ubicaciones <strong>no persisten</strong> (poll al arrancar). <strong>Op log</strong> + checkpoint ~1min.</p></div>
+<div class="card accent-orange"><h3 style="margin-top:0;">🏗️ Mutaciones</h3><p style="font-size:14px;"><strong>Lease 60s → primary + serials</strong> (7 pasos Fig.2; datos primero, control después). Pipeline <strong>B/T+R·L</strong> (~80ms/MB). <strong>Record append</strong> at-least-once ≤16MB. <strong>Snapshot COW</strong> (C′ local). Consistent vs <strong>defined</strong> (Tab.1).</p></div>
+<div class="card accent-gold"><h3 style="margin-top:0;">⚙️ Master + tolerancia</h3><p style="font-size:14px;">Locks en <strong>orden total</strong> · placement <strong>máquinas+racks</strong> · re-replicación priorizada · <strong>GC 3 días</strong> · <strong>versiones</strong> vs stale · kill-9 rutina · <strong>shadows</strong> · <strong>checksums 64KB/32bit</strong> pre-serve + scrubbing.</p></div>
+<div class="card accent-pink"><h3 style="margin-top:0;">🚀 Mediciones</h3><p style="font-size:14px;">Reads <strong>10→94MB/s</strong> (límite 125) · writes <strong>6.3→35</strong> (límite 67) · append 1 archivo <strong>6→4.8</strong> · A/B: 342/72TB y 227/180TB · recovery 600GB en <strong>23.2min</strong> · master 200-500 ops/s (<strong>FindLocation 64%</strong>).</p></div>
+<div class="card accent-teal"><h3 style="margin-top:0;">🔗 Puente GFS ↔ Bigtable</h3><p style="font-size:14px;">SSTables + commit logs <strong>son archivos GFS</strong> (64MB ×3). Master fuera de datos en ambos. Leases+serial (GFS) vs single-row+Chubby (BT). Append > overwrite en los dos. <strong>GFS no usa Chubby.</strong></p></div>
+`;
+const $ = s => document.querySelector(s);
+function go(view){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); $('#view-'+view).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===view)); window.scrollTo({top:0, behavior:'smooth'}); if(view==='quiz' && !quiz.rendered){ quiz.render(); } if(view==='animaciones' && !animsRendered){ initAnims(); } updateProgress(); }
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(t.dataset.view)));
+(function(){ const bar=document.getElementById('tabs'); const sync=()=>document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.classList.contains('active')?'true':'false')); bar.addEventListener('click', ()=>setTimeout(sync,0)); bar.addEventListener('keydown', e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const ts=[...bar.querySelectorAll('.tab')]; let i=ts.indexOf(document.activeElement); if(i<0) return; e.preventDefault(); i=(i+(e.key==='ArrowRight'?1:-1)+ts.length)%ts.length; ts[i].focus(); go(ts[i].dataset.view); sync(); }); sync(); })();
+const themeBtn = $('#themeBtn');
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; localStorage.setItem('gfs-theme', document.body.classList.contains('light') ? 'light' : 'dark'); });
+if(localStorage.getItem('gfs-theme')==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; }
+let done = JSON.parse(localStorage.getItem('gfs-done')||'{}');
+let quizScores = JSON.parse(localStorage.getItem('gfs-quiz')||'[]');
+function updateProgress(){ const total = MODULES.length; const finished = MODULES.filter(m=>done[m.id]).length; $('#progressFill').style.width = Math.round((finished/total)*100) + '%'; }
+function markDone(id){ done[id]=true; localStorage.setItem('gfs-done', JSON.stringify(done)); renderModuleNav(); updateProgress(); }
+function unmarkDone(id){ delete done[id]; localStorage.setItem('gfs-done', JSON.stringify(done)); renderModuleNav(); updateProgress(); }
+let currentModule = 0;
+function renderModuleNav(){ const nav=$('#moduleNav'); nav.innerHTML=''; MODULES.forEach((m,i)=>{ const b=document.createElement('button'); b.className='module-link'+(i===currentModule?' active':''); b.innerHTML='<span class="idx">'+String(i).padStart(2,'0')+'</span><span>'+m.title+'</span>'+(done[m.id]?'<span class="check">✓</span>':''); b.onclick=()=>{currentModule=i; renderModuleNav(); renderModule();}; nav.appendChild(b); }); }
+function renderModule(){ const m=MODULES[currentModule]; const c=$('#moduleContent'); c.innerHTML='<span class="kicker" style="color:var(--'+m.accent+');">'+m.tag+'</span><h2>'+m.title+'</h2><p class="lede">'+m.summary+'</p><div class="done-banner" style="'+(done[m.id]?'display:flex;':'display:none;')+'">✓ Módulo completado</div>'+m.html+'<div class="card accent-'+m.accent+'" style="margin-top:26px;"><div class="kicker" style="color:var(--'+m.accent+');">Mini-check rápido</div><p style="font-weight:600; color:var(--text); margin:8px 0;">'+m.mini.q+'</p><div id="miniOpts"></div><div class="explain" id="miniExplain"></div></div><div class="module-pager"><button class="btn ghost" id="prevBtn"'+(currentModule===0?' disabled style="opacity:.4;cursor:default;"':'')+'>← Anterior</button><button class="btn '+(done[m.id]?'ghost':'teal')+'" id="doneBtn">'+(done[m.id]?'↩ Desmarcar':'✓ Marcar como completado')+'</button><button class="btn" id="nextBtn"'+(currentModule===MODULES.length-1?' disabled style="opacity:.4;cursor:default;"':'')+'>Siguiente →</button></div>';
+const mo=$('#miniOpts'); m.mini.opts.forEach((opt,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=opt; b.onclick=()=>{ [...mo.children].forEach(x=>x.disabled=true); const ex=$('#miniExplain'); if(i===m.mini.a){ b.classList.add('correct'); ex.innerHTML='<span class="why">✓ Correcto.</span> '+m.mini.why; } else { b.classList.add('wrong'); mo.children[m.mini.a].classList.add('correct'); ex.innerHTML='<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> '+m.mini.why; } ex.classList.add('show'); }; mo.appendChild(b); });
+$('#prevBtn').onclick=()=>{ if(currentModule>0){ currentModule--; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+$('#nextBtn').onclick=()=>{ if(currentModule<MODULES.length-1){ currentModule++; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+$('#doneBtn').onclick=()=>{ if(done[m.id]){ unmarkDone(m.id); } else { markDone(m.id); } renderModule(); }; }
+const quiz = { rendered:false, answers:{},
+render(){ this.rendered=true; const c=$('#quizContainer'); c.innerHTML=''; QUIZ.forEach((q,qi)=>{ const card=document.createElement('div'); card.className='question-card'; card.id='q'+qi; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--'+q.c+'-soft); color:var(--'+q.c+');">'+q.tag+'</span><span style="color:var(--dim); font-size:13px;">Pregunta '+(qi+1)+' de '+QUIZ.length+'</span></div><div class="qtext">'+q.q+'</div><div class="opts"></div><div class="explain"></div>'; const box=card.querySelector('.opts'); q.opts.forEach((opt,oi)=>{ const b=document.createElement('button'); b.className='opt'; b.innerHTML=opt; b.onclick=()=>this.answer(qi,oi); box.appendChild(b); }); c.appendChild(card); }); this.refreshChip(); },
+answer(qi,oi){ if(this.answers[qi]!==undefined) return; this.answers[qi]=oi; const q=QUIZ[qi]; const card=$('#q'+qi); card.querySelectorAll('.opt').forEach((b,i)=>{ b.disabled=true; if(i===q.a) b.classList.add('correct'); if(i===oi&&oi!==q.a) b.classList.add('wrong'); }); const ex=card.querySelector('.explain'); ex.innerHTML='<span class="why">'+(oi===q.a?'✓ Correcto':'✗ Incorrecto')+'.</span> '+q.why; ex.classList.add('show'); this.refreshChip(); if(Object.keys(this.answers).length===QUIZ.length){ this.finish(); } },
+refreshChip(){ const n=Object.keys(this.answers).length; const ok=Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length; $('#scoreChip').textContent=ok+' / '+n+' correctas ('+QUIZ.length+' totales)'; },
+finish(){ const ok=Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length; const pct=Math.round(ok/QUIZ.length*100); const r=$('#quizResult'); r.classList.add('show'); $('#quizPercent').textContent=pct+'%'; $('#gradeFill').style.width=pct+'%'; let msg; if(pct===100) msg='🏆 ¡Perfecto! Dominas GFS y sus trade-offs.'; else if(pct>=80) msg='🎉 ¡Muy bien! Repasa solo las de trade-off falladas.'; else if(pct>=60) msg='👍 Vas bien. Relee los bloques ⚖️ de los módulos.'; else msg='📚 Vuelve a Aprende: fíjate en citas + trade-offs antes de reintentar.'; $('#quizMsg').textContent=msg; r.scrollIntoView({behavior:'smooth'}); quizScores.push(pct); localStorage.setItem('gfs-quiz', JSON.stringify(quizScores)); },
+reset(){ this.answers={}; this.rendered=false; $('#quizResult').classList.remove('show'); $('#scoreChip').textContent='0 / 0 correctas'; this.render(); window.scrollTo({top:0,behavior:'smooth'}); } };
+function renderCases(){ const c=$('#casesContainer'); c.innerHTML=''; CASES.forEach((cs,i)=>{ const card=document.createElement('div'); card.className='case-card'; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso '+(i+1)+'</span></div><h3 style="margin-top:4px;">'+cs.title+'</h3><div class="case-step">'+cs.prompt+'</div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn ghost small hint-btn">🔍 Pista 1</button><button class="btn ghost small hint-btn">🔍 Pista 2</button></div><div class="explain hint-ex"></div><button class="btn teal small reveal-btn" style="margin-top:8px;">💡 Ver solución</button><div class="explain sol-ex" style="margin-top:12px;"></div>'; const hex=card.querySelector('.hint-ex'); const hbtns=card.querySelectorAll('.hint-btn'); hbtns[0].onclick=()=>{ hex.innerHTML='<span class="why">Pista 1:</span> '+cs.h1; hex.classList.add('show'); hbtns[0].style.display='none'; }; hbtns[1].onclick=()=>{ hex.innerHTML='<span class="why">Pista 2:</span> '+cs.h2; hex.classList.add('show'); hbtns[1].style.display='none'; }; const ex=card.querySelector('.sol-ex'); const btn=card.querySelector('.reveal-btn'); btn.onclick=()=>{ ex.innerHTML='<span class="why">Solución:</span> '+cs.solution+'<br><br><span class="why">📏 '+(cs.rubric||'Rúbrica (5pts): 2 decisión + 2 mecanismo + 1 trade-off.')+'</span>'; ex.classList.add('show'); btn.style.display='none'; }; c.appendChild(card); }); }
+function renderGlossary(filter){ filter=filter||''; const list=$('#glossaryList'); list.innerHTML=''; const f=filter.toLowerCase(); GLOSSARY.filter(function(td){ return td[0].toLowerCase().includes(f)||td[1].toLowerCase().includes(f); }).forEach(function(td){ const div=document.createElement('div'); div.className='gloss-term'; div.innerHTML='<h3><code>'+td[0]+'</code></h3><div class="def">'+td[1]+'</div>'; list.appendChild(div); }); if(!list.children.length){ list.innerHTML='<p>Sin resultados.</p>'; } }
+$('#glossarySearch').addEventListener('input', function(e){ renderGlossary(e.target.value); });
+$('#cheatsheetContent').innerHTML = CHEATSHEET;
+let animsRendered = false;
+function initAnims(){ if(animsRendered) return; animsRendered=true; animGfsArch.init(); animGfsWrite.init(); animGfsAppend.init(); animGfsSnap.init(); animBridge.init(); }
+function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+const NODE={w:132,h:44,rx:10};
+const cBlue='#5b8cff', cTeal='#2dd4bf', cOrange='#ff9e5e', cPurple='#c084fc', cGold='#fbbf24', cDim='#4a5870';
+function nodeBox(x,y,label,fill,stroke){ const g=el('g',{}); g.appendChild(el('rect',{x:x-NODE.w/2,y:y-NODE.h/2,width:NODE.w,height:NODE.h,rx:NODE.rx,fill:fill,'fill-opacity':0.16,stroke:stroke,'stroke-width':1.2})); const t=el('text',{x:x,y:y+4,'text-anchor':'middle',class:'tnode'}); t.textContent=label; g.append(t); return g; }
+function arrow(g,x1,y1,x2,y2,color,label){ g.appendChild(el('path',{d:'M '+x1+' '+y1+' C '+((x1+x2)/2)+' '+y1+', '+((x1+x2)/2)+' '+y2+', '+x2+' '+y2,fill:'none',stroke:color,'stroke-width':1.6})); if(label){ const l=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle',class:'tedge'}); l.textContent=label; g.append(l); } }
+function svgDefs(svg){ const defs=el('defs',{}); defs.innerHTML='<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'; svg.appendChild(defs); }
+function animChrome(svgId, total, idleNarr){
+  const svg=document.getElementById(svgId);
+  const card=svg.closest('.card');
+  const bar=document.createElement('div'); bar.className='anim-status';
+  bar.innerHTML='<span class="status-badge">\u25CF Listo</span><div class="anim-progress"><div class="anim-progress-fill"></div></div><span class="step-counter">0/'+total+'</span>';
+  const nar=document.createElement('div'); nar.className='narrator'; nar.innerHTML=idleNarr;
+  const controls=card.querySelector('.controls');
+  controls.after(bar); bar.after(nar);
+  return {card:card, badge:bar.children[0], fill:bar.querySelector('.anim-progress-fill'), counter:bar.querySelector('.step-counter'), nar:nar};
+}
+function animSetUI(ch, playBtn, state, idx, total, narrHTML, capEl, capHTML){
+  ch.fill.style.width=Math.round(idx/total*100)+'%';
+  ch.counter.textContent=idx+'/'+total;
+  if(narrHTML!=null) ch.nar.innerHTML=narrHTML;
+  if(capEl&&capHTML!=null) capEl.innerHTML=capHTML;
+  ch.badge.classList.remove('playing','paused','done');
+  if(playBtn) playBtn.classList.remove('playing');
+  if(state==='playing'){ ch.badge.textContent='\u25B6 Reproduciendo\u2026'; ch.badge.classList.add('playing'); if(playBtn){ playBtn.innerHTML='\u23F8 Pausar'; playBtn.classList.add('playing'); } }
+  else if(state==='paused'){ ch.badge.textContent='\u23F8 Pausado \u2014 pulsa para continuar'; ch.badge.classList.add('paused'); if(playBtn) playBtn.innerHTML='\u25B6 Continuar'; }
+  else if(state==='done'){ ch.badge.textContent='\u2713 Completado'; ch.badge.classList.add('done'); if(playBtn) playBtn.innerHTML='\u21BA Repetir'; }
+  else { ch.badge.textContent='\u25CF Listo'; if(playBtn&&playBtn._idleLabel) playBtn.innerHTML=playBtn._idleLabel; }
+}
+function svgCap(svg, text, y){
+  const old=svg.querySelector('.svgcap'); if(old) old.remove();
+  if(!text) return;
+  const t=el('text',{x:360,y:y,'text-anchor':'middle',class:'svgcap'}); t.textContent=text; svg.append(t);
+}
+function glowIdx(svg, idxs){
+  const gs=svg.querySelectorAll('g');
+  gs.forEach(function(g){ g.removeAttribute('filter'); });
+  idxs.forEach(function(i){ if(gs[i]) gs[i].setAttribute('filter','url(#glow)'); });
+}
+function flowOn(svg, on){
+  svg.querySelectorAll('path').forEach(function(p){ const d=p.getAttribute('d')||''; if(d.length<30) return; if(on) p.classList.add('flow'); else p.classList.remove('flow'); });
+}
+const animGfsArch = { idx:0, timer:null, playing:false,
+steps:['<b>Paso 1/5 · Lookup.</b> El cliente manda al master <b>(nombre, índice de chunk)</b>. Solo metadata, cero bytes.','<b>Paso 2/5 · Respuesta.</b> El master devuelve <b>handle + réplicas</b> (+ prefetch de chunks siguientes). El cliente lo cachea.','<b>Paso 3/5 · Datos directo.</b> El cliente contacta al chunkserver (el más cercano) por <b>rango de bytes</b>. El master ya salió del camino.','<b>Paso 4/5 · HeartBeats.</b> Master↔chunkservers: instrucciones + estado. La metadata vive en <b>RAM</b>.','<b>Paso 5/5 · Regla de oro.</b> Los datos <b>nunca</b> pasan por el master. Solo metadata. ✓'],
+titles:['Paso 1/5 · lookup','Paso 2/5 · handle+réplicas','Paso 3/5 · datos directo','Paso 4/5 · heartbeats','Paso 5/5 · regla de oro ✓'],
+init(){ this.svg=$('#svgGraph'); svgDefs(this.svg);
+  this.ch=animChrome('svgGraph',5,'Pulsa <b>▶ Reproducir</b>: quién habla con quién en GFS.');
+  this.playBtn=document.querySelector('[onclick="animGfsArch.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#graphCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,5,null,this.cap,'Pulsa "Siguiente paso" o "▶ Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s); s.appendChild(nodeBox(360,40,'cliente',cGold,cGold)); s.appendChild(nodeBox(360,120,'master (metadata)',cBlue,cBlue)); s.appendChild(nodeBox(150,250,'chunkserver A',cTeal,cTeal)); s.appendChild(nodeBox(360,250,'chunkserver B',cTeal,cTeal)); s.appendChild(nodeBox(570,250,'chunkserver C',cTeal,cTeal)); arrow(s,360,62,360,98,cGold,'nombre+índice'); arrow(s,390,98,390,62,cBlue,'handle+réplicas'); arrow(s,330,62,250,228,cTeal,'datos directo'); arrow(s,470,140,540,228,cDim,'heartbeat'); },
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const s=this.steps[this.idx];
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,5,s,this.cap,s);
+  glowIdx(this.svg,[[0,1],[1,0],[0,3],[1,2,3,4],[]][this.idx]); svgCap(this.svg,this.titles[this.idx],330); flowOn(this.svg,this.playing&&!manual);
+  this.idx++;
+  if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; }
+  if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,5); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1400); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,5); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',5,5,'<b>✓ Arquitectura.</b> Metadata por el master, bytes directo. Sin POSIX, sin caché de datos.',this.cap,'Cliente→master→chunkservers: metadata vs datos.'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,5,'Pulsa <b>▶ Reproducir</b>: quién habla con quién en GFS.',this.cap,'Pulsa "Siguiente paso" o "▶ Reproducir".'); } };
+const animGfsWrite = { idx:0, timer:null, playing:false,
+steps:['<b>Paso 1/7 · Lease?</b> El cliente pregunta al master quién tiene el lease (lo otorga si no hay).','<b>Paso 2/7 · Lease OK.</b> Master responde primary + secundarias; el cliente lo cachea.','<b>Paso 3/7 · Push.</b> Datos a TODAS las réplicas, en cualquier orden (buffer LRU). Control y datos separados.','<b>Paso 4/7 · Serial.</b> Con todos los ACKs, el primary numera la mutación y la aplica local.','<b>Paso 5/7 · Réplica.</b> El primary reenvía a secundarias en el mismo orden serial.','<b>Paso 6/7 · ACKs.</b> Secundarias confirman al primary (errores incluidos).','<b>Paso 7/7 · Fin.</b> El primary responde al cliente. Fallo → reintenta 3–7, luego reinicia. Región inconsistente. ✓'],
+titles:['Paso 1/7 · lease?','Paso 2/7 · lease OK','Paso 3/7 · push','Paso 4/7 · serial','Paso 5/7 · réplica','Paso 6/7 · ACK','Paso 7/7 · fin ✓'],
+labels:['1 lease?','2 lease OK','3 push','4 serial','5 replica','6 ACK','7 fin'],
+init(){ this.svg=$('#svgCheck'); svgDefs(this.svg);
+  this.ch=animChrome('svgCheck',7,'Pulsa <b>▶ Reproducir</b>: el write en 7 pasos (Fig.2).');
+  this.playBtn=document.querySelector('[onclick="animGfsWrite.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#checkCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,7,null,this.cap,'Pulsa "Siguiente paso" o "▶ Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s); for(let i=0;i<7;i++){ const x=75+i*90; const active=i<this.idx; const g=nodeBox(x,120,this.labels[i],active?cTeal:cDim,active?cTeal:cDim); s.append(g); if(i<6) s.appendChild(el('line',{x1:x+58,y1:120,x2:x+90-58,y2:120,stroke:active?cTeal:cDim,'stroke-width':1.4})); } if(this.idx>0) svgCap(s,this.titles[this.idx-1],285); },
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const s=this.steps[this.idx];
+  this.idx++;
+  this.draw(); glowIdx(this.svg,[this.idx-1]);
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx,7,s,this.cap,s);
+  if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; }
+  if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,7); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1200); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,7); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',7,7,'<b>✓ Write completo.</b> Datos primero, orden después. Pipeline B/T+R·L (~80ms/MB).',this.cap,'Write en 7 pasos: lease → push → serial → réplicas → ACKs.'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,7,'Pulsa <b>▶ Reproducir</b>: el write en 7 pasos (Fig.2).',this.cap,'Pulsa "Siguiente paso" o "▶ Reproducir".'); } };
+const animGfsAppend = { idx:0, timer:null, playing:false,
+steps:['<b>Paso 1/5 · Push.</b> El cliente empuja datos a todas las réplicas del <b>último chunk</b> (sin decir offset).','<b>Paso 2/5 · Offset.</b> El primary elige el offset y lo devuelve: ahí empieza una región definida.','<b>Paso 3/5 · ¿Cabe?</b> Si excede 64MB → <b>pad</b> hasta el máximo y retry en el siguiente (records ≤16MB).','<b>Paso 4/5 · Retry.</b> Fallo en alguna réplica → reintento → posibles <b>duplicados</b> (réplicas no idénticas).','<b>Paso 5/5 · Filtra la app.</b> Checksums + IDs únicos descartan padding y duplicados. At-least-once. ✓'],
+titles:['Paso 1/5 · push','Paso 2/5 · offset','Paso 3/5 · ¿cabe?','Paso 4/5 · retry','Paso 5/5 · filtra ✓'],
+labels:['push','offset','¿cabe?','retry','filtra'],
+init(){ this.svg=$('#svgEnemy'); svgDefs(this.svg);
+  this.ch=animChrome('svgEnemy',5,'Pulsa <b>▶ Reproducir</b>: record append sin lock manager.');
+  this.playBtn=document.querySelector('[onclick="animGfsAppend.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#enemyCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,5,null,this.cap,'Pulsa "Siguiente paso" o "▶ Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s); for(let i=0;i<5;i++){ const x=96+i*120; const active=i<this.idx; const g=nodeBox(x,120,'('+(i+1)+') '+this.labels[i],active?cTeal:cDim,active?cTeal:cDim); s.append(g); if(i<4) s.appendChild(el('line',{x1:x+58,y1:120,x2:x+120-58,y2:120,stroke:active?cTeal:cDim,'stroke-width':1.4})); } if(this.idx>0) svgCap(s,this.titles[this.idx-1],285); },
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const s=this.steps[this.idx];
+  this.idx++;
+  this.draw(); glowIdx(this.svg,[this.idx-1]);
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx,5,s,this.cap,s);
+  if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; }
+  if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,5); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1300); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,5); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',5,5,'<b>✓ Append atómico.</b> Sin lock manager: cientos de productores, una secuencia contigua.',this.cap,'Record append: push → offset → pad/retry → filtra.'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,5,'Pulsa <b>▶ Reproducir</b>: record append sin lock manager.',this.cap,'Pulsa "Siguiente paso" o "▶ Reproducir".'); } };
+const animGfsSnap = { idx:0, timer:null, playing:false,
+steps:[
+ {n:'<b>Paso 1/4 · Revoca.</b> Snapshot de /d: el master <b>revoca leases</b> de los chunks cubiertos y loguea la operación.', c:'Leases revocados; operación logueada.', d:'revoke', cap:'1/4 leases revocados'},
+ {n:'<b>Paso 2/4 · Duplica metadata.</b> Los archivos del snapshot <b>apuntan a los mismos chunks</b>. Cero bytes copiados.', c:'Metadata duplicada; mismos chunks C.', d:'snap', cap:'2/4 cero bytes copiados'},
+ {n:'<b>Paso 3/4 · COW al escribir.</b> Primer write a chunk compartido (refcount>1) → nuevo handle <b>C′ con copia local</b> + lease nuevo.', c:'C′ creado en los mismos servidores (local, ~3×).', d:'cow', cap:'3/4 copia local C′'},
+ {n:'<b>Paso 4/4 · GC perezoso.</b> Borrar = renombrar a oculto (~3 días); scans limpian expirados + huérfanos. ✓', c:'Nada se borra de inmediato; red de 3 días.', d:'gc', cap:'4/4 GC perezoso ✓'}],
+init(){ this.svg=$('#svgZookie'); svgDefs(this.svg);
+  this.ch=animChrome('svgZookie',4,'Pulsa <b>▶ Reproducir</b>: snapshot COW + GC perezoso.');
+  this.playBtn=document.querySelector('[onclick="animGfsSnap.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#zookieCaption'); this.draw('idle');
+  animSetUI(this.ch,this.playBtn,'idle',0,4,null,this.cap,'Pulsa reproducir para ver el snapshot.'); },
+draw(state){ const s=this.svg; s.innerHTML=''; svgDefs(s);
+  const t=el('text',{x:360,y:40,'text-anchor':'middle',class:'tnode'}); t.textContent='snapshot de /d + GC perezoso'; s.append(t);
+  const box=function(x,y,label,col){ s.appendChild(nodeBox(x,y,label,col,col)); };
+  if(state==='idle'){ box(200,150,'C@s1',cTeal); box(360,150,'C@s2',cTeal); box(520,150,'C@s3',cTeal);
+    const n=el('text',{x:360,y:230,'text-anchor':'middle',class:'tedge'}); n.textContent='chunks C ×3, leases activos, refs = 1'; s.append(n); }
+  else if(state==='revoke'){ box(200,150,'C@s1',cGold); box(360,150,'C@s2',cGold); box(520,150,'C@s3',cGold);
+    const n=el('text',{x:360,y:230,'text-anchor':'middle',class:'tedge'}); n.textContent='leases revocados; snapshot S apunta a C'; s.append(n); }
+  else if(state==='snap'){ box(200,150,'C@s1',cGold); box(360,150,'C@s2',cGold); box(520,150,'C@s3',cGold);
+    const n=el('text',{x:360,y:230,'text-anchor':'middle',class:'tedge'}); n.textContent='metadata duplicada; cero bytes copiados'; s.append(n);
+    const n2=el('text',{x:360,y:255,'text-anchor':'middle',class:'tnode'}); n2.textContent='S → C (mismos chunks)'; s.append(n2); }
+  else if(state==='cow'){ box(200,150,'C (viejo)',cDim); box(360,150,"C′@s1.. (copia local)",cTeal); box(520,150,'lease nuevo',cTeal);
+    const n=el('text',{x:360,y:230,'text-anchor':'middle',class:'tedge'}); n.textContent='primer write: copia local ~3× + lease sobre C′'; s.append(n); }
+  else { box(200,150,'foo (hidden)',cOrange); box(360,150,'3 días',cOrange); box(520,150,'huérfanos fuera',cOrange);
+    const n=el('text',{x:360,y:230,'text-anchor':'middle',class:'tedge'}); n.textContent='borrar = renombrar; scans limpian expirados'; s.append(n); } },
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const st=this.steps[this.idx];
+  this.draw(st.d); svgCap(this.svg,st.cap,300);
+  this.idx++;
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx,4,st.n,this.cap,st.c);
+  if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; }
+  if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,4); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1600); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,4); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ COW + GC.</b> Snapshot instantáneo; la copia la paga quien escribe; el borrado espera 3 días.',this.cap,'Snapshot COW + GC perezoso ✓.'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw('idle'); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>▶ Reproducir</b>: snapshot COW + GC perezoso.',this.cap,'Pulsa reproducir para ver el snapshot.'); } };
+const animBridge = { mode:'both',
+init(){ this.svg=$('#svgArch'); svgDefs(this.svg);
+  this.ch=animChrome('svgArch',3,'Elige qué capa iluminar: lo que aporta GFS, lo que aporta Bigtable, o la pila completa.');
+  this.segBtns=Array.prototype.slice.call(this.ch.card.querySelectorAll('.controls .btn'));
+  this.cap=$('#archCaption'); this.draw(); this.markSeg();
+  animSetUI(this.ch,null,'idle',0,3,null,this.cap,'Pulsa un botón: GFS, Bigtable o pila completa.');
+},
+markSeg(){ const m=this.mode; this.segBtns.forEach(function(b){ b.classList.remove('seg-on'); }); const i=m==='gfs'?0:m==='bigtable'?1:2; if(this.segBtns[i]) this.segBtns[i].classList.add('seg-on'); },
+capText(){ return this.mode==='gfs' ? 'Capa GFS: chunks 64MB ×3 + master de metadata.' : this.mode==='bigtable' ? 'Capa Bigtable: log, memtable, SSTables + Chubby.' : 'Pila completa: apps → Bigtable → GFS → discos.'; },
+narrText(){ return this.mode==='gfs' ? 'Iluminado <b>GFS</b>: Bigtable persiste aquí sus SSTables y commit logs como archivos de chunks replicados.' : this.mode==='bigtable' ? 'Iluminado <b>Bigtable</b>: modelo (fila,columna,tiempo), tablets, compactions; coordina con Chubby, no con GFS.' : 'Pila <b>completa</b>: MapReduce/apps → tablet servers → chunks GFS → discos commodity. Chubby solo coordina a Bigtable.'; },
+show(m){ this.mode=m; this.draw(); this.markSeg();
+  animSetUI(this.ch,null,'done',3,3,this.narrText(),this.cap,this.capText());
+  const gs=this.svg.querySelectorAll('g'); gs.forEach(function(g){ g.setAttribute('filter','url(#glow)'); });
+  setTimeout(function(){ gs.forEach(function(g,i){ if(i>0) g.removeAttribute('filter'); }); },900);
+},
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s); const all=this.mode==='both'; const g=this.mode==='gfs'; const b=this.mode==='bigtable';
+  s.appendChild(nodeBox(360,36,'apps / MapReduce',cGold,cGold));
+  s.appendChild(nodeBox(360,112,b||all?'Bigtable: log, memtable, SSTable':'Bigtable',b||all?cTeal:cDim,b||all?cTeal:cDim));
+  s.appendChild(nodeBox(360,192,g||all?'GFS: chunks 64MB ×3':'GFS',g||all?cBlue:cDim,g||all?cBlue:cDim));
+  s.appendChild(nodeBox(360,272,'discos commodity',cDim,cDim));
+  s.appendChild(nodeBox(600,112,b||all?'Chubby (solo BT)':'Chubby',b||all?cPurple:cDim,b||all?cPurple:cDim));
+  arrow(s,360,58,360,90,cGold,'usa'); arrow(s,360,134,360,170,cTeal,'persiste en'); arrow(s,360,214,360,250,cBlue,'guarda en'); arrow(s,480,112,540,112,cPurple,'coordina');
+  svgCap(s, this.mode==='both'?'pila completa: BT sobre GFS':this.mode==='gfs'?'GFS: el suelo':'Bigtable: el modelo', 330); } };
+renderModuleNav(); renderModule(); renderCases(); renderGlossary(''); updateProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora · Aprende & Practica — Amazon Aurora Cloud-Native Relational DB</title>
+<style>
+/* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
+   Tesis: apuntes de curso compuestos como página editorial — titulares serif,
+   datelines mono, reglas finas en vez de tarjetas, examen numerado, un solo
+   azul tinta reservado a la acción. Ejes: density media · warmth cálida ·
+   formality media-baja · energy quieta · ornament estructural · contrast alto.
+   Offline: Georgia + sans/mono nativos (sin fuentes bloqueantes). Clases e ids
+   intactos: el JS no cambia salvo iconos de módulo y flechas en tabs. */
+:root{
+  --bg:#131110; --bg2:#171514; --surface:#1b1917; --surface2:#221f1c; --surface3:#2a2622;
+  --border:#322d27; --border-soft:#25211d;
+  --text:#ece7dc; --muted:#a8a196; --dim:#6f6a61;
+  --blue:#8ba3c7; --blue-soft:rgba(139,163,199,.12);
+  --teal:#6fae9d; --teal-soft:rgba(111,174,157,.11);
+  --orange:#c08d5c; --orange-soft:rgba(192,141,92,.11);
+  --purple:#9d8ab8; --purple-soft:rgba(157,138,184,.11);
+  --gold:#c2a05e; --gold-soft:rgba(194,160,94,.11);
+  --pink:#b08396; --pink-soft:rgba(176,131,150,.11);
+  --good:#74b18f; --bad:#c07f8c;
+  --brand1:#8ba3c7; --brand2:#8ba3c7;
+  --display:Georgia,'Palatino Linotype','Book Antiqua',Palatino,serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --shadow:none;
+  --shadow-sm:none;
+  --radius:8px; --radius-sm:6px; --radius-xs:4px;
+  --ring:0 0 0 2px rgba(139,163,199,.45);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; color:var(--text);
+  font-family:var(--sans); line-height:1.7; font-size:16px;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+body.light{
+  --bg:#f4f1e9; --bg2:#ece6d5; --surface:#fbf9f2; --surface2:#f0e9d6; --surface3:#e3d8bf;
+  --border:#d2c7a9; --border-soft:#e0d6bc;
+  --text:#26241f; --muted:#5e594e; --dim:#948d7d;
+  --blue:#3c5a86; --blue-soft:rgba(60,90,134,.09);
+  --teal:#337065; --teal-soft:rgba(51,112,101,.09);
+  --orange:#8f5f2b; --orange-soft:rgba(143,95,43,.09);
+  --purple:#635183; --purple-soft:rgba(99,81,131,.09);
+  --gold:#7d6a2e; --gold-soft:rgba(125,106,46,.10);
+  --pink:#8f4f68; --pink-soft:rgba(143,79,104,.09);
+  --good:#3c7a5d; --bad:#9c4a59;
+  --shadow:0 1px 2px rgba(60,50,25,.08);
+  --shadow-sm:0 1px 2px rgba(60,50,25,.06);
+  background:var(--bg);
+}
+::selection{background:var(--border); color:var(--text);}
+a{color:var(--blue); text-decoration:none; border-radius:3px;}
+a:hover{text-decoration:underline;}
+a:focus-visible, button:focus-visible, input:focus-visible{outline:none; box-shadow:var(--ring);}
+::-webkit-scrollbar{width:11px; height:11px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:8px; border:3px solid var(--bg);}
+::-webkit-scrollbar-track{background:transparent;}
+.skip-link{position:absolute; left:12px; top:-48px; z-index:100; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px 14px; font-size:14px; font-weight:600; transition:top .15s ease; text-decoration:none;}
+.skip-link:focus{top:12px;}
+
+/* ============ HEADER / NAV ============ */
+header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border-soft);}
+.topbar{max-width:1200px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:11px; font-weight:650; letter-spacing:-.01em; font-size:16px;}
+.brand .logo{width:34px; height:34px; border-radius:6px; flex:0 0 auto; background:var(--surface3); border:1px solid var(--border); display:grid; place-items:center; font-weight:700; font-family:var(--display); font-size:17px; color:var(--text);}
+.brand small{display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em;}
+.tabs{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border-soft); border-radius:8px; padding:3px;}
+.tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; padding:7px 13px; border-radius:6px; cursor:pointer;}
+.tab:hover{color:var(--text); background:var(--surface2);}
+.tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
+.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
+.theme-btn:hover{border-color:var(--dim);}
+.hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
+.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}
+.progress-track{height:3px; background:var(--border-soft);}
+.progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+
+/* ============ LAYOUT / TYPE — escala 12 / 14 / 16 / 18 / 24 / 40 ============ */
+main{max-width:1200px; margin:0 auto; padding:32px 20px 110px;}
+.view{display:none;}
+.view.active{display:block; animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;}to{opacity:1;}}
+@keyframes pop{from{opacity:0;}to{opacity:1;}}
+@keyframes animPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+h1.title{font-family:var(--display); font-weight:700; font-size:clamp(2rem,4.4vw,2.75rem); margin:12px 0 12px; letter-spacing:0; line-height:1.12; text-wrap:balance;}
+h1.title em{font-style:italic;}
+h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0 0 12px; letter-spacing:0; line-height:1.25; text-wrap:balance;}
+h3{font-family:var(--display); font-weight:700; font-size:1.15rem; margin:30px 0 10px; line-height:1.3;}
+p{max-width:68ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
+p strong, li strong, td strong{color:var(--text);}
+ul, ol{color:var(--muted);}
+.lede{font-size:1.125rem; color:var(--muted); max-width:64ch; line-height:1.65;}
+.dateline{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--dim); margin:0 0 4px;}
+.dateline::before{content:""; width:26px; height:1px; background:var(--dim);}
+.dateline cite{font-style:normal; color:var(--muted);}
+.kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-weight:700;}
+.kicker::before{content:""; width:18px; height:1px; background:var(--dim);}
+
+.card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
+.card.accent-blue, .card.accent-teal, .card.accent-orange, .card.accent-purple, .card.accent-gold, .card.accent-pink{border-left:1px solid var(--border-soft);}
+.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:72ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
+.callout::before{display:grid; place-items:center; width:24px; height:24px; border-radius:6px; position:absolute; left:12px; top:13px; font-size:13px; font-weight:700; background:var(--surface3); border:1px solid var(--border);}
+.callout .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; font-weight:700; color:var(--dim);}
+.callout.info{border-left-color:var(--blue);} .callout.info .lbl{color:var(--blue);} .callout.info::before{content:"i"; color:var(--blue); font-family:var(--sans); font-style:normal;}
+.callout.tip{border-left-color:var(--teal);} .callout.tip .lbl{color:var(--teal);} .callout.tip::before{content:"✓"; color:var(--teal);}
+.callout.warn{border-left-color:var(--orange);} .callout.warn .lbl{color:var(--orange);} .callout.warn::before{content:"!"; color:var(--orange);}
+.callout.err{border-left-color:var(--bad);} .callout.err .lbl{color:var(--bad);} .callout.err::before{content:"×"; color:var(--bad);}
+.callout.dark{background:var(--surface2);}
+.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:72ch; color:var(--muted);}
+.trade b{color:var(--text);}
+.trade b:first-child{color:var(--text);}
+
+code{font-family:var(--mono); font-size:.85em; background:var(--surface2); border:1px solid var(--border-soft); padding:1px 5px; border-radius:4px; color:var(--text);}
+pre{background:#100f0e; color:#d8d5cf; padding:16px 18px; border-radius:4px; overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.7; max-width:100%; border:1px solid var(--border-soft);}
+body.light pre{background:#26241f; color:#e2ded6;}
+pre code{background:none; border:0; padding:0; color:inherit; font-size:inherit;}
+.kw{color:#c8b88a;} .str{color:#93b898;} .cmt{color:#6e6e76;} .fn{color:#9db4d0;} .op{color:#b39ec4;}
+
+table{border-collapse:separate; border-spacing:0; width:100%; margin:14px 0; font-size:13.5px; border:1px solid var(--border-soft); border-radius:4px; overflow:hidden;}
+th,td{padding:9px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--border-soft);}
+th{background:var(--surface2); font-weight:650; color:var(--text); font-size:12.5px; position:sticky; top:0;}
+tr:last-child th, tr:last-child td{border-bottom:0;}
+tbody tr:hover td{background:var(--surface2);}
+tr:nth-child(even) td{background:color-mix(in srgb, var(--surface2) 50%, transparent);}
+table, .score-chip, .step-counter{font-variant-numeric:tabular-nums;}
+
+.pill{display:inline-block; padding:2px 10px; border-radius:999px; font-size:11.5px; font-weight:650; font-family:var(--mono); border:1px solid var(--border);}
+.pill.blue{background:var(--blue-soft); color:var(--blue); border-color:transparent;}
+.pill.teal{background:var(--teal-soft); color:var(--teal); border-color:transparent;}
+.pill.orange{background:var(--orange-soft); color:var(--orange); border-color:transparent;}
+.pill.purple{background:var(--purple-soft); color:var(--purple); border-color:transparent;}
+.pill.gold{background:var(--gold-soft); color:var(--gold); border-color:transparent;}
+
+.btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); cursor:pointer; background:var(--surface3); color:var(--text); font-weight:600; font-size:14px; font-family:var(--sans); padding:9px 17px; border-radius:var(--radius-sm);}
+.btn:hover{border-color:var(--dim); filter:brightness(1.1);}
+.btn:active{transform:none;}
+.btn:disabled{opacity:.45; cursor:default;}
+.btn.ghost{background:var(--surface2); color:var(--text); border-color:var(--border-soft);}
+.btn.ghost:hover{border-color:var(--dim);}
+.btn.teal{background:var(--teal); border-color:transparent; color:#10201c;}
+body.light .btn.teal{color:#fbf9f3;}
+.btn.teal:hover{filter:brightness(.94);}
+.btn.playing{background:var(--gold); border-color:transparent; color:#1a1408;}
+.btn.small{padding:6px 12px; font-size:13px;}
+.linklike{background:none; border:0; padding:9px 4px; cursor:pointer; color:var(--blue); font-family:var(--sans); font-size:14px; font-weight:600; text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px;}
+.linklike:hover{filter:brightness(1.15);}
+.controls .btn.seg-on{border-color:var(--teal); color:var(--teal);}
+
+/* ============ HERO (editorial: dateline, titular, una acción) ============ */
+.hero{display:grid; grid-template-columns:1.5fr 1fr; gap:32px; align-items:start; padding:20px 0 8px; border-bottom:1px solid var(--border-soft); padding-bottom:28px;}
+.hero-cards{display:grid; gap:12px;}
+.hero-cta{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:20px;}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:24px 0;}
+.stat{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 14px 14px; text-align:left;}
+.stat .n{font-family:var(--display); font-size:1.7rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1.1;}
+.stat .l{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5;}
+.path{list-style:none; margin:18px 0; padding:0; border-top:1px solid var(--border-soft);}
+.path li{border-bottom:1px solid var(--border-soft);}
+.path-step{display:flex; gap:18px; align-items:baseline; width:100%; text-align:left; background:none; border:0; padding:16px 4px; cursor:pointer; color:var(--text); font-family:var(--sans);}
+.path-step:hover .path-t{color:var(--blue);}
+.path-n{font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--dim); min-width:44px;}
+.path-step:hover .path-n{color:var(--blue);}
+.path-t{display:block; font-size:16px; font-weight:650; color:var(--text);}
+.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:62ch;}
+
+/* ============ APRENDE ============ */
+.aprende-layout{display:grid; grid-template-columns:250px 1fr; gap:24px; align-items:start;}
+.module-nav{position:sticky; top:78px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:6px;}
+.module-link{display:flex; align-items:center; gap:10px; text-align:left; cursor:pointer; background:transparent; border:0; border-radius:6px; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:8px 11px; border-left:2px solid transparent;}
+.module-link:hover{background:var(--surface2); color:var(--text);}
+.module-link.active{background:var(--surface2); color:var(--text); border-left-color:var(--blue);}
+.module-link .idx{font-family:var(--mono); font-size:11px; color:var(--dim);}
+.module-link.done .check{margin-left:auto; color:var(--good); font-size:13px; font-weight:700;}
+.module-content{min-width:0;}
+.module-content > h2{margin-top:4px;}
+.done-banner{display:none; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--good); border-radius:6px; padding:9px 14px; margin-bottom:14px; color:var(--text); font-weight:600; font-size:14px;}
+.module-pager{display:flex; justify-content:space-between; gap:12px; margin-top:24px; flex-wrap:wrap;}
+.legend{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;}
+
+/* ============ SVG figures ============ */
+figure{margin:20px 0;}
+figure svg{width:100%; height:auto; display:block; background:var(--surface); border:1px solid var(--border-soft); border-radius:4px;}
+figure figcaption{font-size:14px; color:var(--muted); background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:9px 13px; margin-top:8px; font-family:var(--sans);}
+figure figcaption span{color:var(--text);}
+.tnode{font:600 13px var(--sans); fill:var(--text);}
+.tedge{font:400 11px var(--mono); fill:var(--muted);}
+svg text.svgcap{font:700 14px var(--sans); fill:var(--gold);}
+svg .flow{stroke-dasharray:7 5; animation:dashmove 0.9s linear infinite;}
+@keyframes dashmove{to{stroke-dashoffset:-12;}}
+.controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:12px 0;}
+.controls label{cursor:pointer;}
+input[type="checkbox"]{accent-color:var(--blue);}
+input[type="range"]{-webkit-appearance:none; appearance:none; height:4px; border-radius:99px; background:var(--border); outline-offset:4px;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+input[type="range"]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+
+/* ============ ANIM feedback ============ */
+.anim-status{display:flex; align-items:center; gap:12px; margin:14px 0 4px; flex-wrap:wrap;}
+.status-badge{font-family:var(--mono); font-size:11.5px; font-weight:700; padding:3px 11px; border-radius:999px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;}
+.status-badge.playing{color:var(--teal); border-color:var(--teal); animation:animPulse 1.4s ease-in-out infinite;}
+.status-badge.paused{color:var(--gold); border-color:var(--gold);}
+.status-badge.done{color:var(--good); border-color:var(--good);}
+.anim-progress{flex:1; min-width:140px; height:6px; border-radius:999px; background:var(--surface2); overflow:hidden; border:1px solid var(--border-soft);}
+.anim-progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+.step-counter{font-family:var(--mono); font-size:12px; color:var(--dim); min-width:52px; text-align:right;}
+.narrator{background:var(--surface); border:1px solid var(--border-soft); border-left:3px solid var(--blue); border-radius:6px; padding:11px 15px; margin:10px 0; font-size:15px; line-height:1.65; color:var(--text); min-height:52px;}
+.narrator b{color:var(--text);}
+
+/* ============ QUIZ (examen numerado) ============ */
+.quiz-toolbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:14px 0;}
+.score-chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-weight:650; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums;}
+.question-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:16px 0; scroll-margin-top:90px;}
+.qmeta{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+.qmeta .qnum{font-family:var(--display); font-style:italic; font-size:15px; color:var(--dim);}
+.qtag{font-family:var(--mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; border:1px solid transparent;}
+.qtext{font-size:16.5px; font-weight:650; margin-bottom:12px; color:var(--text); line-height:1.6;}
+.opts{counter-reset:qa;}
+.opt{position:relative; display:block; width:100%; text-align:left; cursor:pointer; font-family:var(--sans); background:var(--surface); border:1px solid var(--border-soft); color:var(--text); border-radius:6px; padding:10px 13px 10px 50px; margin:7px 0; font-size:14px; line-height:1.55;}
+.opt::before{counter-increment:qa; content:counter(qa,upper-alpha); position:absolute; left:11px; top:50%; transform:translateY(-50%); width:26px; height:26px; display:grid; place-items:center; border-radius:6px; background:var(--surface2); border:1px solid var(--border); font-family:var(--mono); font-size:12px; font-weight:700; color:var(--dim);}
+.opt:hover{border-color:var(--dim);}
+.opt:hover::before{color:var(--text); border-color:var(--dim);}
+.opt.correct{border-color:var(--good);}
+.opt.correct::before{background:var(--good); border-color:var(--good); color:#0e1512;}
+.opt.wrong{border-color:var(--bad);}
+.opt.wrong::before{background:var(--bad); border-color:var(--bad); color:#fff;}
+.opt:disabled{cursor:default;}
+.opt:disabled:not(.correct):not(.wrong){opacity:.7;}
+.explain{display:none; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--teal); border-radius:0 6px 6px 0; padding:13px 15px; margin-top:11px; font-size:13.5px; color:var(--muted);}
+.explain.show{display:block; animation:pop .2s ease;}
+.explain .why{font-weight:700; color:var(--text);}
+.quiz-result{display:none; text-align:center; padding:30px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border-soft); margin:20px 0;}
+.quiz-result.show{display:block; animation:pop .25s ease;}
+.big-score{font-family:var(--display); font-size:3.2rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1;}
+.grade-bar{height:10px; border-radius:999px; background:var(--surface2); border:1px solid var(--border-soft); overflow:hidden; margin:14px auto; max-width:420px;}
+.grade-fill{height:100%; width:0; border-radius:999px; background:var(--blue); transition:width .6s ease;}
+.case-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:18px 0; scroll-margin-top:90px;}
+.case-card h3{margin-top:6px;}
+.case-step{background:var(--surface2); border:1px solid var(--border-soft); border-radius:6px; padding:12px 15px; margin:10px 0; font-size:14px;}
+.hint-btn{font-family:var(--mono); font-size:12.5px;}
+.reveal-btn{margin-top:6px;}
+
+/* ============ GLOSARIO ============ */
+.glossary-search{width:100%; max-width:480px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:var(--sans); font-size:14.5px; padding:11px 15px 11px 40px; border-radius:6px; margin:12px 0 8px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236f6a61' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:13px center;}
+.glossary-search:focus{border-color:var(--blue); box-shadow:var(--ring); outline:none;}
+.glossary-search::placeholder{color:var(--dim);}
+.gloss-term{background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:15px 17px; margin:10px 0; border-left:2px solid transparent;}
+.gloss-term:hover{border-left-color:var(--dim);}
+.gloss-term h3{margin:0 0 5px; font-size:15.5px;}
+.gloss-term .def{color:var(--muted); font-size:14px;}
+
+/* ============ CHEATSHEET ============ */
+#cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:0 14px; align-items:start;}
+#cheatsheetContent .card{margin:7px 0;}
+#cheatsheetContent .card:first-child{grid-column:1 / -1;}
+
+footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-soft); text-align:center; color:var(--dim); font-size:12.5px;}
+
+@media(max-width:860px){
+  body{font-size:15.5px;}
+  .hero{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .path-step{padding:14px 2px;}
+  #cheatsheetContent{grid-template-columns:1fr;}
+  .aprende-layout{grid-template-columns:1fr;}
+  .module-nav{position:static; flex-direction:row; overflow-x:auto; padding:6px; scrollbar-width:thin;}
+  .module-link{white-space:nowrap; border-left:0; border-bottom:2px solid transparent; border-radius:0;}
+  .module-link.active{border-bottom-color:var(--blue);}
+  h1.title{font-size:1.7rem;}
+  .tabs{margin-left:0;}
+  table{display:block; overflow-x:auto;}
+}
+@media print{
+  header, .tabs, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  body{background:#fff;}
+  main{max-width:100%; padding:0;}
+  .view{display:none !important;}
+  #view-cheatsheet{display:block !important;}
+  #cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  #cheatsheetContent .card{box-shadow:none; break-inside:avoid; border:1px solid #999; margin:4px 0; padding:10px 12px;}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *, *::before, *::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+  svg .flow{animation:none;}
+}
+
+</style>
+</head>
+<body><a class="skip-link" href="#main">Saltar al contenido</a>
+<header>
+  <div class="topbar">
+    <a class="hub-link" href="../../index.html">← Hub</a>
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <div>Aurora Studio</div>
+        <small>Amazon Aurora: High-Throughput Cloud-Native Relational DB</small>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
+      <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="aprende">Aprende</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="animaciones">Animaciones</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="quiz">Quiz & Casos</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
+    </nav>
+    <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<main id="main">
+
+<!-- ===================== INICIO ===================== -->
+<section id="view-inicio" class="view active">
+  <div class="hero">
+    <div>
+      <p class="dateline">Apuntes de estudio · Basado en <cite>Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases</cite> · Verbitski et al., SIGMOD 2017</p>
+      <h1 class="title">El <em>log</em> es la base de datos</h1>
+      <p class="lede">Esa es la idea central de Aurora: el servicio relacional OLTP de AWS que desacopla <strong>cómputo y almacenamiento</strong>, escribe solo el <strong>redo log</strong> a un storage distribuido <strong>multi-AZ</strong>, y deja que el storage materialice páginas, recupere y se auto-repare — para escalar <strong>sin que la red colapse</strong>.</p>
+      <p>Esta app te lleva desde cero (¿por qué la red es el cuello de botella?) hasta los detalles finos (quórum 4/6, segmentos de 10GB, VCL/VDL, PGMRPL), con <strong>animaciones interactivas</strong>, <strong>guías paso a paso</strong> y un <strong>quiz con casos</strong> para comprobar lo que aprendiste.</p>
+      <div class="hero-cta">
+        <button class="btn" onclick="go('aprende')">Comenzar a aprender →</button>
+        <button class="linklike" onclick="go('quiz')">Ir directo al quiz →</button>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="card accent-blue" style="margin:0;">
+        <div class="kicker">Cómputo ≠ Almacenamiento</div>
+        <p style="margin:6px 0 0; font-size:14.5px;"><strong>Cómputo</strong> = MySQL/InnoDB (queries, transacciones, locks, caché). <strong>Almacenamiento</strong> = servicio distribuido que guarda solo el log, materializa páginas y se recupera solo. Aurora los separa.</p>
+      </div>
+      <div class="card accent-teal" style="margin:0;">
+        <div class="kicker">La idea central en 1 línea</div>
+        <p style="margin:6px 0 0; font-size:14.5px;">Todo write es solo un <strong>redo log record</strong> con LSN. Las páginas nunca salen del engine: el storage las <em>genera</em> aplicando el log.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="n">6×</div><div class="l">copias por segmento (3 AZs)</div></div>
+    <div class="stat"><div class="n">10GB</div><div class="l">tamaño de segmento (PG)</div></div>
+    <div class="stat"><div class="n">15</div><div class="l">réplicas lectoras por clúster</div></div>
+    <div class="stat"><div class="n">35×</div><div class="l">más tx que MySQL espejado*</div></div>
+  </div>
+
+  <h2>¿Cómo usar esta app?</h2>
+  <p class="lede">Tres pasos, en orden. Cada uno prepara el siguiente.</p>
+  <ol class="path">
+    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">7 módulos progresivos, de novato a nivel de paper. Cada uno con ejemplos y mini-checks.</span></span></button></li>
+    <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">Visualiza el quórum 4/6, el ahorro de IOs, el pipeline del storage, VCL/VDL y el flujo de escritura.</span></span></button></li>
+    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">22 preguntas técnicas con explicación + casos prácticos con solución paso a paso.</span></span></button></li>
+  </ol>
+</section>
+
+<!-- ===================== APRENDE ===================== -->
+<section id="view-aprende" class="view">
+  <span class="kicker">Ruta de aprendizaje</span>
+  <h2>📚 Aprende Aurora desde cero</h2>
+  <p class="lede">Sigue los módulos en orden. Cada uno construye sobre el anterior. Marca "completado" para llevar tu progreso.</p>
+
+  <div class="aprende-layout">
+    <nav class="module-nav" id="moduleNav"></nav>
+    <div class="module-content" id="moduleContent"></div>
+  </div>
+</section>
+
+<!-- ===================== ANIMACIONES ===================== -->
+<section id="view-animaciones" class="view">
+  <span class="kicker">Laboratorio visual</span>
+  <h2>🎬 Animaciones interactivas</h2>
+  <p class="lede">Pulsa los botones y observa cómo se comporta el sistema. Estas son las mismas ideas de los módulos, pero en movimiento.</p>
+
+  <div class="card accent-blue" id="anim1">
+    <h3>1 · Quórum 4/6 con 3 AZs (simulador de fallos)</h3>
+    <p style="font-size:14px;">Un PG tiene <strong>6 segmentos</strong> (2 por AZ). Haz clic en un nodo para caído/vivo, o usa los botones. Write necesita <strong>4/6</strong>, read <strong>3/6</strong>.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animGraph.failAZ('C')">🔥 Caer AZ-C</button>
+      <button class="btn small" onclick="animGraph.failOne()">💥 Caer 1 nodo</button>
+      <button class="btn small ghost" onclick="animGraph.reset()">Reparar todo</button>
+      <button class="btn teal small" onclick="animGraph.check()">▶ ¿Hay quórum?</button>
+    </div>
+    <figure>
+      <svg id="svgGraph" viewBox="0 0 720 320" role="img" aria-label="Simulador de quorum"></svg>
+      <figcaption>Fig A · <span id="graphCaption">6 vivos: write ✓ (6≥4) y read ✓ (6≥3). Haz clic en los nodos.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-purple" id="anim2">
+    <h3>2 · MySQL amplificado vs Aurora log-only</h3>
+    <p style="font-size:14px;">Mismo SysBench write-only 100GB/30min. Mira <strong>transacciones</strong> e <strong>IOs por tx</strong> en el nodo DB.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animCheck.show('mysql')">MySQL espejado</button>
+      <button class="btn small" onclick="animCheck.show('aurora')">Aurora</button>
+      <button class="btn teal small" onclick="animCheck.show('both')">▶ Comparar</button>
+    </div>
+    <figure>
+      <svg id="svgCheck" viewBox="0 0 720 360" role="img" aria-label="Comparativa de IOs"></svg>
+      <figcaption>Fig B · <span id="checkCaption">780K tx × 7,4 IOs vs 27,4M tx × 0,95 IOs.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-teal" id="anim3">
+    <h3>3 · Pipeline del storage node (8 pasos)</h3>
+    <p style="font-size:14px;">Solo <strong>(1) recibir y (2) persistir+ACK</strong> están en foreground. El resto es background. Recorre paso a paso.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animEnemy.step()">Siguiente paso →</button>
+      <button class="btn small ghost" onclick="animEnemy.play()">▶ Reproducir</button>
+      <button class="btn small ghost" onclick="animEnemy.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgEnemy" viewBox="0 0 720 300" role="img" aria-label="Pipeline del storage"></svg>
+      <figcaption>Fig C · <span id="enemyCaption">Pulsa "Siguiente paso".</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-orange" id="anim4">
+    <h3>4 · VCL vs VDL: dónde truncar</h3>
+    <p style="font-size:14px;">Completo hasta <strong>1007</strong>, CPLs en <strong>900/1000/1100</strong>. ¿Hasta dónde es durable?</p>
+    <div class="controls">
+      <button class="btn small" onclick="animZookie.play()">▶ Reproducir</button>
+      <button class="btn small ghost" onclick="animZookie.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgZookie" viewBox="0 0 720 340" role="img" aria-label="VCL y VDL"></svg>
+      <figcaption>Fig D · <span id="zookieCaption">Pulsa reproducir.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="card accent-gold" id="anim5">
+    <h3>5 · Flujo de escritura Aurora</h3>
+    <p style="font-size:14px;">Writer lotea por PG → <strong>6 réplicas, espera 4 ACKs</strong> → avanza VDL → stream async a réplicas + S3.</p>
+    <div class="controls">
+      <button class="btn small" onclick="animArch.play()">▶ Animar flujo</button>
+      <button class="btn small ghost" onclick="animArch.reset()">Reiniciar</button>
+    </div>
+    <figure>
+      <svg id="svgArch" viewBox="0 0 720 360" role="img" aria-label="Arquitectura de Aurora"></svg>
+      <figcaption>Fig E · <span id="archCaption">Pulsa "Animar flujo".</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="view-quiz" class="view">
+  <span class="kicker">Comprueba tu aprendizaje</span>
+  <h2>📝 Quiz técnico</h2>
+  <p class="lede">Responde y recibe la explicación al instante. Puedes reintentar las veces que quieras. Después pasa a los <strong>casos prácticos</strong>.</p>
+
+  <div class="quiz-toolbar">
+    <span class="score-chip" id="scoreChip">0 / 0 correctas</span>
+    <button class="btn ghost small" onclick="quiz.reset()">↺ Reiniciar quiz</button>
+  </div>
+  <div id="quizContainer"></div>
+  <div class="quiz-result" id="quizResult">
+    <div class="big-score" id="quizPercent">0%</div>
+    <div class="grade-bar"><div class="grade-fill" id="gradeFill"></div></div>
+    <p id="quizMsg" style="text-align:center; margin:0 auto;"></p>
+  </div>
+
+  <hr style="border:none; border-top:1px solid var(--border-soft); margin:40px 0;">
+
+  <h2>🧩 Casos prácticos (ejercicios)</h2>
+  <p class="lede">Aplica lo aprendido. Intenta resolver cada caso <em>antes</em> de pulsar "Ver solución".</p>
+  <div id="casesContainer"></div>
+</section>
+
+<!-- ===================== GLOSARIO ===================== -->
+<section id="view-glosario" class="view">
+  <span class="kicker">Referencia rápida</span>
+  <h2>📖 Glosario</h2>
+  <p class="lede">Todos los términos del paper en un solo lugar. Escribe para filtrar.</p>
+  <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: quórum, LSN, VDL)…">
+  <div id="glossaryList"></div>
+</section>
+
+<!-- ===================== CHEATSHEET ===================== -->
+<section id="view-cheatsheet" class="view">
+  <span class="kicker">Repaso de último minuto</span>
+  <h2>⚡ Cheatsheet</h2>
+  <p class="lede">Todo lo esencial en una página, ideal para repasar antes del quiz o el examen.</p>
+  <div id="cheatsheetContent"></div>
+</section>
+
+</main>
+
+<footer>
+  Herramienta de estudio autogenerada sobre el paper "Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases" (SIGMOD 2017). *SysBench write-only 100GB, 30 min, r3.8xlarge.
+  Pensada para aprender a tu ritmo: leer → animar → practicar.
+</footer>
+
+<script>
+/* ============================================================
+   DATOS DE CONTENIDO
+============================================================ */
+const MODULES = [
+  {
+    id:'m0', icon:'🌩️', tag:'Módulo 0', accent:'gold', title:'El problema: la red es el cuello de botella',
+    summary:'Por qué mover workloads a la nube cambia el I/O, y por qué Aurora desacopla cómputo y storage.',
+    html:`
+    <p class="lede">Antes de hablar de quórums y LSNs, entiende <strong>qué problema</strong> resuelve Aurora. Sin esto, su arquitectura parece exagerada.</p>
+    <h3>El contexto: todo se va a la nube</h3>
+    <p>Los workloads se mudan a proveedores cloud por <strong>aprovisionamiento flexible</strong> y pago por <strong>gasto operativo</strong>. Pero muchos necesitan una base <strong>relacional OLTP</strong> igual o mejor que on-premise. Aurora es la respuesta de AWS.</p>
+    <div class="callout info"><div class="lbl">Tendencia clave</div>
+      Resiliencia y escalabilidad se logran <strong>desacoplando cómputo de almacenamiento</strong> y <strong>replicando el storage en varios nodos</strong>. Así se puede reemplazar hosts, agregar réplicas, hacer failover o escalar sin atar los datos a una máquina.</div>
+    <h3>El cuello de botella se movió</h3>
+    <p>Como los I/Os se reparten en una flota multi-tenant (muchos nodos y discos), <strong>los discos dejan de ser lo caliente</strong>. El límite pasa a ser <strong>la red entre el engine y el storage</strong>: paquetes por segundo, ancho de banda y —sobre todo— <strong>amplificación</strong>, porque un engine rápido emite writes en paralelo y el nodo/path más lento domina la latencia.</p>
+    <h3>Dos fuentes de stalls síncronos</h3>
+    <table>
+      <tr><th>Situación</th><th>Qué pasa</th></tr>
+      <tr><td><strong>Cache miss (lectura)</strong></td><td>El hilo se bloquea hasta completar el read; puede forzar <strong>evict + flush</strong> de una página dirty. Checkpointing y background writes lo mitigan, pero causan stalls y contención.</td></tr>
+      <tr><td><strong>Commit de transacción</strong></td><td>Un stall en un commit frena a otros. Protocolos como <strong>2PC</strong> son intolerantes a fallos y lentos entre data centers con “ruido de fondo” continuo de fallos.</td></tr>
+    </table>
+    <div class="callout tip"><div class="lbl">Idea fuerza</div>
+      Aurora ataca esto con una arquitectura <strong>orientada a servicios</strong>: un storage <strong>multi-tenant scale-out</strong> que abstrae un <strong>redo log segmentado virtualizado</strong>, acoplado débilmente a una flota de instancias. El engine conserva queries, transacciones, locks, caché y undo; el storage asume <strong>redo, durabilidad, recovery y backup</strong>.</div>
+    <h3>Tres ventajas de esta arquitectura</h3>
+    <table>
+      <tr><th>Ventaja</th><th>Qué significa</th></tr>
+      <tr><td><strong>1. Storage tolerante a fallos</strong></td><td>Servicio independiente y self-healing en varios DCs: protege al engine de varianza y fallos de red/storage. Un fallo de durabilidad ≈ evento largo de disponibilidad ≈ variación larga de performance.</td></tr>
+      <tr><td><strong>2. Solo se escribe el redo</strong></td><td>Reduce los IOPS de red en un <strong>orden de magnitud</strong>; liberado ese cuello, se optimizan muchos otros puntos de contención.</td></tr>
+      <tr><td><strong>3. Lo caro se vuelve continuo</strong></td><td>Backup y recovery pasan de operaciones puntuales caras a <strong>operaciones asíncronas amortizadas</strong> en la flota: recovery casi instantáneo sin checkpoints y backups baratos sin interferir.</td></tr>
+    </table>
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Pensar que Aurora es “MySQL más rápido”. No: es <strong>otra arquitectura</strong> (log-is-database + storage inteligente) que parte del código MySQL pero cambia dónde y cómo se escribe, recupera y replica.</div>
+    `,
+    mini: { q:'Según el paper, ¿dónde está hoy el constraint central en data processing de alto throughput?', opts:['En el CPU del engine','En los discos individuales','En la red entre cómputo y storage','En el parser SQL'], a:2, why:'Con I/Os repartidos en la flota, los discos dejan de ser lo caliente; el límite se mueve a la red (PPS, ancho de banda y amplificación por writes paralelos).' }
+  },
+  {
+    id:'m1', icon:'🗳️', tag:'Módulo 1', accent:'blue', title:'Durabilidad a escala: quórum 6/4/3 y segmentos',
+    summary:'Votos, AZs, fallos correlacionados y por qué 2/3 no alcanza: el diseño AZ+1 de Aurora.',
+    html:`
+    <p class="lede">Si un sistema no garantiza <strong>“dato escrito = dato leíble”</strong>, nada más importa. Aquí está el razonamiento de quórum de Aurora.</p>
+    <h3>Quórum 101</h3>
+    <p>Cada dato replicado tiene V votos. Un read necesita Vr votos y un write Vw votos, con reglas:</p>
+    <pre><code>Vr + Vw &gt; V   <span class="cmt">// todo read ve el write más reciente (intersección)</span>
+Vw &gt; V / 2      <span class="cmt">// todo write ve el write más reciente (sin conflictos)</span></code></pre>
+    <p>Lo clásico para tolerar 1 nodo caído es <strong>V=3, Vw=2, Vr=2</strong>. Aurora dice: <strong>insuficiente</strong>.</p>
+    <h3>Por qué 2/3 no alcanza: fallos correlacionados</h3>
+    <p>Un <strong>AZ</strong> es un subconjunto de una región aislado en poder, red, deploys, inundaciones, etc. Replicas en 3 AZs toleran eventos grandes. Pero en una flota hay <strong>ruido de fondo</strong>: discos/nodos/path caídos en reparación en A, B y C. Si además <strong>falla todo el AZ C</strong> (incendio, techo, inundación), cualquier réplica con fallo concurrente en A o B pierde el quórum 2/3: quedan 1 de 3 y <strong>no se sabe si está actualizada</strong>. El fallo de un AZ es un <strong>fallo correlacionado</strong> de todos sus discos.</p>
+    <div class="callout err"><div class="lbl">Punto del paper</div>
+      Los quórums deben tolerar <strong>un AZ entero + ruido de fondo concurrente</strong>, no solo un nodo.</div>
+    <h3>El diseño AZ+1 de Aurora</h3>
+    <p>Cada ítem se replica <strong>6 veces en 3 AZs (2 copias por AZ)</strong>, con <strong>V=6, Vw=4, Vr=3</strong>:</p>
+    <table>
+      <tr><th>Garantía</th><th>Qué tolera</th></tr>
+      <tr><td><strong>(a) Sin perder datos</strong></td><td>Perder un <strong>AZ entero + 1 nodo adicional</strong> (3 nodos) sin perder disponibilidad de lectura.</td></tr>
+      <tr><td><strong>(b) Sin perder writes</strong></td><td>Perder <strong>2 nodos cualesquiera</strong> (incluido un AZ) y seguir escribiendo. El quórum de lectura permite reconstruir el de escritura agregando copias.</td></tr>
+    </table>
+    <h3>Segmented storage: el truco del MTTR</h3>
+    <p>¿Alcanza AZ+1? Hay que asegurar que un <strong>doble fallo</strong> (MTTF) sea improbable durante la <strong>ventana de reparación</strong> (MTTR). En vez de bajar el MTTF, Aurora <strong>reduce el MTTR</strong>: parte el volumen en <strong>segmentos de 10GB</strong>, cada uno replicado 6× en un <strong>Protection Group (PG)</strong> (2 segmentos por AZ). Un segmento de 10GB se repara en <strong>~10s en un link de 10Gbps</strong>. Habría que ver 2 fallos en la misma ventana de 10s <em>más</em> un AZ caído para perder el quórum: suficientemente improbable.</p>
+    <pre><code>volumen = PGs concatenados  <span class="cmt">// PG = 6 segmentos de 10GB (2 por AZ)</span>
+volumen máx actual: 64TB (no replicado)
+nodos: VMs EC2 con SSDs locales, PGs asignados al crecer</code></pre>
+    <div class="callout tip"><div class="lbl">Ventaja operativa</div>
+      Un sistema que tolera fallos largos tolera los cortos: congestión, reboots, parches de OS, upgrades por AZ (un solo miembro del PG a la vez), <strong>heat management</strong> (marcar un segmento caliente como malo y migrar). Deploys ágiles sin dolor.</div>
+    `,
+    mini: { q:'¿Qué quórum usa Aurora y qué tolera?', opts:['V=3, W=2, R=2; tolera 1 nodo','V=6, W=4, R=3; tolera AZ+1 en reads y 2 nodos en writes','V=5, W=3, R=3; tolera 2 AZs','Sin quórum, todo síncrono'], a:1, why:'6 copias en 3 AZs (2 por AZ), write 4/6 y read 3/6: pierde un AZ+1 nodo sin perder datos y 2 nodos sin perder writes.' }
+  },
+  {
+    id:'m2', icon:'📜', tag:'Módulo 2', accent:'purple', title:'The Log is the Database',
+    summary:'MySQL amplifica writes; Aurora solo envía redo al storage y deja que él materialice páginas.',
+    html:`
+    <p class="lede">Poner una base tradicional sobre storage segmentado replicado 6× con quórum 4/6 tiene un costo <strong>intolerable</strong>: cada write de app genera <strong>múltiples I/Os distintos</strong> que la replicación amplifica.</p>
+    <h3>Cómo escribe MySQL tradicional (espejado)</h3>
+    <p>Un MySQL activo en AZ1 con EBS + standby en AZ2 con mirroring síncrono escribe: <strong>redo log, binlog (a S3), páginas modificadas, double-write (anti torn-pages) y metadatos FRM</strong>. El flujo (EBS → espejo local → mirror al standby → EBS standby) es <strong>secuencial y síncrono</strong>: latencias aditivas, jitter amplificado, quórum efectivo 4/4.</p>
+    <div class="callout warn"><div class="lbl">Doble problema</div>
+      No solo <em>cómo</em> se escribe (secuencial/síncrono), sino <em>qué</em> se escribe: la misma info en varias formas (ej. double-write). Chain replication abarata red pero mantiene stalls y latencias aditivas.</div>
+    <h3>El giro: offload del redo al storage</h3>
+    <p>En una base clásica, el <strong>log applicator</strong> aplica el redo a la imagen en memoria para producir el after-image; el commit exige log durable, la página puede diferirse. Aurora <strong>empuja el applicator al storage</strong>:</p>
+    <ul style="color:var(--muted);">
+      <li><strong>La red solo ve redo log records.</strong> Nunca salen páginas del engine: ni background writes, ni checkpoints, ni evictions.</li>
+      <li>El storage <strong>genera páginas en background o bajo demanda</strong>. Regenerar todo desde el inicio sería carísimo, así que <strong>materializa continuamente</strong>.</li>
+      <li>Esa materialización es <strong>optional para correctitud</strong>: para el engine, <em>el log es la base</em>; las páginas materializadas son solo un <strong>caché de aplicaciones del log</strong>.</li>
+      <li>Solo se rematerializan <strong>páginas con cadenas largas</strong> (no todo el log como un checkpoint).</li>
+    </ul>
+    <h3>El experimento del paper (SysBench write-only, 100GB, 30 min, r3.8xlarge)</h3>
+    <table>
+      <tr><th>Config</th><th>Transacciones</th><th>IOs/tx (nodo DB)</th></tr>
+      <tr><td><strong>Mirrored MySQL</strong></td><td>780.000</td><td>7,4</td></tr>
+      <tr><td><strong>Aurora con réplicas</strong></td><td>27.378.000</td><td>0,95</td></tr>
+    </table>
+    <p>Aurora sostiene <strong>35× más transacciones</strong> con <strong>7,7× menos I/Os por tx</strong> en el nodo DB (a pesar de amplificar 6×), y <strong>46× menos I/Os por nodo de storage</strong> (cada uno ve 1/6). Ese ahorro permite <strong>replicar agresivo y paralelizar</strong> para domar el jitter.</p>
+    <div class="callout tip"><div class="lbl">Bonus: recovery gratis</div>
+      Como la aplicación del redo ocurre <strong>continua, asíncrona y distribuida</strong>, el crash recovery se reparte en el procesamiento normal: <strong>nada que hacer al arrancar</strong> (sin replay desde checkpoint).</div>
+    `,
+    mini: { q:'¿Qué cruza la red en Aurora?', opts:['Páginas + redo + binlog','Solo redo log records','Páginas completas cada checkpoint','Snapshots S3'], a:1, why:'Del engine nunca salen páginas (ni background, ni checkpoint, ni eviction). Solo redo; el storage genera las páginas.' }
+  },
+  {
+    id:'m3', icon:'🔧', tag:'Módulo 3', accent:'teal', title:'Storage service: fondo vs foreground',
+    summary:'Los 8 pasos del nodo de storage; solo recibir+persistir están en el path crítico.',
+    html:`
+    <p class="lede">El tenet del storage: <strong>minimizar la latencia del write en foreground</strong>. Casi todo lo demás va al background —y hay tiempo de sobra por la variabilidad pico-vs-promedio.</p>
+    <h3>Los 8 pasos (Fig. 4 del paper)</h3>
+    <pre><code>(1) recibir log record → cola en memoria
+(2) persistir en disco → ACK
+(3) organizar records, detectar gaps (batches perdidos)
+(4) gossip con peers para rellenar huecos
+(5) coalescer logs → nuevas páginas de datos
+(6) stage periódico de log + páginas a S3
+(7) garbage collect de versiones viejas
+(8) validación periódica de CRCs</code></pre>
+    <div class="callout info"><div class="lbl">Solo (1) y (2) son foreground</div>
+      Todo lo demás es <strong>asíncrono</strong>. GC solo cuando el nodo está ocioso o el disco se llena; si hay backlog, se hace <strong>throttle del foreground</strong> (y como los segmentos tienen alta entropía entre nodos, el quórum 4/6 lo absorbe como “nodo lento”). A diferencia de una base clásica, aquí el background tiene <strong>correlación negativa</strong> con el foreground.</div>
+    <h3>Otras decisiones</h3>
+    <table>
+      <tr><th>Técnica</th><th>Para qué</th></tr>
+      <tr><td><strong>CPU por disco</strong></td><td>Se puede gastar CPU (coalesce, compresión) para ahorrar disco y latencia.</td></tr>
+      <tr><td><strong>Backlinks por PG</strong></td><td>Cada log lleva el LSN previo de su PG para rastrear completitud (SCL) y detectar gaps.</td></tr>
+      <tr><td><strong>S3 continuo</strong></td><td>Backup/restore dejan de ser operaciones puntuales: son <strong>streaming amortizado</strong>.</td></tr>
+    </table>
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Creer que “gossip, coalesce y backup” están en el path del commit. No: el commit solo espera <strong>4/6 ACKs de persistir el log</strong>. Lo demás ocurre después y en paralelo.</div>
+    `,
+    mini: { q:'¿Qué pasos del storage están en el foreground?', opts:['Los 8 pasos','Solo recibir + persistir y ACK','Solo gossip y GC','Coalesce + S3 + CRC'], a:1, why:'Únicamente (1) recibir/encolar y (2) persistir/ACK impactan la latencia; del (3) al (8) son asíncronos.' }
+  },
+  {
+    id:'m4', icon:'➡️', tag:'Módulo 4', accent:'orange', title:'The Log Marches Forward: consistencia sin 2PC',
+    summary:'LSN, VCL/VDL/CPL, commits asíncronos, reads sin quórum y réplicas con lag de ms.',
+    html:`
+    <p class="lede">El log avanza como <strong>secuencia ordenada</strong> (cada record tiene un <strong>LSN</strong> monotónico del engine). Con eso, Aurora mantiene consistencia <strong>asíncronamente</strong>, sin 2PC “charlatán” e intolerante a fallos.</p>
+    <h3>Vocabulario mínimo</h3>
+    <table>
+      <tr><th>Término</th><th>Qué es</th></tr>
+      <tr><td><strong>LSN</strong></td><td>Log Sequence Number monotónico asignado por la DB. Límite: no asignar más allá de <strong>VDL + LAL</strong> (LAL = 10M): back-pressure si el storage/red no da abasto.</td></tr>
+      <tr><td><strong>SCL</strong></td><td>Segment Complete LSN: el mayor LSN bajo el cual <em>ese segmento</em> ya recibió todo (vía backlinks). Sirve para gossip y para saber a quién leerle.</td></tr>
+      <tr><td><strong>VCL</strong></td><td>Volume Complete LSN: el mayor LSN con <strong>todos</strong> los records previos disponibles. Todo lo de arriba se <strong>trunca</strong>.</td></tr>
+      <tr><td><strong>CPL / VDL</strong></td><td>CPL = log final de cada <strong>mini-transacción (MTR)</strong> atómica. VDL = mayor CPL ≤ VCL. Se trunca todo &gt; VDL. Ej: completo hasta 1007 pero CPLs en 900/1000/1100 → durable hasta <strong>1000</strong>.</td></tr>
+      <tr><td><strong>PGMRPL</strong></td><td>Protection Group Min Read Point: low-water-mark de reads por PG. Bajo eso, los logs son innecesarios → se puede <strong>coalescer + GC</strong> seguro.</td></tr>
+    </table>
+    <h3>Writes, commits y reads en operación normal</h3>
+    <ul style="color:var(--muted);">
+      <li><strong>Writes:</strong> el engine lotea log records por PG, los envía a las 6 réplicas y espera <strong>4/6 ACKs</strong>; al avanzar los ACKs avanza el <strong>VDL</strong>. Pueden coexistir muchísimas transacciones; el control de concurrencia es el de <strong>MySQL clásico</strong> (el storage no se entera).</li>
+      <li><strong>Commits asíncronos:</strong> el thread registra el “commit LSN” en una lista de espera y sigue con otro trabajo. Cuando el VDL ≥ commit LSN, un thread dedicado <strong>manda los ACKs</strong>. Los workers <strong>nunca se pausan por commits</strong>.</li>
+      <li><strong>Reads sin quórum:</strong> la página debe estar en su <strong>última versión en caché</strong>; solo se puede evictar si su page-LSN ≥ VDL (todo endurecido). Al leer de disco se fija un <strong>read-point (= VDL actual)</strong> y se lee de <strong>un solo segmento</strong> cuyo SCL cubra ese punto. Sin consenso.</li>
+    </ul>
+    <h3>Réplicas lectoras</h3>
+    <p>Un writer + hasta <strong>15 réplicas</strong> montan el <strong>mismo volumen compartido</strong> (cero costo extra de storage/writes). El writer les hace <strong>stream del log + metadatos</strong>; la réplica aplica al caché solo records con <strong>LSN ≤ VDL</strong> y de forma <strong>atómica por MTR</strong>. Lag típico <strong>≤ 20ms</strong> (vs segundos/minutos en MySQL).</p>
+    <h3>Recovery (rápido, &lt;10s)</h3>
+    <p>Al rearrancar, la DB contacta un <strong>quórum de lectura por PG</strong>, recalcula el VDL, <strong>trunca con rangos versionados por epoch</strong> (hasta un end-LSN ≥ cualquier log posible gracias al límite LAL) y luego hace <strong>undo recovery online</strong> (lista de in-flights desde los undo segments). El redo ya está aplicado en el storage.</p>
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Confundir VCL con VDL: <strong>VCL = completitud</strong> (todo hasta ahí llegó), <strong>VDL = durabilidad</strong> (mayor CPL ≤ VCL, truncable). Sin CPLs, el storage no sabría dónde cortar sin romper atomicidad de MTRs.</div>
+    `,
+    mini: { q:'Completo hasta 1007, CPLs en 900/1000/1100. ¿Dónde se trunca?', opts:['En 1007','En 1000','En 1100','En 900'], a:1, why:'VDL = mayor CPL ≤ VCL (1007). De 900/1000/1100, el mayor ≤ 1007 es 1000. Todo lo de arriba se trunca.' }
+  },
+  {
+    id:'m5', icon:'🏗️', tag:'Módulo 5', accent:'gold', title:'Arquitectura completa',
+    summary:'Fork de MySQL/InnoDB + RDS + storage multi-AZ: cómo encajan las piezas.',
+    html:`
+    <p class="lede">Juntando las tres ideas (quórum, log-is-database, avance asíncrono) sale la arquitectura de la Fig. 5.</p>
+    <h3>Engine: fork de MySQL/InnoDB</h3>
+    <p>Conserva query processor, transacciones, lock manager, B+-Tree y <strong>MTRs</strong> (grupos atómicos internos, ej. split/merge). Diverge en el <strong>subsistema de I/O</strong>: los redo de cada MTR se lotean <strong>shardeados por PG</strong> hacia el storage, marcando el último como <strong>CPL</strong>. Mismos <strong>niveles de aislamiento</strong> que MySQL (ANSI + snapshot reads); las réplicas usan starts/commits del writer para snapshot isolation read-only. El storage presenta una vista <strong>lógicamente idéntica</strong> a discos locales.</p>
+    <h3>Clúster y control plane (RDS)</h3>
+    <table>
+      <tr><th>Pieza</th><th>Rol</th></tr>
+      <tr><td><strong>Clúster</strong></td><td>1 writer + 0–15 read replicas, en una sola región, típicamente en <strong>distintos AZs</strong>, contra la flota de storage de la región.</td></tr>
+      <tr><td><strong>Host Manager</strong></td><td>Agente RDS por instancia: monitorea salud, decide <strong>failover</strong> o reemplazo.</td></tr>
+      <tr><td><strong>3 VPCs</strong></td><td>Customer (apps↔engine), RDS (engine↔control plane), Storage (engine↔storage). Aislamiento de seguridad.</td></tr>
+      <tr><td><strong>DynamoDB + SWF + S3</strong></td><td>DynamoDB guarda config de volúmenes y metadata de backups; SWF orquesta operaciones largas (restore, re-replicación); S3 recibe el <strong>stream continuo de backups</strong>.</td></tr>
+    </table>
+    <h3>Storage fleet</h3>
+    <p>Clúster de <strong>VMs EC2 con SSDs</strong> en ≥3 AZs por región: aprovisiona volúmenes, sirve reads/writes, hace backup/restore, repara (gossip + migración), y se monitorea con <strong>métricas y alarmas</strong> proactivas.</p>
+    <div class="callout tip"><div class="lbl">Imagen mental</div>
+      Engine = “cerebro transaccional” (rápido, con caché). Storage = “memoria durable distribuida” (log + páginas materializadas + self-healing). S3 = “respaldo continuo”. Réplicas = “cachés calientes del mismo log”.</div>
+    `,
+    mini: { q:'¿Cuántas réplicas lectoras soporta un clúster Aurora y sobre qué storage?', opts:['5, cada una con su volumen','15, todas sobre el mismo volumen compartido','Sin límite, storage local','1 standby con EBS'], a:1, why:'Un writer y hasta 15 réplicas montan un único volumen compartido: sin costo extra de storage ni disk writes.' }
+  },
+  {
+    id:'m6', icon:'🚀', tag:'Módulo 6', accent:'pink', title:'Rendimiento y lecciones',
+    summary:'Números SysBench/TPC-C, replica lag y lo aprendido en 18 meses de producción.',
+    html:`
+    <p class="lede">Aurora lleva en producción desde julio 2015 (GA). Estos son los números del paper (r3.8xlarge, 32 vCPU, 244GB, caché 170GB; MySQL con EBS 30K IOPS).</p>
+    <h3>Escala con tamaño de instancia y de DB (SysBench)</h3>
+    <p>Throughput <strong>escala lineal</strong> con el tamaño (large → 8xlarge) y llega a <strong>5× MySQL 5.6/5.7</strong> en read/write (1GB). En write-only: hasta <strong>67× con 100GB</strong> y <strong>34× con 1TB</strong> out-of-cache.</p>
+    <table>
+      <tr><th>DB</th><th>Aurora (writes/s)</th><th>MySQL (writes/s)</th></tr>
+      <tr><td>1GB</td><td>107.000</td><td>8.400</td></tr>
+      <tr><td>10GB</td><td>107.000</td><td>2.400</td></tr>
+      <tr><td>100GB</td><td>101.000</td><td>1.500</td></tr>
+      <tr><td>1TB</td><td>41.000</td><td>1.200</td></tr>
+    </table>
+    <h3>Conexiones, réplicas y hot rows</h3>
+    <table>
+      <tr><th>Conexiones (OLTP writes/s)</th><th>Aurora</th><th>MySQL</th></tr>
+      <tr><td>50 / 500 / 5.000</td><td>40.000 → 71.000 → 110.000</td><td>10.000 → 21.000 → 13.000 (cae)</td></tr>
+    </table>
+    <table>
+      <tr><th>Replica lag (write-only)</th><th>Aurora</th><th>MySQL</th></tr>
+      <tr><td>1K → 10K writes/s</td><td>2,6ms → 5,4ms</td><td>&lt;1s → 300s</td></tr>
+    </table>
+    <p>En <strong>TPC-C con hot-row contention</strong> (Percona variant): <strong>2,3×–16,3×</strong> el throughput de MySQL 5.7.</p>
+    <h3>Lecciones de 18 meses (lo que piden los clientes cloud)</h3>
+    <ul style="color:var(--muted);">
+      <li><strong>Segmentos pequeños + reparación rápida</strong> vencen a la “probabilidad de fallo”: diseña para el MTTR.</li>
+      <li><strong>Quórum resiliente</strong> (AZ+1) convierte mantenimiento (parches, upgrades, heat) en no-eventos.</li>
+      <li><strong>Mueve el cómputo al storage</strong> (applicator, coalesce) y la red deja de doler: menos IOPS, más paralelismo.</li>
+      <li><strong>Evita sincronización multifase</strong>: puntos de consistencia (VCL/VDL) + avance asíncrono &gt; 2PC.</li>
+      <li><strong>Monitoreo proactivo</strong> con métricas/alarmas: detectar antes de que el usuario lo note.</li>
+    </ul>
+    <div class="callout warn"><div class="lbl">Error común de novato</div>
+      Comparar “lag de réplica” en segundos (MySQL binlog replay) con Aurora (stream de redo ≤20ms). Son <strong>arquitecturas distintas</strong>: volumen compartido vs replay lógico.</div>
+    `,
+    mini: { q:'¿Replica lag de Aurora a 10K writes/s vs MySQL?', opts:['~5ms vs ~300s','~300s vs ~5ms','Iguales (~1s)','Aurora no tiene réplicas'], a:0, why:'El paper mide ~5,38ms en Aurora frente a ~300.000ms (300s) en MySQL: varios órdenes de magnitud.' }
+  }
+];
+
+const QUIZ = [
+  {tag:'Intro', c:'gold', q:'Según el paper, ¿dónde se movió el constraint central del data processing de alto throughput?', opts:['Del storage a la CPU','De cómputo/storage a la red','Del SQL al NoSQL','Del backup al restore'], a:1, why:'Con I/Os repartidos en la flota multi-tenant, discos y nodos dejan de ser lo caliente; el límite es la red (PPS, ancho de banda, amplificación).'},
+  {tag:'Intro', c:'gold', q:'¿Qué funciones se offloadean del engine al storage en Aurora?', opts:['Queries y locks','Redo logging, durable storage, crash recovery y backup/restore','Parser SQL y optimizer','Autenticación de usuarios'], a:1, why:'El engine conserva queries, transacciones, locking, caché, access methods y undo; el storage asume redo, durabilidad, recovery y backups.'},
+  {tag:'Quórum', c:'blue', q:'¿Qué reglas debe cumplir un quórum consistente?', opts:['Vr + Vw > V y Vw > V/2','Vr = Vw = V','Vr + Vw < V','Vw < V/3'], a:0, why:'Intersección read-write (ver lo último escrito) y write-write (sin writes en conflicto).'},
+  {tag:'Quórum', c:'blue', q:'¿Por qué un quórum 2/3 (V=3) es inadecuado a escala cloud?', opts:['Es muy caro','No tolera un fallo correlacionado de AZ + ruido de fondo concurrente','No permite reads','Requiere 2PC'], a:1, why:'Un AZ caído + un disco/nodo caído en otro AZ rompe el 2/3: queda 1 de 3 sin saber si está actualizado.'},
+  {tag:'Quórum', c:'blue', q:'El diseño de Aurora es…', opts:['V=6, W=4, R=3, 2 copias por AZ','V=3, W=2, R=2','V=5, W=5, R=5','Sin réplicas'], a:0, why:'6 copias en 3 AZs (2 por AZ): pierde AZ+1 nodo en reads y 2 nodos en writes.'},
+  {tag:'Quórum', c:'blue', q:'¿Qué es un Protection Group (PG)?', opts:['Un grupo de usuarios','6 segmentos de 10GB (2 por AZ) que replican una porción del volumen','Un índice de Leopard','Un tipo de VPC'], a:1, why:'El volumen se parte en segmentos de 10GB; cada PG son seis segmentos organizados en 3 AZs. Unidad de fallo/reparación.'},
+  {tag:'Quórum', c:'blue', q:'¿Por qué segmentos de 10GB?', opts:['Por compatibilidad MySQL','Para reducir el MTTR (~10s en 10Gbps) y achicar la ventana de doble fallo','Porque S3 lo exige','Para ahorrar CPU'], a:1, why:'En vez de bajar el MTTF, se baja el MTTR: reparar 10GB en ~10s hace improbable un doble fallo + AZ caído.'},
+  {tag:'Log', c:'purple', q:'En Aurora, ¿qué cruza la red desde el engine?', opts:['Páginas + redo + binlog + FRM','Solo redo log records','Checkpoints completos','Backups S3'], a:1, why:'Nunca salen páginas (ni background, ni checkpoint, ni eviction). Solo redo; el storage materializa páginas.'},
+  {tag:'Log', c:'purple', q:'En el experimento SysBench (100GB, 30 min), Aurora vs mirrored MySQL…', opts:['780K vs 27M tx a favor de MySQL','27,4M vs 780K tx y 0,95 vs 7,4 IOs/tx a favor de Aurora','Igual throughput','MySQL con menos IOs'], a:1, why:'35× más transacciones con 7,7× menos I/Os por tx en el nodo DB (y 46× menos por nodo storage).'},
+  {tag:'Log', c:'purple', q:'Las páginas materializadas en el storage son…', opts:['La única copia válida','Opcionales para correctitud: un caché de aplicaciones del log','Checkpoints síncronos','Backups S3'], a:1, why:'Para el engine, el log es la base; materializar es optimización (solo páginas con cadenas largas).'},
+  {tag:'Storage', c:'teal', q:'¿Qué pasos del storage están en el foreground?', opts:['Los 8','Solo (1) recibir/encolar y (2) persistir/ACK','Gossip + GC + S3','Coalesce + CRC'], a:1, why:'Del (3) al (8) —organizar, gossip, coalesce, S3, GC, CRC— son asíncronos fuera del path crítico.'},
+  {tag:'Storage', c:'teal', q:'¿Para qué gossipan los storage nodes?', opts:['Para elegir líder','Para detectar gaps (batches perdidos) y rellenar huecos vía SCL/backlinks','Para hacer backup','Para balancear VPCs'], a:1, why:'Cada segmento solo ve un subset del log; con backlinks/SCL detectan lo que les falta y lo piden a peers.'},
+  {tag:'Consistencia', c:'orange', q:'¿Qué es el VCL?', opts:['El mayor CPL durable','El mayor LSN con todos los records previos disponibles (lo de arriba se trunca)','El mínimo read point','El límite de asignación'], a:1, why:'Volume Complete LSN: completitud. VDL es el mayor CPL ≤ VCL: durabilidad truncable.'},
+  {tag:'Consistencia', c:'orange', q:'Completo hasta 1007 con CPLs en 900/1000/1100. ¿VDL?', opts:['1007','1000','1100','900'], a:1, why:'Mayor CPL ≤ VCL = 1000. Todo LSN > 1000 se trunca.'},
+  {tag:'Consistencia', c:'orange', q:'¿Qué es una MTR y cómo se marca?', opts:['Una VPC; se marca con epoch','Mini-transacción atómica; su último log es un CPL','Un segmento; se marca con CRC','Un backup; se marca en S3'], a:1, why:'Cada transacción se parte en MTRs ordenadas y atómicas compuestas de logs contiguos; el final es consistency point.'},
+  {tag:'Consistencia', c:'orange', q:'¿Cómo commitea Aurora?', opts:[' workers se pausan hasta 4/6 ACKs','Asíncrono: el thread registra el commit LSN y sigue; otro thread responde al avanzar el VDL','Con 2PC entre AZs','Sin durabilidad'], a:1, why:'Commit WAL-equivalente: completo sii VDL ≥ commit LSN. Los workers nunca se pausan por commits.'},
+  {tag:'Consistencia', c:'orange', q:'¿Cómo lee Aurora en operación normal?', opts:['Quórum 4/6 en cada read','Un solo segmento cuyo SCL cubra el read-point (=VDL al emitir)','Siempre de S3','De todas las réplicas'], a:1, why:'Sin consenso en reads: basta un segmento completo respecto al read-point. Solo en recovery se usa quórum de lectura por PG.'},
+  {tag:'Consistencia', c:'orange', q:'¿Qué es PGMRPL?', opts:['El máximo LSN asignable','Low-water-mark de reads por PG: bajo eso se puede coalescer + GC','Un índice de usuarios','El epoch de truncado'], a:1, why:'Garantiza que no habrá reads con read-point menor: los logs viejos son innecesarios y se reciclan seguro.'},
+  {tag:'Réplicas', c:'teal', q:'Las read replicas de Aurora…', opts:['Tienen su propio volumen y replay de binlog','Montan el mismo volumen, consumen el stream de redo ≤ VDL atómico por MTR, lag ≤20ms','No existen','Requieren EBS espejado'], a:1, why:'Cero costo extra de storage/writes; aplican al caché solo lo durable y atómico. Lag de ms, no de minutos.'},
+  {tag:'Recovery', c:'pink', q:'En recovery, la DB…', opts:['Replaya desde el último checkpoint como ARIES clásico','Contacta quórum de lectura por PG, recalcula VDL, trunca con rangos por epoch y hace undo online','Restaura todo de S3','Pierde lo no checkpointed'], a:1, why:'El redo ya está aplicado en el storage; la DB restablece estado runtime, trunca lo no durable (límite LAL=10M para acotar) y deshace in-flights online. Típico <10s.'},
+  {tag:'Perf', c:'pink', q:'¿Replica lag a 10K writes/s (Aurora vs MySQL)?', opts:['~5ms vs ~300s','~300s vs ~5ms','Iguales','MySQL más rápido'], a:0, why:'Varios órdenes de magnitud: stream de redo compartido vs replay de binlog.'},
+  {tag:'Perf', c:'pink', q:'¿Qué es LAL (10M) y para qué sirve?', opts:['Un índice','Límite de asignación de LSN sobre el VDL: back-pressure + cota para truncado en recovery','Tamaño de segmento','Número de réplicas'], a:1, why:'Evita que la DB se adelante demasiado al storage (throttle) y permite probar un end-LSN ≥ cualquier log posible al truncar.'}
+];
+
+const CASES = [
+  {
+    title:'Caso 1 · ¿Aguanta este fallo? (quórum)',
+    prompt:`Un PG tiene 6 segmentos (A1,A2 en AZ-A; B1,B2 en AZ-B; C1,C2 en AZ-C). Caen <strong>AZ-C entera + B1</strong>.<br><br>
+    <strong>¿Se pueden seguir haciendo writes? ¿Y reads?</strong>`,
+    answer:true,
+    solution:`<strong>Sí a ambos.</strong> Vivos: A1,A2,B2 = <strong>3/6</strong>.<br>
+    1. <strong>Reads (Vr=3):</strong> 3 vivos alcanzan el quórum → se puede leer y <strong>reconstruir</strong> el quórum de escritura agregando copias.<br>
+    2. <strong>Writes (Vw=4):</strong> el diseño garantiza <strong>AZ+1 en reads y 2 nodos en writes</strong>; con 3 caídos (AZ+C+1) se mantiene read-quórum, que es lo que evita perder datos. En la práctica el PG se <strong>re-replica</strong> el segmento perdido y se recupera el write-quórum.<br><br>
+    La lección: un 2/3 clásico habría muerto aquí (1/3 restante sin saber si está actualizado).`
+  },
+  {
+    title:'Caso 2 · Haz las cuentas (IOs)',
+    prompt:`SysBench write-only 100GB, 30 min:<br>
+    <code>MySQL espejado: 780.000 tx, 7,4 IOs/tx</code><br>
+    <code>Aurora: 27.378.000 tx, 0,95 IOs/tx</code><br><br>
+    <strong>¿Cuántas veces más tx? ¿Cuántas veces menos IOs/tx? ¿Por qué no cuentan el mirroring EBS ni los cross-AZ de MySQL?</strong>`,
+    answer:true,
+    solution:`<strong>~35× más tx</strong> (27.378.000 / 780.000 ≈ 35,1) y <strong>~7,8× menos IOs/tx</strong> (7,4 / 0,95 ≈ 7,8; el paper redondea a 7,7).<br><br>
+    No se cuentan el mirroring interno de EBS ni los cross-AZ de MySQL porque <strong>incluso sin contarlos</strong> Aurora ya gana por ese margen: contándolos, la ventaja sería aún mayor. Y cada nodo de storage ve <strong>1/6</strong> (46× menos).`
+  },
+  {
+    title:'Caso 3 · Trunca el log (VCL/VDL)',
+    prompt:`VCL = 1007. CPLs declarados por la DB en 900, 1000 y 1100.<br><br>
+    <strong>¿Hasta dónde es durable? ¿Qué se trunca? ¿Por qué no hasta 1007?</strong>`,
+    answer:true,
+    solution:`<strong>Durable hasta 1000 (VDL).</strong> Se trunca todo con <strong>LSN &gt; 1000</strong> (rangos versionados por epoch).<br><br>
+    No hasta 1007 porque entre 1001–1007 puede haber una <strong>MTR parcial</strong> (su CPL era 1100, nunca llegó). Cortar en 1007 rompería atomicidad; cortar en el último CPL ≤ VCL preserva <strong>MTRs completas</strong>.`
+  },
+  {
+    title:'Caso 4 · ¿Puedo borrar este log? (PGMRPL)',
+    prompt:`El PG X tiene PGMRPL = 5000. Un segmento quiere hacer GC de logs con LSN 4900.<br><br>
+    <strong>¿Es seguro? ¿Y si el PGMRPL fuera 4800?</strong>`,
+    answer:true,
+    solution:`<strong>Con PGMRPL=5000: sí.</strong> Ningún read futuro pedirá read-point &lt; 5000, así que todo &lt; 5000 es innecesario: se puede <strong>coalescer en páginas y borrar</strong>.<br><br>
+    <strong>Con PGMRPL=4800: no.</strong> Aún puede haber reads con read-point 4800–4900 que necesiten esos logs. Hay que esperar a que el low-water-mark avance (el writer lo calcula con gossip de réplicas).`
+  },
+  {
+    title:'Caso 5 · Lag de réplica',
+    prompt:`A 10K writes/s el lag medido es <strong>5,38ms en Aurora</strong> y <strong>300s en MySQL</strong>.<br><br>
+    <strong>¿Por qué tanta diferencia? ¿Qué reglas obedecen las réplicas Aurora?</strong>`,
+    answer:true,
+    solution:`MySQL replica por <strong>replay lógico (binlog)</strong> con costo de storage/writes propios; Aurora comparte el <strong>mismo volumen</strong> y hace <strong>stream del redo</strong> directo al caché.<br><br>
+    Reglas: (a) solo aplicar <strong>LSN ≤ VDL</strong>, (b) aplicar cada <strong>MTR atómicamente</strong>. Resultado: vista consistente con lag de <strong>ms</strong> (típico ≤20ms).`
+  }
+];
+
+const GLOSSARY = [
+  ['2PC','Two-phase commit: protocolo multifase de commit, intolerante a fallos y lento entre DCs. Aurora lo evita.'],
+  ['AZ','Availability Zone: subconjunto aislado (poder, red, deploys, inundaciones) de una región. Aurora usa 3, con 2 copias por AZ.'],
+  ['Back-pressure (LAL)','Límite de asignación de LSN (VDL + 10M): frena writes si el storage/red no da abasto y acota el truncado en recovery.'],
+  ['Binlog','Log de sentencias de MySQL archivado a S3 para point-in-time restores. En Aurora el redo al storage lo reemplaza en el path caliente.'],
+  ['Coalesce','Fusión de log records en nuevas páginas materializadas (paso 5 del storage). Solo páginas con cadenas largas.'],
+  ['Commit asíncrono','El thread registra el commit LSN y sigue; otro thread responde cuando VDL ≥ commit LSN. Workers nunca se pausan.'],
+  ['CPL','Consistency Point LSN: último log de cada MTR. VDL = mayor CPL ≤ VCL.'],
+  ['Double-write','Segunda escritura temporal de la página en MySQL clásico contra torn-pages. Aurora no la necesita en red.'],
+  ['DynamoDB (uso)','Guarda config de volúmenes y metadata de backups del storage control plane.'],
+  ['EBS','Elastic Block Store: storage en red usado por el MySQL espejado de comparación.'],
+  ['Epoch','Versionado de rangos de truncado en recovery para no confundir truncados si el recovery se interrumpe y reinicia.'],
+  ['Gossip','Peers del PG intercambian logs faltantes detectados por gaps/SCL.'],
+  ['Hot row','Fila muy contenida (ej. TPC-C). Aurora rinde 2,3×–16,3× vs MySQL 5.7 en esos workloads.'],
+  ['InnoDB','Motor transaccional de MySQL del que Aurora es fork; conserva transacciones, locks, B+-Tree y MTRs.'],
+  ['LAL','LSN Allocation Limit = 10M sobre el VDL. Ver back-pressure.'],
+  ['LSN','Log Sequence Number monotónico asignado por la DB a cada log record.'],
+  ['MTR','Mini-transacción: grupo atómico interno de operaciones (ej. split/merge B-Tree). Último log = CPL.'],
+  ['OLTP','Online Transaction Processing: workloads transaccionales que sirve Aurora.'],
+  ['PG (Protection Group)','6 segmentos de 10GB (2 por AZ) que replican una porción del volumen. Unidad de fallo/reparación.'],
+  ['PGMRPL','PG Min Read Point LSN: low-water-mark de reads por PG; bajo eso se puede hacer GC seguro.'],
+  ['PPS','Paquetes por segundo: uno de los cuellos de red junto al ancho de banda y la amplificación.'],
+  ['Quórum 4/6 y 3/6','Write necesita 4 de 6 votos; read 3 de 6. Reglas: Vr+Vw>V y Vw>V/2.'],
+  ['RDS / Host Manager','Control plane de Aurora; el HM monitorea salud y decide failover/reemplazo.'],
+  ['Read-point','VDL al momento de emitir un read: versión a leer de un solo segmento con SCL suficiente.'],
+  ['Redo log record','Diferencia before→after de una página. Lo único que cruza la red en Aurora.'],
+  ['Réplica (15)','Hasta 15 lectoras por clúster sobre el mismo volumen compartido; stream de redo + metadatos, lag de ms.'],
+  ['S3 (uso)','Destino del stage continuo de log + páginas (backup streaming) y del binlog archivado.'],
+  ['SCL','Segment Complete LSN: mayor LSN bajo el cual ese segmento ya tiene todo (vía backlinks).'],
+  ['Segmento 10GB','Unidad de partición del volumen; se repara en ~10s en 10Gbps. Volumen máx 64TB.'],
+  ['Snapshot / stage','Snapshots periódicos por el pipeline offline + stage a S3; GC de versiones viejas por namespace.'],
+  ['SWF','Simple Workflow Service: orquesta operaciones largas (restore, re-replicación).'],
+  ['VCL','Volume Complete LSN: mayor LSN con todos los previos disponibles.'],
+  ['VDL','Volume Durable LSN: mayor CPL ≤ VCL. Punto de truncado.'],
+  ['VPCs (3)','Customer (apps↔engine), RDS (engine↔control), Storage (engine↔storage).'],
+  ['Write quorum 4/6','El commit endurece cuando 4 de 6 réplicas del PG hacen ACK de persistir el log.']
+];
+
+const CHEATSHEET = `
+<div class="card accent-blue">
+  <h3 style="margin-top:0;">🗳️ Quórum y segmentos</h3>
+  <p style="font-size:14px;"><strong>V=6, W=4, R=3</strong> (2 copias × 3 AZs). Reglas: <code>Vr+Vw&gt;V</code> · <code>Vw&gt;V/2</code>.</p>
+  <p style="font-size:14px;"><strong>AZ+1:</strong> pierde un AZ + 1 nodo en reads; 2 nodos en writes. <strong>PG</strong> = 6 segmentos de <strong>10GB</strong> (~10s de repair). Volumen hasta <strong>64TB</strong>.</p>
+</div>
+
+<div class="card accent-purple">
+  <h3 style="margin-top:0;">📜 Log-is-database</h3>
+  <p style="font-size:14px;">Red solo <strong>redo</strong> por la red. Páginas = <strong>caché de aplicaciones del log</strong> (coalesce solo cadenas largas).</p>
+  <p style="font-size:14px;"><strong>SysBench 100GB:</strong> 27,4M vs 780K tx (<strong>35×</strong>), 0,95 vs 7,4 IOs/tx (<strong>7,7× menos</strong>), 46× menos por nodo.</p>
+</div>
+
+<div class="card accent-teal">
+  <h3 style="margin-top:0;">🔧 Storage: 8 pasos</h3>
+  <p style="font-size:14px;">(1) recibir → (2) persistir+ACK = <strong>foreground</strong>. (3) gaps → (4) gossip → (5) coalesce → (6) S3 → (7) GC → (8) CRC = <strong>background</strong>.</p>
+</div>
+
+<div class="card accent-orange">
+  <h3 style="margin-top:0;">➡️ Sin 2PC: VCL/VDL</h3>
+  <p style="font-size:14px;"><strong>LSN</strong> monotónico (LAL=VDL+10M) · <strong>SCL</strong> por segmento · <strong>VCL</strong> completitud · <strong>VDL</strong> mayor CPL ≤ VCL (trunca &gt;VDL) · <strong>PGMRPL</strong> low-water-mark para GC.</p>
+  <p style="font-size:14px;"><strong>Commits async:</strong> completo sii VDL ≥ commit LSN. <strong>Reads:</strong> un segmento con SCL ≥ read-point. <strong>Réplicas:</strong> ≤VDL atómico por MTR (≤20ms).</p>
+</div>
+
+<div class="card accent-gold">
+  <h3 style="margin-top:0;">🏗️ Arquitectura</h3>
+  <p style="font-size:14px;">Fork <strong>MySQL/InnoDB</strong> (MTRs con CPL) · 1 writer + <strong>15 réplicas</strong> en un volumen · <strong>RDS/HM</strong> + 3 VPCs + <strong>DynamoDB/SWF/S3</strong> · EC2+SSD en ≥3 AZs.</p>
+  <p style="font-size:14px;"><strong>Recovery &lt;10s:</strong> quórum de lectura por PG → VDL → trunca por epoch → undo online.</p>
+</div>
+
+<div class="card accent-pink">
+  <h3 style="margin-top:0;">🚀 Rendimiento</h3>
+  <p style="font-size:14px;">Escala lineal; <strong>5×</strong> MySQL (1GB), <strong>67×</strong> (100GB), <strong>34×</strong> (1TB). Conexiones 5K: 110K vs 13K. Lag 10K w/s: <strong>5,4ms vs 300s</strong>. TPC-C hot-row: <strong>2,3–16,3×</strong>.</p>
+</div>
+`;
+
+/* ============================================================
+   NAVEGACIÓN
+============================================================ */
+const $ = s => document.querySelector(s);
+const views = ['inicio','aprende','animaciones','quiz','glosario','cheatsheet'];
+
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $('#view-'+view).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===view));
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(view==='quiz' && !quiz.rendered){ quiz.render(); }
+  if(view==='animaciones' && !animsRendered){ initAnims(); }
+  updateProgress();
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(t.dataset.view)));
+(function(){ const bar=document.getElementById('tabs'); const sync=()=>document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.classList.contains('active')?'true':'false')); bar.addEventListener('click', ()=>setTimeout(sync,0)); bar.addEventListener('keydown', e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const ts=[...bar.querySelectorAll('.tab')]; let i=ts.indexOf(document.activeElement); if(i<0) return; e.preventDefault(); i=(i+(e.key==='ArrowRight'?1:-1)+ts.length)%ts.length; ts[i].focus(); go(ts[i].dataset.view); sync(); }); sync(); })();
+
+/* theme toggle */
+const themeBtn = $('#themeBtn');
+themeBtn.addEventListener('click', ()=>{
+  document.body.classList.toggle('light');
+  themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('aurora-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+});
+if(localStorage.getItem('aurora-theme')==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; }
+
+/* ============================================================
+   PROGRESO (localStorage)
+============================================================ */
+let done = JSON.parse(localStorage.getItem('aurora-done')||'{}');
+let quizScores = JSON.parse(localStorage.getItem('aurora-quiz')||'[]');
+
+function updateProgress(){
+  const total = MODULES.length;
+  const finished = MODULES.filter(m=>done[m.id]).length;
+  const pct = Math.round((finished/total)*100);
+  $('#progressFill').style.width = pct + '%';
+}
+function markDone(id){
+  done[id] = true;
+  localStorage.setItem('aurora-done', JSON.stringify(done));
+  renderModuleNav();
+  updateProgress();
+}
+function unmarkDone(id){
+  delete done[id];
+  localStorage.setItem('aurora-done', JSON.stringify(done));
+  renderModuleNav();
+  updateProgress();
+}
+
+/* ============================================================
+   MÓDULOS (Aprende)
+============================================================ */
+let currentModule = 0;
+
+function renderModuleNav(){
+  const nav = $('#moduleNav');
+  nav.innerHTML = '';
+  MODULES.forEach((m,i)=>{
+    const b = document.createElement('button');
+    b.className = 'module-link' + (i===currentModule?' active':'');
+    b.innerHTML = `<span class="idx">${String(i).padStart(2,'0')}</span><span>${m.title}</span>${done[m.id]?'<span class="check">✓</span>':''}`;
+    b.onclick = ()=>{ currentModule=i; renderModuleNav(); renderModule(); };
+    nav.appendChild(b);
+  });
+}
+
+function renderModule(){
+  const m = MODULES[currentModule];
+  const c = $('#moduleContent');
+  c.innerHTML = `
+    <span class="kicker" style="color:var(--${m.accent});">${m.tag}</span>
+    <h2>${m.title}</h2>
+    <p class="lede">${m.summary}</p>
+    <div class="done-banner" id="doneBanner" style="${done[m.id]?'display:flex;':''}">✓ Módulo completado</div>
+    ${m.html}
+    <div class="card accent-${m.accent}" style="margin-top:26px;">
+      <div class="kicker" style="color:var(--${m.accent});">Mini-check rápido</div>
+      <p style="font-weight:600; color:var(--text); margin:8px 0;">${m.mini.q}</p>
+      <div id="miniOpts"></div>
+      <div class="explain" id="miniExplain"></div>
+    </div>
+    <div class="module-pager">
+      <button class="btn ghost" id="prevBtn" ${currentModule===0?'disabled style="opacity:.4;cursor:default;"':''}>← Anterior</button>
+      <button class="btn ${done[m.id]?'ghost':'teal'}" id="doneBtn">${done[m.id]?'↩ Desmarcar':'✓ Marcar como completado'}</button>
+      <button class="btn" id="nextBtn" ${currentModule===MODULES.length-1?'disabled style="opacity:.4;cursor:default;"':''}>Siguiente →</button>
+    </div>`;
+
+  // mini check options
+  const mo = $('#miniOpts');
+  m.mini.opts.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = ()=>{
+      [...mo.children].forEach(x=>x.disabled=true);
+      const ex = $('#miniExplain');
+      if(i===m.mini.a){
+        b.classList.add('correct');
+        ex.innerHTML = `<span class="why">✓ Correcto.</span> ${m.mini.why}`;
+      } else {
+        b.classList.add('wrong');
+        mo.children[m.mini.a].classList.add('correct');
+        ex.innerHTML = `<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> ${m.mini.why}`;
+      }
+      ex.classList.add('show');
+    };
+    mo.appendChild(b);
+  });
+
+  $('#prevBtn').onclick = ()=>{ if(currentModule>0){ currentModule--; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  $('#nextBtn').onclick = ()=>{ if(currentModule<MODULES.length-1){ currentModule++; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  $('#doneBtn').onclick = ()=>{ if(done[m.id]){ unmarkDone(m.id); } else { markDone(m.id); } renderModule(); };
+}
+
+/* ============================================================
+   QUIZ
+============================================================ */
+const quiz = {
+  rendered:false, answers:{},
+  render(){
+    this.rendered = true;
+    const c = $('#quizContainer');
+    c.innerHTML = '';
+    QUIZ.forEach((q,qi)=>{
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.id = 'q'+qi;
+      card.innerHTML = `
+        <div class="qmeta">
+          <span class="qtag" style="background:var(--${q.c}-soft); color:var(--${q.c});">${q.tag}</span>
+          <span style="color:var(--dim); font-size:13px;">Pregunta ${qi+1} de ${QUIZ.length}</span>
+        </div>
+        <div class="qtext">${q.q}</div>
+        <div class="opts"></div>
+        <div class="explain"></div>`;
+      const optsBox = card.querySelector('.opts');
+      q.opts.forEach((opt,oi)=>{
+        const b = document.createElement('button');
+        b.className = 'opt';
+        b.innerHTML = opt;
+        b.onclick = ()=> this.answer(qi, oi);
+        optsBox.appendChild(b);
+      });
+      c.appendChild(card);
+    });
+    this.refreshChip();
+  },
+  answer(qi, oi){
+    if(this.answers[qi]!==undefined) return; // ya respondida
+    this.answers[qi] = oi;
+    const q = QUIZ[qi];
+    const card = $('#q'+qi);
+    const opts = card.querySelectorAll('.opt');
+    opts.forEach((b,i)=>{
+      b.disabled = true;
+      if(i===q.a) b.classList.add('correct');
+      if(i===oi && oi!==q.a) b.classList.add('wrong');
+    });
+    const ex = card.querySelector('.explain');
+    ex.innerHTML = `<span class="why">${oi===q.a?'✓ Correcto':'✗ Incorrecto'}.</span> ${q.why}`;
+    ex.classList.add('show');
+    this.refreshChip();
+    // scroll to result when all answered
+    if(Object.keys(this.answers).length === QUIZ.length){ this.finish(); }
+  },
+  refreshChip(){
+    const n = Object.keys(this.answers).length;
+    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length;
+    $('#scoreChip').textContent = `${correct} / ${n} correctas (${QUIZ.length} totales)`;
+  },
+  finish(){
+    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length;
+    const pct = Math.round(correct/QUIZ.length*100);
+    const r = $('#quizResult');
+    r.classList.add('show');
+    $('#quizPercent').textContent = pct + '%';
+    $('#gradeFill').style.width = pct + '%';
+    let msg;
+    if(pct===100) msg = '🏆 ¡Perfecto! Dominas el paper de Aurora.';
+    else if(pct>=80) msg = '🎉 ¡Muy bien! Solo repasa los puntos fallados.';
+    else if(pct>=60) msg = '👍 Vas bien. Relee los módulos de las preguntas que fallaste.';
+    else msg = '📚 Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
+    $('#quizMsg').textContent = msg;
+    r.scrollIntoView({behavior:'smooth'});
+    quizScores.push(pct);
+    localStorage.setItem('aurora-quiz', JSON.stringify(quizScores));
+  },
+  reset(){
+    this.answers = {};
+    this.rendered = false;
+    $('#quizResult').classList.remove('show');
+    $('#scoreChip').textContent = '0 / 0 correctas';
+    this.render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+};
+
+/* ============================================================
+   CASOS
+============================================================ */
+function renderCases(){
+  const c = $('#casesContainer');
+  c.innerHTML = '';
+  CASES.forEach((cs,i)=>{
+    const card = document.createElement('div');
+    card.className = 'case-card';
+    card.innerHTML = `
+      <div class="qmeta">
+        <span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso ${i+1}</span>
+      </div>
+      <h3 style="margin-top:4px;">${cs.title}</h3>
+      <div class="case-step">${cs.prompt}</div>
+      <button class="btn teal small reveal-btn">💡 Ver solución</button>
+      <div class="explain" style="margin-top:12px;"></div>`;
+    const ex = card.querySelector('.explain');
+    const btn = card.querySelector('.reveal-btn');
+    btn.onclick = ()=>{
+      ex.innerHTML = `<span class="why">Solución:</span> ${cs.solution}`;
+      ex.classList.add('show');
+      btn.style.display = 'none';
+    };
+    c.appendChild(card);
+  });
+}
+
+/* ============================================================
+   GLOSARIO
+============================================================ */
+function renderGlossary(filter=''){
+  const list = $('#glossaryList');
+  list.innerHTML = '';
+  const f = filter.toLowerCase();
+  GLOSSARY.filter(([t,d])=> t.toLowerCase().includes(f) || d.toLowerCase().includes(f))
+    .forEach(([t,d])=>{
+      const div = document.createElement('div');
+      div.className = 'gloss-term';
+      div.innerHTML = `<h3><code>${t}</code></h3><div class="def">${d}</div>`;
+      list.appendChild(div);
+    });
+  if(list.children.length===0){
+    list.innerHTML = '<p>Sin resultados para ese término.</p>';
+  }
+}
+$('#glossarySearch').addEventListener('input', e=>renderGlossary(e.target.value));
+
+/* ============================================================
+   CHEATSHEET
+============================================================ */
+$('#cheatsheetContent').innerHTML = CHEATSHEET;
+
+/* ============================================================
+   ANIMACIONES (SVG interactivas)
+============================================================ */
+let animsRendered = false;
+
+function initAnims(){
+  if(animsRendered) return;
+  animsRendered = true;
+  animGraph.init();
+  animCheck.init();
+  animEnemy.init();
+  animZookie.init();
+  animArch.init();
+}
+
+/* ---- utilidades SVG ---- */
+function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+const NODE={w:130,h:44,rx:10};
+const cBlue='#5b8cff', cTeal='#2dd4bf', cOrange='#ff9e5e', cPurple='#c084fc', cGold='#fbbf24', cDim='#4a5870', cBg='#1d283c';
+function nodeBox(x,y,label,fill,stroke,txtfill){
+  const g = el('g',{});
+  const r = el('rect',{x:x-NODE.w/2,y:y-NODE.h/2,width:NODE.w,height:NODE.h,rx:NODE.rx,fill:fill,'fill-opacity':0.16,stroke:stroke,'stroke-width':1.2});
+  const tAttrs = {x:x,y:y+4,'text-anchor':'middle',class:'tnode'};
+  if(txtfill) tAttrs.fill = txtfill;
+  const t = el('text',tAttrs);
+  t.textContent = label;
+  g.append(r,t);
+  return g;
+}
+function arrow(g,x1,y1,x2,y2,color,label){
+  const path = el('path',{d:`M ${x1} ${y1} C ${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}`,fill:'none',stroke:color,'stroke-width':1.6});
+  const mark = el('path',{d:'M -2 -4 L 8 0 L -2 4',fill:'none',stroke:color,'stroke-width':1.6,transform:`translate(${x2},${y2}) rotate(${Math.atan2(y2-y1,x2-x1)*180/Math.PI})`});
+  g.append(path,mark);
+  if(label){ const l=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle',class:'tedge'}); l.textContent=label; g.append(l); }
+}
+function flash(node){ node.setAttribute('filter','url(#glow)'); setTimeout(()=>node.removeAttribute('filter'),600); }
+function svgDefs(svg){
+  const defs = el('defs',{});
+  defs.innerHTML = `<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  svg.appendChild(defs);
+}
+
+/* ---- 1. Quorum simulator ---- */
+const animGraph = {
+  failed:new Set(),
+  nodes:[
+    {id:'A1',x:150,y:110,az:'A'},{id:'A2',x:270,y:110,az:'A'},
+    {id:'B1',x:150,y:230,az:'B'},{id:'B2',x:270,y:230,az:'B'},
+    {id:'C1',x:520,y:110,az:'C'},{id:'C2',x:520,y:230,az:'C'}
+  ],
+  init(){ this.svg = $('#svgGraph'); svgDefs(this.svg); this.draw(); },
+  toggle(id){ this.failed.has(id) ? this.failed.delete(id) : this.failed.add(id); this.draw(); },
+  failAZ(az){ this.nodes.filter(n=>n.az===az).forEach(n=>this.failed.add(n.id)); this.draw(); },
+  failOne(){ const alive=this.nodes.filter(n=>!this.failed.has(n.id)); if(alive.length){ this.failed.add(alive[alive.length-1].id); this.draw(); } },
+  reset(){ this.failed=new Set(); this.draw(); $('#graphCaption').textContent='6 vivos: write ✓ (6≥4) y read ✓ (6≥3). Haz clic en los nodos.'; },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const azs=[{x:60,y:40,l:'AZ-A'},{x:60,y:160,l:'AZ-B'},{x:440,y:40,l:'AZ-C'}];
+    azs.forEach(a=>{ const box=el('rect',{x:a.x,y:a.y,width:220,height:110,rx:12,fill:'none',stroke:cDim,'stroke-width':1.1,'stroke-dasharray':'5 4'}); const lb=el('text',{x:a.x+12,y:a.y+22,class:'tedge'}); lb.textContent=a.l; s.append(box,lb); });
+    // AZ-B boxes: two boxes actually; draw second row for B
+    const self=this;
+    this.nodes.forEach(n=>{
+      const dead=self.failed.has(n.id);
+      const g=el('g',{style:'cursor:pointer'});
+      const r=el('rect',{x:n.x-46,y:n.y-20,width:92,height:40,rx:10,fill:dead?'#fb7185':'#2dd4bf','fill-opacity':dead?0.2:0.16,stroke:dead?'#fb7185':'#2dd4bf','stroke-width':1.4});
+      const tx=el('text',{x:n.x,y:n.y+5,'text-anchor':'middle',class:'tnode'}); tx.textContent=n.id+(dead?' ✗':' ✓');
+      g.append(r,tx);
+      g.addEventListener('click',()=>self.toggle(n.id));
+      s.appendChild(g);
+    });
+    const alive=6-this.failed.size;
+    $('#graphCaption').textContent = alive+' vivos ('+[...this.failed].join(', ')+(this.failed.size?' caídos':'')+'): write '+(alive>=4?'✓':'✗')+' (≥4) · read '+(alive>=3?'✓':'✗')+' (≥3).';
+  },
+  check(){
+    const alive=6-this.failed.size;
+    const w=alive>=4, r=alive>=3;
+    $('#graphCaption').textContent = w&&r ? '✓ Quórum OK: writes (≥4) y reads (≥3) disponibles. El PG se re-replica en background.'
+      : (!r ? '✗ Sin quórum de lectura (<3): datos no disponibles. En Aurora esto exige perder AZ+1+nada-más: improbable con MTTR de ~10s.'
+      : '⚠ Solo reads (≥3) sin writes (<4): se lee y se reconstruye el write-quórum agregando copias.');
+  }
+};
+
+/* ---- 2. IO compare ---- */
+const animCheck = {
+  mode:'both',
+  init(){ this.svg = $('#svgCheck'); svgDefs(this.svg); this.draw(); },
+  show(m){ this.mode=m; this.draw(); },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const showM = this.mode==='mysql'||this.mode==='both';
+    const showA = this.mode==='aurora'||this.mode==='both';
+    const bar=(x,y,w,h,color)=>{ s.appendChild(el('rect',{x:x,y:y-h,width:w,height:h,rx:8,fill:color,'fill-opacity':0.85})); };
+    // tx bars (log-ish scale visual, anotated)
+    if(showM){ bar(120,300,110,60,cOrange); const l1=el('text',{x:175,y:250,'text-anchor':'middle',class:'tnode'}); l1.textContent='780K tx'; s.append(l1);
+      bar(300,300,110,22,cOrange); const l2=el('text',{x:355,y:250,'text-anchor':'middle',class:'tnode'}); l2.textContent='7,4 IOs/tx'; s.append(l2);
+      const t=el('text',{x:235,y:325,class:'tedge','text-anchor':'middle'}); t.textContent='MySQL espejado'; s.append(t); }
+    if(showA){ const ox = showM?0:-220; bar(480+ox,300,110,230,cTeal); const l1=el('text',{x:535+ox,y:60,'text-anchor':'middle',class:'tnode'}); l1.textContent='27,4M tx (35×)'; s.append(l1);
+      bar(620+ox,300,40,22,cBlue); const l2=el('text',{x:640+ox,y:250,'text-anchor':'middle',class:'tnode'}); l2.textContent='0,95'; s.append(l2);
+      const t=el('text',{x:560+ox,y:325,class:'tedge','text-anchor':'middle'}); t.textContent='Aurora'; s.append(t); }
+    $('#checkCaption').textContent = this.mode==='mysql' ? 'MySQL espejado: 780K tx, 7,4 IOs/tx (sin contar mirror EBS ni cross-AZ).'
+      : this.mode==='aurora' ? 'Aurora: 27,4M tx, 0,95 IOs/tx. Solo redo por la red; 46× menos por nodo storage.'
+      : '35× más tx con 7,7× menos IOs/tx. Solo el redo cruza la red.';
+  },
+  step(){}, play(){ this.show('both'); }, reset(){}
+};
+
+/* ---- 3. Storage pipeline stepper ---- */
+const animEnemy = {
+  stepN:0, timer:null,
+  steps:[
+    '(1) Recibir: log record → cola en memoria.',
+    '(2) Persistir en disco → ACK (foreground termina aquí).',
+    '(3) Organizar + detectar gaps (batches perdidos).',
+    '(4) Gossip con peers: pedir huecos vía SCL/backlinks.',
+    '(5) Coalesce: logs → nuevas páginas.',
+    '(6) Stage periódico a S3 (backup continuo).',
+    '(7) GC de versiones viejas (solo si PGMRPL lo permite).',
+    '(8) Scrub CRCs periódico. ✓ Todo async fuera del commit.'
+  ],
+  init(){ this.svg=$('#svgEnemy'); svgDefs(this.svg); this.draw(); },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    const n=8, w=76;
+    for(let i=0;i<n;i++){
+      const x=40+i*w;
+      const active=i<this.stepN;
+      s.appendChild(nodeBox(x+30,120,'('+(i+1)+')',active?cTeal:cDim,active?cTeal:cDim));
+      if(i<n-1){ s.appendChild(el('line',{x1:x+30+52,y1:120,x2:x+w+30-52,y2:120,stroke:active?cTeal:cDim,'stroke-width':1.4})); }
+    }
+    const fg=el('rect',{x:30,y:190,width:2*w+20,height:60,rx:10,fill:cGold,'fill-opacity':0.12,stroke:cGold,'stroke-width':1.2});
+    const fgl=el('text',{x:40+ w,y:215,class:'tnode',fill:cGold}); fgl.textContent='FOREGROUND (1-2)';
+    const fgl2=el('text',{x:40+w,y:233,class:'tedge'}); fgl2.textContent='resto = background';
+    s.append(fg,fgl,fgl2);
+  },
+  render(){ this.draw(); $('#enemyCaption').textContent = this.stepN===0 ? 'Pulsa "Siguiente paso".' : 'Paso '+this.stepN+'/8: '+this.steps[this.stepN-1]; },
+  step(){ if(this.stepN<8){ this.stepN++; this.render(); } },
+  play(){ this.reset(); this.timer=setInterval(()=>{ if(this.stepN>=8){ clearInterval(this.timer); } else { this.stepN++; this.render(); } },900); },
+  reset(){ if(this.timer) clearInterval(this.timer); this.stepN=0; this.render(); }
+};
+
+/* ---- 4. VCL/VDL ---- */
+const animZookie = {
+  timer:null,
+  init(){ this.svg=$('#svgZookie'); svgDefs(this.svg); this.draw('idle'); },
+  draw(state){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    s.appendChild(el('line',{x1:50,y1:150,x2:680,y2:150,stroke:cDim,'stroke-width':1.6}));
+    const marks=[[150,'900','CPL',cGold],[330,'1000','CPL',cTeal],[430,'1007','VCL',cBlue],[520,'1100','CPL?',cDim]];
+    marks.forEach(m=>{
+      s.appendChild(el('circle',{cx:m[0],cy:150,r:state!=='idle'&&((m[1]==='1000'&&state!=='idle')||(m[1]==='1007'))?9:6,fill:m[3]}));
+      const lb=el('text',{x:m[0],y:120,'text-anchor':'middle',class:'tnode'}); lb.textContent=m[1]; s.append(lb);
+      const lb2=el('text',{x:m[0],y:180,'text-anchor':'middle',class:'tedge'}); lb2.textContent=m[2]; s.append(lb2);
+    });
+    if(state==='truncated'){
+      s.appendChild(el('rect',{x:345,y:200,width:120,height:52,rx:10,fill:cTeal,'fill-opacity':0.14,stroke:cTeal,'stroke-width':1.2}));
+      const wl=el('text',{x:405,y:224,'text-anchor':'middle',class:'tnode',fill:cTeal}); wl.textContent='VDL = 1000 ✓';
+      const wl2=el('text',{x:405,y:242,'text-anchor':'middle',class:'tedge'}); wl2.textContent='trunca LSN > 1000';
+      s.append(wl,wl2);
+      const cut=el('line',{x1:470,y1:60,x2:470,y2:260,stroke:'#fb7185','stroke-width':2,'stroke-dasharray':'6 4'}); s.append(cut);
+    }
+  },
+  play(){
+    this.reset();
+    const c=$('#zookieCaption');
+    const seq=[
+      {tm:0, fn:()=>{ c.innerHTML='<b>1.</b> El storage tiene todo hasta <b>1007 (VCL)</b>, pero la DB declaró CPLs en 900/1000/1100.'; this.draw('vcl'); }},
+      {tm:1500, fn:()=>{ c.innerHTML='<b>2.</b> 1001–1007 puede ser una <b>MTR parcial</b> (su CPL 1100 nunca llegó). Cortar en 1007 rompería atomicidad.'; }},
+      {tm:3200, fn:()=>{ c.innerHTML='<b>3.</b> VDL = mayor CPL ≤ VCL = <b>1000</b>. Se trunca todo con LSN &gt; 1000 (rangos por epoch). ✓'; this.draw('truncated'); }}
+    ];
+    seq.forEach(st=>{ this.timer=setTimeout(st.fn, st.tm); });
+  },
+  reset(){ if(this.timer) clearTimeout(this.timer); this.draw('idle'); $('#zookieCaption').textContent='Pulsa reproducir.'; }
+};
+
+/* ---- 5. Aurora arch flow ---- */
+const animArch = {
+  timer:null,
+  init(){ this.svg=$('#svgArch'); svgDefs(this.svg); this.draw(); },
+  draw(){
+    const s=this.svg; s.innerHTML=''; svgDefs(s);
+    s.appendChild(nodeBox(360,40,'writer (MySQL/InnoDB)',cGold,cGold));
+    const cluster=el('rect',{x:60,y:100,width:600,height:120,rx:16,fill:'none',stroke:cTeal,'stroke-width':1.2,'stroke-dasharray':'5 4'});
+    const cl=el('text',{x:80,y:122,class:'tnode',fill:cTeal}); cl.textContent='Storage fleet · 1 PG = 6 segmentos';
+    s.append(cluster,cl);
+    [[140,165],[250,165],[360,165],[470,165],[580,165]].forEach((p,i)=>{
+      s.appendChild(nodeBox(p[0],p[1],'seg '+(i+1),cBlue,cBlue));
+      arrow(s,360,62,p[0],p[1]-22,cGold,'');
+    });
+    s.appendChild(nodeBox(200,280,'réplicas ×15 (stream redo)',cPurple,cPurple));
+    s.appendChild(nodeBox(520,280,'S3 (backup continuo)',cOrange,cOrange));
+    arrow(s,360,187,200,280-22,cPurple,'async');
+    arrow(s,470,187,520,280-22,cOrange,'stage');
+  },
+  play(){
+    this.reset();
+    const c=$('#archCaption');
+    const seq=[
+      {tm:0, m:'<b>1.</b> El writer lotea redo por PG (MTRs con CPL) y lo envía a las 6 réplicas del PG.'},
+      {tm:1400, m:'<b>2.</b> Cada segmento persiste → ACK. Con <b>4/6 ACKs</b> el log queda durable: avanza el VDL.'},
+      {tm:3000, m:'<b>3.</b> Commits: completos sii VDL ≥ commit LSN (async, sin pausar workers).'},
+      {tm:4400, m:'<b>4.</b> El writer hace stream del redo + metadatos a las 15 réplicas (aplican ≤VDL, atómico por MTR, ~ms).'},
+      {tm:5800, m:'<b>5.</b> Reads: un segmento con SCL ≥ read-point. Backup a S3 y GC/PGMRPL en background. ✓'}
+    ];
+    seq.forEach(st=>{ this.timer=setTimeout(()=>{ c.innerHTML=st.m; }, st.tm); });
+  },
+  reset(){ if(this.timer) clearTimeout(this.timer); $('#archCaption').textContent='Pulsa "Animar flujo".'; }
+};
+
+/* ============================================================
+   INICIALIZACIÓN
+============================================================ */
+renderModuleNav();
+renderModule();
+renderCases();
+renderGlossary();
+updateProgress();
+</script>
+</body>
+</html>

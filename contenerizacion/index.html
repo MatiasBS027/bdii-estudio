@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contenerización · Muelle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500;600&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <div class="dock">
+    <aside class="rail" aria-label="Temas">
+      <div class="rail-brand">
+        <p class="stamp"><a href="../index.html">← Hub</a> · MUELLE</p>
+        <p class="rail-title">Contenerización</p>
+        <p class="rail-sub">Estudio, no receta</p>
+      </div>
+      <nav class="rail-nav" id="rail-nav"></nav>
+      <div class="rail-foot">
+        <p class="progress-label">Capas revisadas</p>
+        <div class="progress-track" aria-hidden="true"><span class="progress-fill" id="progress-fill"></span></div>
+        <p class="progress-meta" id="progress-meta">0 / 7</p>
+      </div>
+    </aside>
+
+    <main id="main" class="deck">
+      <header class="deck-bar">
+        <p class="where" id="where">Mapa</p>
+        <button type="button" class="ghost" id="btn-reset-progress">Reiniciar progreso</button>
+      </header>
+      <div id="view" class="view"></div>
+    </main>
+  </div>
+
+  <script src="js/content.js"></script>
+  <script src="js/check.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/labs/docker.js"></script>
+  <script src="js/labs/compose.js"></script>
+  <script src="js/labs/persist.js"></script>
+  <script src="js/labs/arranque.js"></script>
+  <script src="js/labs/auth.js"></script>
+  <script src="js/labs/k8s.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
