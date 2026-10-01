@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zanzibar · Aprende & Practica — Google's Authorization System</title>
+<title>Zanzibar · BDII Estudio — Google's Authorization System</title>
 <style>
 /* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
    Tesis: apuntes de curso compuestos como página editorial — titulares serif,
@@ -277,7 +277,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
   table{display:block; overflow-x:auto;}
 }
 @media print{
-  .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  header, .hub-link, .suite-stamp, .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
   body{background:#fff;}
   main{max-width:100%; padding:0;}
   .view{display:none !important;}
@@ -300,8 +300,8 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <div class="brand">
       <div class="logo">Z</div>
       <div>
-        <div>Zanzibar Studio</div>
-        <small>Google's Consistent, Global Authorization System</small>
+        <div>Zanzibar</div>
+        <small>BDII Estudio · Global Authorization System</small>
       </div>
     </div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
@@ -1026,7 +1026,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(
 
 /* theme toggle */
 const themeBtn = $('#themeBtn');
-themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('zanzibar-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){}});
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('zanzibar-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
 (function(){ let s=null; try{s=localStorage.getItem('zanzibar-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; } })();
 
 /* ============================================================
@@ -1272,7 +1272,20 @@ function initAnims(){
 /* ---- utilidades SVG ---- */
 function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
 const NODE={w:130,h:44,rx:10};
-const cBlue='#5b8cff', cTeal='#2dd4bf', cOrange='#ff9e5e', cPurple='#c084fc', cGold='#fbbf24', cDim='#4a5870', cBg='#1d283c';
+let cBlue,cTeal,cOrange,cPurple,cGold,cDim,cBg,cBad;
+function refreshAnimColors(){
+  const cs=getComputedStyle(document.body);
+  const g=k=>(cs.getPropertyValue(k)||'').trim();
+  cBlue=g('--blue')||'#8ba3c7';
+  cTeal=g('--teal')||'#6fae9d';
+  cOrange=g('--orange')||'#c08d5c';
+  cPurple=g('--purple')||'#9d8ab8';
+  cGold=g('--gold')||'#c2a05e';
+  cDim=g('--dim')||'#6f6a61';
+  cBg=g('--surface')||'#1b1917';
+  cBad=g('--bad')||'#c07f8c';
+}
+refreshAnimColors();
 function nodeBox(x,y,label,fill,stroke,txtfill){
   const g = el('g',{});
   const r = el('rect',{x:x-NODE.w/2,y:y-NODE.h/2,width:NODE.w,height:NODE.h,rx:NODE.rx,fill:fill,'fill-opacity':0.16,stroke:stroke,'stroke-width':1.2});
@@ -1289,12 +1302,14 @@ function arrow(g,x1,y1,x2,y2,color,label){
   g.append(path,mark);
   if(label){ const l=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle',class:'tedge'}); l.textContent=label; g.append(l); }
 }
-function flash(node){ node.setAttribute('filter','url(#glow)'); setTimeout(()=>node.removeAttribute('filter'),600); }
-function svgDefs(svg){
-  const defs = el('defs',{});
-  defs.innerHTML = `<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
-  svg.appendChild(defs);
+function flash(node){
+  if(!node) return;
+  const prev=node.getAttribute('stroke-width')||'1.2';
+  node.setAttribute('data-prev-sw', prev);
+  node.setAttribute('stroke-width','2.6');
+  setTimeout(()=>{ const p=node.getAttribute('data-prev-sw')||prev; node.setAttribute('stroke-width',p); node.removeAttribute('data-prev-sw'); },600);
 }
+function svgDefs(svg){ /* Study-desk: sin glow */ }
 
 /* ---- 1. Grafo de tuplas ---- */
 const animGraph = {
@@ -1407,7 +1422,7 @@ const animCheck = {
     gs.forEach(g=>g.removeAttribute('filter'));
     // order of g elements: 0 union, 1 _this, 2 computed, 3 tuple_to, 4 folder, 5 group
     const idx={root:0,this:1,comp:2,ttu:3,folder:4,group:5};
-    st.hl.forEach(h=>{ const g=gs[idx[h]]; if(g) g.setAttribute('filter','url(#glow)'); });
+    st.hl.forEach(h=>{ const g=gs[idx[h]]; if(g) flash(g); });
     this.step++;
   },
   play(){
@@ -1456,7 +1471,7 @@ const animEnemy = {
       {t:0, fn:()=>{cap.innerHTML='<b>Paso 1:</b> Alice quita a Bob del documento (A1).';}},
       {t:1400, fn:()=>{cap.innerHTML='<b>Paso 2:</b> Charlie, que sí tiene acceso, edita y guarda (A2). El cliente recibe un zookie con T(A2).';}},
       {t:2900, fn:()=>{cap.innerHTML='<b>Paso 3:</b> Bob intenta ver el documento. Su Check lleva el zookie, así que evalúa en T ≥ T(A2).';}},
-      {t:4400, fn:()=>{cap.innerHTML='<b>Resultado:</b> como T ≥ T(A2) &gt; T(A1), la remoción de Bob ya es visible → <span style="color:var(--bad);">denegado ✓</span>.'; this.refs.win.setAttribute('filter','url(#glow)');}},
+      {t:4400, fn:()=>{cap.innerHTML='<b>Resultado:</b> como T ≥ T(A2) &gt; T(A1), la remoción de Bob ya es visible → <span style="color:var(--bad);">denegado ✓</span>.'; flash(this.refs.win);}},
       {t:5900, fn:()=>{cap.innerHTML='<b>Sin zookie:</b> si el Check leyera datos viejos (antes de A1), Bob vería el contenido nuevo de Charlie → <span style="color:var(--bad);">new enemy problem</span>.';}}
     ];
     seq.forEach(st=>{ this.timer=setTimeout(st.fn, st.t); });

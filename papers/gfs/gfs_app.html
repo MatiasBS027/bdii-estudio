@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GFS · Aprende & Practica — The Google File System</title>
+<title>GFS · BDII Estudio — The Google File System</title>
 <style>
 /* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
    Tesis: apuntes de curso compuestos como página editorial — titulares serif,
@@ -277,7 +277,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
   table{display:block; overflow-x:auto;}
 }
 @media print{
-  .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  header, .hub-link, .suite-stamp, .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
   body{background:#fff;}
   main{max-width:100%; padding:0;}
   .view{display:none !important;}
@@ -297,7 +297,8 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <header>
   <div class="topbar">
     <a class="hub-link" href="../../index.html">← Hub</a><span class="suite-stamp">BDII Estudio</span>
-    <div class="brand"><div class="logo">G</div><div><div>GFS Studio</div><small>GFS: The Google File System</small></div></div>
+    <div class="brand"><div class="logo">G</div><div><div>GFS</div>
+        <small>BDII Estudio · The Google File System</small></div></div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
       <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
       <button class="tab" role="tab" aria-selected="false" data-view="aprende">Aprende</button>
@@ -579,7 +580,7 @@ function go(view){ document.querySelectorAll('.view').forEach(v=>v.classList.rem
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(t.dataset.view)));
 (function(){ const bar=document.getElementById('tabs'); const sync=()=>document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.classList.contains('active')?'true':'false')); bar.addEventListener('click', ()=>setTimeout(sync,0)); bar.addEventListener('keydown', e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const ts=[...bar.querySelectorAll('.tab')]; let i=ts.indexOf(document.activeElement); if(i<0) return; e.preventDefault(); i=(i+(e.key==='ArrowRight'?1:-1)+ts.length)%ts.length; ts[i].focus(); go(ts[i].dataset.view); sync(); }); sync(); })();
 const themeBtn = $('#themeBtn');
-themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('gfs-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){}});
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('gfs-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
 (function(){ let s=null; try{s=localStorage.getItem('gfs-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; } })();
 let done = (function(){ try{return JSON.parse(localStorage.getItem('gfs-done')||'{}');}catch(e){return {};} })();
 let quizScores = (function(){ try{const a=JSON.parse(localStorage.getItem('gfs-quiz')||'[]'); return Array.isArray(a)?a:[];}catch(e){return [];} })();
@@ -607,10 +608,23 @@ let animsRendered = false;
 function initAnims(){ if(animsRendered) return; animsRendered=true; animGfsArch.init(); animGfsWrite.init(); animGfsAppend.init(); animGfsSnap.init(); animBridge.init(); }
 function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
 const NODE={w:132,h:44,rx:10};
-const cBlue='#5b8cff', cTeal='#2dd4bf', cOrange='#ff9e5e', cPurple='#c084fc', cGold='#fbbf24', cDim='#4a5870';
+let cBlue,cTeal,cOrange,cPurple,cGold,cDim,cBg,cBad;
+function refreshAnimColors(){
+  const cs=getComputedStyle(document.body);
+  const g=k=>(cs.getPropertyValue(k)||'').trim();
+  cBlue=g('--blue')||'#8ba3c7';
+  cTeal=g('--teal')||'#6fae9d';
+  cOrange=g('--orange')||'#c08d5c';
+  cPurple=g('--purple')||'#9d8ab8';
+  cGold=g('--gold')||'#c2a05e';
+  cDim=g('--dim')||'#6f6a61';
+  cBg=g('--surface')||'#1b1917';
+  cBad=g('--bad')||'#c07f8c';
+}
+refreshAnimColors();
 function nodeBox(x,y,label,fill,stroke){ const g=el('g',{}); g.appendChild(el('rect',{x:x-NODE.w/2,y:y-NODE.h/2,width:NODE.w,height:NODE.h,rx:NODE.rx,fill:fill,'fill-opacity':0.16,stroke:stroke,'stroke-width':1.2})); const t=el('text',{x:x,y:y+4,'text-anchor':'middle',class:'tnode'}); t.textContent=label; g.append(t); return g; }
 function arrow(g,x1,y1,x2,y2,color,label){ g.appendChild(el('path',{d:'M '+x1+' '+y1+' C '+((x1+x2)/2)+' '+y1+', '+((x1+x2)/2)+' '+y2+', '+x2+' '+y2,fill:'none',stroke:color,'stroke-width':1.6})); if(label){ const l=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle',class:'tedge'}); l.textContent=label; g.append(l); } }
-function svgDefs(svg){ const defs=el('defs',{}); defs.innerHTML='<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'; svg.appendChild(defs); }
+function svgDefs(svg){ /* Study-desk: sin glow */ }
 function animChrome(svgId, total, idleNarr){
   const svg=document.getElementById(svgId);
   const card=svg.closest('.card');
