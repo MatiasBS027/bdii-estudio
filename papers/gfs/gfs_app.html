@@ -654,8 +654,19 @@ function svgCap(svg, text, y){
 }
 function glowIdx(svg, idxs){
   const gs=svg.querySelectorAll('g');
-  gs.forEach(function(g){ g.removeAttribute('filter'); });
-  idxs.forEach(function(i){ if(gs[i]) gs[i].setAttribute('filter','url(#glow)'); });
+  gs.forEach(function(g){
+    g.querySelectorAll('rect,circle,path,line').forEach(function(n){
+      if(n.hasAttribute('data-prev-sw')){ n.setAttribute('stroke-width', n.getAttribute('data-prev-sw')); n.removeAttribute('data-prev-sw'); }
+    });
+  });
+  idxs.forEach(function(i){
+    if(!gs[i]) return;
+    gs[i].querySelectorAll('rect,circle').forEach(function(n){
+      const prev=n.getAttribute('stroke-width')||'1.2';
+      n.setAttribute('data-prev-sw', prev);
+      n.setAttribute('stroke-width','2.4');
+    });
+  });
 }
 function flowOn(svg, on){
   svg.querySelectorAll('path').forEach(function(p){ const d=p.getAttribute('d')||''; if(d.length<30) return; if(on) p.classList.add('flow'); else p.classList.remove('flow'); });
@@ -786,7 +797,7 @@ capText(){ return this.mode==='gfs' ? 'Capa GFS: chunks 64MB ×3 + master de met
 narrText(){ return this.mode==='gfs' ? 'Iluminado <b>GFS</b>: Bigtable persiste aquí sus SSTables y commit logs como archivos de chunks replicados.' : this.mode==='bigtable' ? 'Iluminado <b>Bigtable</b>: modelo (fila,columna,tiempo), tablets, compactions; coordina con Chubby, no con GFS.' : 'Pila <b>completa</b>: MapReduce/apps → tablet servers → chunks GFS → discos commodity. Chubby solo coordina a Bigtable.'; },
 show(m){ this.mode=m; this.draw(); this.markSeg();
   animSetUI(this.ch,null,'done',3,3,this.narrText(),this.cap,this.capText());
-  const gs=this.svg.querySelectorAll('g'); gs.forEach(function(g){ g.setAttribute('filter','url(#glow)'); });
+  const gs=this.svg.querySelectorAll('g'); glowIdx(this.svg, Array.from({length:gs.length},(_,i)=>i));
   setTimeout(function(){ gs.forEach(function(g,i){ if(i>0) g.removeAttribute('filter'); }); },900);
 },
 draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s); const all=this.mode==='both'; const g=this.mode==='gfs'; const b=this.mode==='bigtable';
