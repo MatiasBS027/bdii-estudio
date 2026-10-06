@@ -4,6 +4,8 @@
 > **Objetivo del usuario:** interiorización profunda — extraer el 100% de información valiosa del paper, entender trade-offs y su importancia, no solo pasar el quiz.
 > **Convención de idioma:** cita literal en inglés + traducción/explicación en español. Nunca parafrasear sin marcarlo.
 
+> **Flujo operativo y errores conocidos:** checklist paso a paso y Definition of Done en [`docs/FLUJO_PAPER_NUEVO.md`](docs/FLUJO_PAPER_NUEVO.md); bugs/anti-patrones en [`docs/LECCIONES_ERRORES.md`](docs/LECCIONES_ERRORES.md). **Bigtable = implementación de referencia; GFS = hermano con UX portada; Aurora/Zanzibar = antiguos a propósito** hasta que se revisiten.
+
 ---
 
 ## 0. Principios (no negociables)

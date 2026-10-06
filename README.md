@@ -33,9 +33,13 @@ index.html                 # hub
 papers/gfs|bigtable|aurora|zanzibar/
 contenerizacion/           # Docker → K8s (Study-desk, layout dock)
 SISTEMA_HTML_ESTUDIO.md    # spec para generar papers nuevos
+docs/FLUJO_PAPER_NUEVO.md  # checklist + Definition of Done (empezar acá)
+docs/LECCIONES_ERRORES.md  # error log / anti-patrones
 ```
 
 ## Añadir un paper nuevo
+
+**Entrada recomendada:** [`docs/FLUJO_PAPER_NUEVO.md`](docs/FLUJO_PAPER_NUEVO.md) (checklist y Definition of Done) y [`docs/LECCIONES_ERRORES.md`](docs/LECCIONES_ERRORES.md) (errores a no repetir). Referencia: **Bigtable**; GFS es el hermano con UX portada; Aurora/Zanzibar están desactualizados a propósito.
 
 1. Generá un HTML siguiendo [`SISTEMA_HTML_ESTUDIO.md`](SISTEMA_HTML_ESTUDIO.md) (6 vistas, quiz, offline).
 2. Guardalo en `papers/<slug>/<slug>_app.html`.
