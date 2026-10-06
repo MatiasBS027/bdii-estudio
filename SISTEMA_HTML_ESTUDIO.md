@@ -107,8 +107,11 @@ Estructura por caso: `título + prompt con datos del paper + [pistas graduadas] 
 
 ## 10. Persistencia y modos
 
-- `localStorage`: `*-done` (módulos), `*-quiz` (historial scores), `*-theme`. Barra progreso = módulos done / total.
-- Modo estudio (default): feedback inmediato + explain. **Modo examen** (añadir): oculta explains, timer opcional, nota final + lista de trade-offs fallados con link al módulo.
+- `localStorage`: `*-done` (módulos), `*-mini` (mini-checks), `*-quiz` (historial scores), `*-quiz-wrong` (índices fallados), `*-cases` (pistas/soluciones), `*-last` (vista/módulo/panel para Continuar), `*-theme`.
+- Barra de progreso: módulos done / total + meta (mini-checks + último quiz %).
+- **Continuar:** botón en Inicio restaura `*-last` (vista + módulo o modo de quiz).
+- Modo **Estudio** (default): feedback inmediato + explain. Modo **Examen**: oculta explains hasta terminar; nota final + lista de falladas con salto a pregunta y módulo. Modo **Solo falladas** + filtros por `.qtag`. Paginación 1 / 5 / Todas.
+- Aprende: mini-TOC intra-módulo (`h3` / `.trade`), links a Animaciones, Modo lectura. Animaciones: link de vuelta a Aprende. Cheatsheet: CTA Imprimir/PDF.
 
 ## 11. QA checklist (rúbrica de aceptación)
 
