@@ -29,7 +29,7 @@ Inicio | Aprende | Animaciones | Quiz & Casos | Glosario | Cheatsheet
 ```
 
 - **Inicio:** tesis en 1 frase + 1 línea "idea central" + 4 stats con número exacto del paper + cómo usar (3 cards).
-- **Aprende:** 6-8 módulos en orden del paper. Cada módulo = `lede + cita(s) + traducción didáctica + ⚖️ trade-off(s) + ⚠️ error común + mini-check (1Q)`.
+- **Aprende:** 8-10 módulos en orden del paper (cubre §1…§N + related work). Cada módulo = `lede + cita(s) + traducción didáctica + trade-off(s) + error común + mini-check (1Q)`. Longitud de clase OK si hace falta para 100% cobertura.
 - **Animaciones:** 1 por mecanismo núcleo (mínimo 5). Botones paso-a-paso + reproducir + reiniciar + caption que explica el paso.
 - **Quiz & Casos:** quiz técnico + casos separados. Ver §6 y §7.
 - **Glosario:** bilingüe, filtrable. Cada entrada = `término EN + definición ES + trade-off o ejemplo + ref`.
@@ -98,10 +98,12 @@ Estructura por caso: `título + prompt con datos del paper + [pistas graduadas] 
 - **Naming:** variables descriptivas del dominio (`animWebtable, animLocate, animServe, animRecovery, animRead`). Prohibido reutilizar nombres de otro paper (`enemy, zookie, check, graph` genéricos).
 - Ideal: 1 control interactivo real (slider block-size 8KB/64KB, toggle Bloom on/off, toggle caché vacía/stale) que cambie el resultado visible.
 
-## 9. Glosario y cheatsheet
+## 9. Glosario, cheatsheet y tip bubbles (piloto Bigtable)
 
-- Glosario: 20-30 términos, `ES + EN`, 1 línea con trade-off o ejemplo + `§ref`. Buscador filtra por término y definición.
-- Cheatsheet: 5-6 cards (una por sección), cada una ≤5 líneas, solo fórmulas, paths y números. Debe imprimirse en 1 página.
+- Glosario: 20-40 términos, `ES + EN`, 1 línea con trade-off o ejemplo + `§ref`. Buscador filtra por término y definición.
+- Cheatsheet: 5-7 cards (una por sección + related work), cada una ≤5 líneas, solo fórmulas, paths y números. Debe imprimirse en 1 página.
+- **Tip bubbles (obligatorio desde piloto Bigtable):** los términos del `GLOSSARY` (y alias/acrónimos) se subrayan con borde punteado en Aprende / Inicio / Animaciones / Quiz explains / Cheatsheet. Hover (desktop) o tap (móvil) abre una burbuja tipo speech-bubble Study-desk con término + definición + `§ref`. Misma fuente de verdad que la vista Glosario — no duplicar definiciones en HTML estático.
+- Implementación de referencia: `papers/bigtable/bigtable_app.html` → `buildTipIndex` + `enhanceTips(root)`.
 
 ## 10. Persistencia y modos
 
@@ -118,7 +120,9 @@ Estructura por caso: `título + prompt con datos del paper + [pistas graduadas] 
 - [ ] ¿Quiz tiene 40% trade-off + 10% numérica + distractores = errores reales?
 - [ ] ¿Casos tienen solución en 3 partes + rúbrica?
 - [ ] ¿Funciona offline en 1 archivo, dark/light, móvil?
+- [ ] **Cobertura 100%:** ¿cada sección del paper (§1…§N + related work) tiene módulo o bloque de clase, y el quiz falla por estudio — no por contenido ausente?
+- [ ] **Tip bubbles:** ¿hover/tap sobre términos del glosario muestra burbuja con la misma definición?
 
 ## 12. Prompt de generación (pegar a la IA)
 
-> Genera un único `.html` offline siguiendo `SISTEMA_HTML_ESTUDIO.md` §§2-10 a partir de `PAPER.pdf` + `RESUMEN.md`. 6-8 módulos con cita EN §+pág + traducción ES + trade-off numerado + error común + mini-check. 24-30 preguntas (30/40/20/10) con `why` que re-enseñe. 6 casos con solución en 3 partes. 5 animaciones SVG paso-a-paso con naming del dominio + 1 control interactivo. Glosario 20-30 filtrable + cheatsheet 1 página. Tokens y componentes de §3. Verifica checklist §11 y reporta gaps.
+> Genera un único `.html` offline siguiendo `SISTEMA_HTML_ESTUDIO.md` §§2-10 a partir de `PAPER.pdf` + `RESUMEN.md`. **Piloto de cobertura:** módulos suficientes para enseñar el 100% del paper (related work incluido); citas EN §+pág + traducción ES + trade-off numerado + error común + mini-check. Quiz que cubra todos los huecos (30/40/20/10) con `why` que re-enseñe. 6+ casos con solución en 3 partes. 5 animaciones SVG paso-a-paso con naming del dominio + 1 control interactivo. Glosario filtrable + tip bubbles (`enhanceTips`) + cheatsheet 1 página. Tokens y componentes de §3. Verifica checklist §11 y reporta gaps. Referencia: `papers/bigtable/bigtable_app.html`.

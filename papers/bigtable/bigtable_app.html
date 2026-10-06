@@ -291,6 +291,24 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
   svg .flow{animation:none;}
 }
 
+
+/* ============ GLOSSARY TIP BUBBLES (Study-desk speech) ============ */
+.tip-term{position:relative; cursor:help; border-bottom:1.5px dotted var(--blue); color:inherit; font-weight:650; background:transparent; padding:0; margin:0; font:inherit; display:inline; border-radius:0; border-top:0; border-left:0; border-right:0;}
+.tip-term:hover, .tip-term:focus-visible, .tip-term.is-open{border-bottom-color:var(--gold); color:var(--gold);}
+.tip-term:focus-visible{outline:none; box-shadow:none;}
+.tip-bubble{position:absolute; z-index:80; left:50%; bottom:calc(100% + 10px); transform:translateX(-50%); width:min(340px, 78vw); padding:12px 14px; background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:10px 10px 10px 4px; box-shadow:0 8px 24px rgba(0,0,0,.28); font-family:var(--sans); font-size:13px; font-weight:500; line-height:1.55; text-align:left; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .15s ease, visibility .15s ease;}
+.tip-bubble::after{content:""; position:absolute; left:50%; bottom:-7px; transform:translateX(-50%) rotate(45deg); width:12px; height:12px; background:var(--surface2); border-right:1px solid var(--border); border-bottom:1px solid var(--border);}
+.tip-bubble .tip-k{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--blue); margin-bottom:4px;}
+.tip-bubble .tip-ref{display:block; margin-top:6px; font-size:11.5px; color:var(--dim);}
+.tip-term:hover .tip-bubble, .tip-term:focus-within .tip-bubble, .tip-term.is-open .tip-bubble{opacity:1; visibility:visible; pointer-events:auto;}
+.tip-term.tip-below .tip-bubble{bottom:auto; top:calc(100% + 10px); border-radius:4px 10px 10px 10px;}
+.tip-term.tip-below .tip-bubble::after{bottom:auto; top:-7px; border-right:0; border-bottom:0; border-left:1px solid var(--border); border-top:1px solid var(--border);}
+@media (hover:none){
+  .tip-term:hover .tip-bubble{opacity:0; visibility:hidden;}
+  .tip-term.is-open .tip-bubble{opacity:1; visibility:visible; pointer-events:auto;}
+}
+@media print{ .tip-bubble{display:none !important;} .tip-term{border-bottom:none; font-weight:inherit;} }
+
 </style>
 </head>
 <body><a class="skip-link" href="#main">Saltar al contenido</a>
@@ -338,15 +356,15 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
   <h2>¿Cómo usar esta app?</h2>
   <p class="lede">Tres pasos, en orden. Cada uno prepara el siguiente.</p>
   <ol class="path">
-    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">8 módulos. Cada término complejo trae cita del paper + explicación en español + su trade-off.</span></span></button></li>
+    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">9 módulos (cobertura 100% del paper). Pasa el cursor o toca un término subrayado para ver la burbuja del glosario.</span></span></button></li>
     <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">Webtable, jerarquía de localización, serving, recovery con sort y path de lectura.</span></span></button></li>
-    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">32 preguntas (trade-off estilo quiz + tricky + numéricas + puente) + 6 casos con solución.</span></span></button></li>
+    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">40 preguntas (trade-off + apps + relacionado + puente) + 7 casos. Si fallas, el hueco es de estudio — no de contenido faltante.</span></span></button></li>
   </ol>
 </section>
 <section id="view-aprende" class="view">
   <span class="kicker">Ruta de aprendizaje</span>
   <h2>Aprende Bigtable desde cero</h2>
-  <p class="lede">Sigue los módulos en orden. Fíjate en los bloques <strong>Trade-off</strong>: son los que más caen en el quiz.</p>
+  <p class="lede">Sigue los módulos en orden. Los términos del glosario aparecen con <strong>subrayado punteado</strong>: hover o tap abre la burbuja. Los <strong>Trade-off</strong> son los que más caen en el quiz.</p>
   <div class="aprende-layout"><nav class="module-nav" id="moduleNav"></nav><div class="module-content" id="moduleContent"></div></div>
 </section>
 <section id="view-animaciones" class="view">
@@ -374,7 +392,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <section id="view-glosario" class="view">
   <span class="kicker">Referencia rápida</span>
   <h2>Glosario bilingüe</h2>
-  <p class="lede">Cita del paper + explicación. Escribe para filtrar (ej: bloom, compaction, locality).</p>
+  <p class="lede">Misma fuente que las burbujas del Aprende. Escribe para filtrar (ej: bloom, compaction, Boxwood).</p>
   <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: bloom, compaction, tablet)…">
   <div id="glossaryList"></div>
 </section>
@@ -440,9 +458,10 @@ mini:{q:'¿Qué atomicidad garantiza Apply en el ejemplo?', opts:['Atómica entr
 { id:'m3', tag:'Módulo 3', accent:'teal', title:'Building blocks: GFS, SSTable y Chubby',
 summary:'Los tres cimientos y el precio de apoyarse en Chubby.',
 html: `
-<p class="lede">Bigtable no reinventa todo: se apoya en infraestructura Google.</p>
+<p class="lede">Bigtable no reinventa todo: se apoya en infraestructura Google. Tres piezas explícitas del paper (§4) + el cluster management system compartido.</p>
 <table><tr><th>Pieza</th><th>Rol en Bigtable</th></tr>
-<tr><td><strong>GFS</strong></td><td>Guarda logs y data files. Cluster en pool compartido con scheduler/monitoreo.</td></tr>
+<tr><td><strong>GFS</strong></td><td>Guarda logs y data files (SSTables + commit logs). Persistencia replicada sin reimplementar disco.</td></tr>
+<tr><td><strong>Cluster management</strong></td><td>Sistema compartido: scheduling, recursos, monitoreo de fallas. Bigtable corre en el mismo pool que otros jobs (§4, p.3).</td></tr>
 <tr><td><strong>SSTable</strong></td><td>Mapa ordenado <strong>inmutable</strong> clave→valor (bytes). Bloques ~64KB + índice al final en memoria. Lookup = 1 seek (binaria en índice + leer bloque). Opcional todo en memoria.</td></tr>
 <tr><td><strong>Chubby</strong></td><td>Lock service (5 réplicas, 1 master, mayoría viva, Paxos). Namespace de dirs/archivos como locks, reads/writes atómicos, caché consistente, sesiones con lease + callbacks.</td></tr></table>
 <div class="callout info"><div class="lbl">Cita del paper §4, p.3–4</div>"Bigtable uses Chubby for: <strong>single active master; bootstrap location; discover tablet servers and finalize deaths; schema info; ACLs</strong>. If Chubby becomes unavailable for an extended period, <strong>Bigtable becomes unavailable</strong>."</div>
@@ -513,9 +532,16 @@ html: `
 <h3>Escala (1→500) · §7, p.9</h3>
 <p>Agregado +100× (random-mem ~300× con 500× máquinas; cuello = CPU por servidor). <strong>No lineal</strong>: caída 1→50 por desbalance (contienda con otros jobs; rebalanceo throttled porque mover = &lt;1s no disponible; carga del benchmark migra). Peor: <strong>random reads solo 100× con 500× máquinas</strong> (64KB×1KB satura links compartidos de 1Gbps).</p>
 <div class="trade"><b>Trade-off 16 · Balanceo throttled.</b> Mover tablets equilibra pero indisponibiliza (&lt;1s). Mover agresivo = flapping; mover poco = desbalance. El paper throttlea y lo paga en per-server.</div>
-<h3>Apps (Tab.1, p.9 · Tab.2, p.10)</h3>
-<p><strong>Analytics:</strong> raw click ~200TB (fila = sitio+tiempo, contiguo+ordenado, 14% comprimido) → summary ~20TB vía MapReduce (cuello = GFS, 29%). <strong>Earth:</strong> raw ~70TB en disco (ya comprimido, compresión off), fila = segmento geográfico, familia dispersa de fuentes; serving ~500GB en cientos de servers in-memory para decenas de miles qps. <strong>Personalized Search:</strong> fila = userid, familia por acción, timestamp = acción; replicado multi-cluster; de replicación cliente eventual a subsistema en servidores; 93 familias → <strong>cuotas por cliente</strong>.</p>
-<div class="trade"><b>Trade-off 17 · Compartir tabla (93 familias).</b> Ganas: un store por-usuario reutilizable. Pierdes: noisy neighbors → cuotas y aislamiento.</div>
+<h3>Producción 2006 · §8, p.9–11</h3>
+<div class="callout info"><div class="lbl">Cita del paper §8, p.9</div>"As of August 2006, there are <strong>388 non-test Bigtable clusters</strong> … about <strong>24,500 tablet servers</strong>." — 14 clusters muy ocupados (8069 servers): <strong>&gt;1.2M requests/s</strong>, ~741 MB/s entrada, ~16 GB/s salida.</div>
+<p><strong>Didáctica:</strong> no es un piloto: ya era infraestructura de producción masiva. Los números de §7 (bench sintético) se validan con tráfico real de §8.</p>
+<h3>Apps (Tab.1, p.9 · Tab.2, p.10) — clase completa</h3>
+<table><tr><th>App</th><th>Diseño de fila / familias</th><th>Escala + truco</th></tr>
+<tr><td><strong>Google Analytics</strong></td><td>Raw: fila = sitio + tiempo de sesión (contiguo+ordenado). Summary: agregados periódicos vía MapReduce.</td><td>Raw ~200 TB → 14% comprimido. Summary ~20 TB (29%). Cuello = throughput GFS, no CPU de Bigtable.</td></tr>
+<tr><td><strong>Google Earth</strong></td><td>Raw: fila = segmento geográfico; familia dispersa de fuentes de imagen. Serving: índice ~500 GB que apunta a datos en GFS.</td><td>Raw ~70 TB en disco; compresión Bigtable <strong>apagada</strong> (ya viene comprimida). Serving: cientos de servers, familias <strong>in-memory</strong>, decenas de miles qps/datacenter.</td></tr>
+<tr><td><strong>Personalized Search</strong></td><td>Fila = userid; una column family por tipo de acción; timestamp = momento de la acción. Perfiles vía MapReduce.</td><td>Replicado multi-cluster (disponibilidad + cercanía). Evolución: replicación cliente eventual → subsistema en servidores. Una tabla compartida llegó a <strong>93 familias</strong> → mecanismo de <strong>cuotas</strong> por cliente.</td></tr></table>
+<div class="trade"><b>Trade-off 17 · Compartir tabla (93 familias).</b> Ganas: un store por-usuario reutilizable entre productos. Pierdes: noisy neighbors → cuotas y aislamiento explícitos (§8, p.11).</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que "Earth apaga la compresión porque Bigtable comprime mal". No: los datos <strong>ya vienen comprimidos</strong>; recomprimir gasta CPU sin ganar ratio (§8).</div>
 <h3>Lecciones (§9, p.11, oro para el quiz)</h3>
 <ul style="color:var(--muted);"><li><strong>Fallos más allá de particiones:</strong> corrupción de memoria/red, clock skew, hung, particiones asimétricas, bugs en Chubby, cuotas GFS, mantenimiento. Respuesta: checksums RPC + quitar supuestos (errores Chubby).</li>
 <li><strong>Retrasa features:</strong> transacciones generales planeadas, nunca implementadas sin uso; al final bastó single-row + mecanismo especializado para índices secundarios (eficiente en 100s de filas, mejor con replicación optimista cross-DC).</li>
@@ -549,6 +575,24 @@ html: `
 <div class="callout warn"><div class="lbl">Error común</div>Decir que "GFS usa Chubby para los leases". No: los leases de 60s son del <strong>propio master GFS</strong> (§3.1 GFS). Chubby lo usa <strong>Bigtable</strong> para elección de master y membership (§4–5 Bigtable). El profe los relaciona porque uno corre sobre el otro, no porque compartan código.</div>
 `,
 mini:{q:'¿Dónde vive físicamente una SSTable de Bigtable?', opts:['En la memoria del master','En un archivo GFS partido en chunks de 64MB replicados 3×','En un archivo Chubby','Solo en el memtable'], a:1, why:'SSTables y commit logs son archivos persistentes y todo lo persistente de Bigtable vive en GFS (§4–5). Chubby guarda locks/schemas, no datos.'} }
+,
+{ id:'m8', tag:'Módulo 8', accent:'purple', title:'Trabajo relacionado y qué NO es Bigtable',
+summary:'Boxwood, DHTs, DBs paralelas, columnar stores y la analogía LSM — contexto §10 para no confundir niveles.',
+html: `
+<p class="lede">§10 del paper ubica Bigtable frente a sistemas que parecen "primos" pero resuelven otro problema. En clase: saber <strong>qué comparar y qué no</strong>.</p>
+<div class="callout info"><div class="lbl">Cita del paper §10, p.12</div>"Boxwood … provides infrastructure for building higher-level services such as file systems or databases" — mientras Bigtable "provides a <strong>direct solution to applications</strong>."</div>
+<table><tr><th>Sistema</th><th>Nivel / meta</th><th>Vs Bigtable</th></tr>
+<tr><td><strong>Boxwood</strong></td><td>Consenso, locking, chunks, B-tree — infraestructura</td><td>Más bajo: tú construirías FS/DB encima. Bigtable ya es el store de apps.</td></tr>
+<tr><td><strong>DHTs</strong> (CAN, Chord, Tapestry, Pastry)</td><td>Área amplia: bandwidth variable, peers no confiables, Byzantine</td><td>Bigtable asume datacenter confiable + admin central; no son metas suyas.</td></tr>
+<tr><td><strong>Oracle RAC</strong></td><td>Shared disks (~GFS) + lock manager distribuido (~Chubby)</td><td>Modelo relacional completo + transacciones. Misma infra, otra interfaz.</td></tr>
+<tr><td><strong>IBM DB2 PE</strong></td><td>Shared-nothing: subset de filas por server en RDBMS local</td><td>Partición parecida a tablets, pero SQL + tx generales.</td></tr>
+<tr><td><strong>C-Store / Sybase IQ / MonetDB</strong></td><td>Columnar, read-optimized</td><td>Locality groups dan beneficio similar; C-Store es relacional read-opt; Bigtable apunta a buen read <em>y</em> write (§10).</td></tr>
+<tr><td><strong>LSM-tree</strong> [26]</td><td>Buffer + merge de archivos ordenados</td><td>Analogía directa: memtable → SSTables + fusión en reads (§5.3–5.4).</td></tr></table>
+<div class="trade"><b>Trade-off 19 · Interfaz low-level vs relacional.</b> Ganas: control de localidad/formato y escala (como GFS vs NFS). Pierdes: joins, SQL, tx multi-fila — el cliente las implementa arriba si las necesita.</div>
+<div class="callout tip"><div class="lbl">Futuro del paper · §11, p.13</div>Planean "cross-data-center replicated Bigtables with multiple masters" y mecanismos especializados (índices secundarios) en vez de tx generales. Eso anticipa la línea Spanner [inferencia: fuera del paper 2006].</div>
+<div class="callout warn"><div class="lbl">Error común</div>Decir que Bigtable "es un DHT" o "es Oracle RAC sin SQL". No: DHT = WAN no confiable; RAC = relacional sobre shared disk. Bigtable = shared-nothing + mapa sparse + Chubby, en datacenter.</div>
+`,
+mini:{q:'¿Por qué Boxwood no es "lo mismo" que Bigtable?', opts:['Porque Boxwood usa GFS','Boxwood es infraestructura de más bajo nivel; Bigtable da soporte directo a aplicaciones','Porque Boxwood no tiene tablets','Porque Boxwood es columnar'], a:1, why:'§10, p.12: Boxwood ofrece consenso/locking/chunks para construir FS o DBs; Bigtable es el store que las apps usan directamente.'} }
 ];
 const QUIZ = [
 {tag:'Modelo', c:'blue', q:'Bigtable es…', opts:['Una base relacional con SQL','Un mapa multidimensional ordenado, disperso, distribuido y persistente indexado por (fila, columna, timestamp)', 'Un filesystem puro','Un lock service'], a:1, why:'El paper lo define en §2, p.2: (row:string, column:string, time:int64) → string, con valores como bytes sin interpretar que el cliente serializa. Ganas control total de layout, formato y localidad; pagas no tener SQL ni joins: GFS y Chubby son bloques externos, no Bigtable.'},
@@ -582,6 +626,14 @@ const QUIZ = [
 {tag:' numérica', c:'pink', q:'Numérica (c): ¿por qué vacía = 3 RTTs y stale = hasta 6?', opts:['3 = réplicas Chubby; 6 = reintentos de Paxos','3 = Chubby + root + METADATA; stale se descubre al fallar y se repite el camino', '3 = niveles de caché; 6 = compactions','Son estimaciones sin medir'], a:1, why:'§5.1, p.4: caché vacía = Chubby (ubicación del root) + root + METADATA = 3 viajes, sin I/O a GFS (todo en memoria). Stale = el fallo se descubre tarde porque METADATA rara vez se mueve, hasta 6. Lo abaratan el prefetch (varias tablets por read) y el root que nunca se parte.'},
 {tag:'Puente', c:'teal', q:'Puente: ¿dónde vive físicamente una SSTable de Bigtable?', opts:['En la memoria del master de Bigtable','En un archivo GFS partido en chunks de 64MB replicados 3×', 'En un archivo Chubby','Solo en el memtable del tablet server'], a:1, why:'§4–5 Bigtable: SSTables y commit logs son archivos persistentes, y todo lo persistente de Bigtable vive en GFS (§2.3 GFS: chunks 64MB ×3). Chubby guarda locks/schemas/elección de master, no datos. Trade-off: Bigtable hereda durabilidad sin reimplementarla, pero hereda sus límites (picos GFS, 64KB×1KB).'},
 {tag:'Puente', c:'teal', q:'Puente: ¿a qué operación de GFS se parece el append al commit log de Bigtable?', opts:['A un overwrite aleatorio de 1KB','Al record append: append secuencial atómico sin lock manager, con reintentos que la capa de arriba filtra', 'Al snapshot copy-on-write','Al checkpoint del operation log'], a:1, why:'§3.3 GFS: record append agrega at-least-once una secuencia contigua en un offset que GFS elige; ante fallos se reintenta y la app filtra duplicados con checksums/IDs. §5.3–5.4 Bigtable: el mismo patrón append-only (commit log + memtable → SSTables). Ambos ponen el append secuencial en el centro y tratan el overwrite como excepción.'},
+{tag:'Apps', c:'pink', q:'Producción 2006: ¿cuántos clusters no-test y tablet servers reporta el paper?', opts:['50 clusters / 1000 servers','388 clusters / ~24.500 tablet servers','14 clusters / 500 servers','1000 clusters / 388 servers'], a:1, why:'§8, p.9: 388 non-test clusters y ~24.500 tablet servers (agosto 2006). Los 14 clusters más ocupados (8069 servers) hacían >1.2M req/s.'},
+{tag:'Apps', c:'pink', q:'¿Por qué Earth apaga la compresión de Bigtable en la tabla raw?', opts:['Porque Bigtable no comprime bien imágenes','Los datos ya vienen comprimidos; recomprimir gasta CPU sin ratio','Porque usa solo memtable','Porque Chubby lo prohíbe'], a:1, why:'§8, p.10: la tabla raw de ~70 TB ya llega comprimida, así que desactivan la compresión de Bigtable. El serving (~500 GB) sí usa locality groups in-memory.'},
+{tag:'Apps', c:'pink', q:'Personalized Search llegó a 93 column families en una tabla compartida. ¿Qué añadieron?', opts:['Transacciones multi-fila','Cuotas por cliente para aislar almacenamiento','Un 4º nivel de METADATA','Compresión gzip forzada'], a:1, why:'§8, p.11: compartir una tabla entre productos con muchas familias motivó un mecanismo de cuotas para aislar el storage por cliente (noisy neighbors).'},
+{tag:'Relacionado', c:'purple', q:'¿Qué distingue a Boxwood de Bigtable según §10?', opts:['Boxwood es más rápido','Boxwood es infraestructura de más bajo nivel; Bigtable da soporte directo a apps','Boxwood usa SQL','Boxwood no tiene locks'], a:1, why:'§10, p.12: Boxwood ofrece acuerdo/locking/chunks para construir FS o DBs; Bigtable es el store que las aplicaciones usan directamente.'},
+{tag:'Relacionado', c:'purple', q:'Oracle RAC ≈ ¿qué piezas de la stack Google?', opts:['Solo MapReduce','Shared disks ≈ GFS y lock manager distribuido ≈ Chubby','Solo SSTables','Solo Bloom filters'], a:1, why:'§10, p.12: el paper compara RAC (discos compartidos + lock manager) con GFS + Chubby, pero RAC ofrece modelo relacional + transacciones completas.'},
+{tag:'Relacionado', c:'purple', q:'¿Por qué las DHTs (Chord, Pastry…) no son el punto de comparación justo?', opts:['Porque son más lentas siempre','Resuelven WAN con peers no confiables/Byzantine; Bigtable asume datacenter confiable','Porque no ordenan claves','Porque usan Chubby'], a:1, why:'§10, p.12: las DHTs afrontan bandwidth variable, participantes no confiables y control descentralizado — metas que Bigtable deliberadamente no tiene.'},
+{tag:'Building blocks', c:'teal', q:'Además de GFS, SSTable y Chubby, §4 menciona…', opts:['Un DNS interno propio','El cluster management system compartido (scheduling, recursos, fallas)','Un segundo master caliente','Zookeeper'], a:1, why:'§4, p.3: Bigtable corre sobre el cluster management system compartido (scheduling, resource management, monitoring). No reinventan el pool.'},
+{tag:'trade-off', c:'gold', q:'Trade-off: interfaz low-level de Bigtable vs C-Store relacional read-optimized…', opts:['Sin diferencia','Bigtable prioriza buen read y write con control de layout; C-Store prioriza reads relacionales','C-Store escala más a PBs','Bigtable tiene SQL completo'], a:1, why:'§10, p.12–13: locality groups dan beneficios tipo columnar, pero C-Store es read-optimized relacional; Bigtable elige interfaz simple y buen rendimiento en ambos lados.'},
 {tag:'Puente', c:'teal', q:'Puente (tricky): ¿usa GFS Chubby para sus leases de 60s?', opts:['Sí, igual que Bigtable','No: los leases de GFS son del propio master (60s + HeartBeats); Chubby lo usa Bigtable para elección de master y membership', 'Sí, para replicar el operation log','GFS no usa leases'], a:1, why:'§3.1 GFS: el lease lo otorga el master GFS (60s, extendible, piggybacked en HeartBeats) y el primary ordena con serial numbers — sin Chubby en ningún lado. §4–5 Bigtable: Chubby (5 réplicas, Paxos) para master único, bootstrap, membership y schemas. Mismo patrón (lease + orden), distinta implementación: se relacionan porque uno corre sobre el otro.'}
 ];
 const CASES = [
@@ -590,7 +642,8 @@ const CASES = [
 { title:'Caso 3 · Bloom: ¿voy a disco? (trade-off)', prompt:`Read de <code>row X, col anchor:foo.com</code> toca 10 SSTables. Bloom dice <strong>NO</strong> en 9 y <strong>quizá</strong> en 1.<br><br><strong>¿Cuántos seeks? ¿Y si el quizá era falso positivo?</strong>`, solution:`Vas a <strong>1 seek</strong> (el quizá). Los 9 NO son seguros (sin falsos negativos).<br>Si era <strong>falso positivo</strong>, pagas 1 seek en vano: ese es el trade-off (RAM + algún seek desperdiciado vs 9 evitados). Para inexistentes, el ahorro es total.`, h1:`Pista 1: el NO de Bloom es seguro (sin falsos negativos); el quizá, no (§6, p.7).`, h2:`Pista 2: 9 seguros + 1 quizá = ¿a cuántas SSTables bajas a disco? ¿Y si el quizá mentía?`, rubric:`Rúbrica (5pts): 2 decisión (1 seek) + 2 mecanismo (NO seguro, quizá dudoso) + 1 trade-off (RAM + falso positivo vs 9 seeks).`},
 { title:'Caso 4 · Recovery sin 100× lecturas', prompt:`Muere un tablet server con 1 log co-mingled. 100 servidores toman 1 tablet c/u.<br><br><strong>¿Por qué sería 100× sin sort? ¿Cuál es el fix exacto?</strong>`, solution:`Sin sort, cada uno leería el <strong>log entero</strong> para su pedacito → 100 lecturas del mismo archivo.<br>Fix: ordenar por <strong>(tabla, fila, seq)</strong> → cada tablet queda <strong>contigua</strong> (un seek + secuencial). Partir en <strong>64MB</strong>, sort en <strong>paralelo</strong> en distintos servers, coordinado por el <strong>master</strong> al dispararse el recovery.`, h1:`Pista 1: un log co-mingled leído entero por 100 servidores = ¿cuántas lecturas del mismo archivo? (§6, p.7)`, h2:`Pista 2: ordenar por (tabla, fila, seq) en segmentos de 64MB deja cada tablet… ¿cómo?`, rubric:`Rúbrica (5pts): 2 decisión (sort, no 100×) + 2 mecanismo (clave de sort, 64MB paralelo, master) + 1 trade-off (complejidad solo en recovery).`},
 { title:'Caso 5 · Minor / merging / major (borrado sensible)', prompt:`Borraste datos sensibles. Haces una <strong>merging compaction</strong> y verificas: siguen en disco.<br><br><strong>¿Por qué? ¿Qué compaction los borra de verdad?</strong>`, solution:`La merging deja <strong>deletion entries</strong> que suprimen viejas vivas; si las tirara, resucitarían. Solo la <strong>major</strong> (todas → una limpia <strong>sin deletes ni borrados</strong>) reclama y hace desaparecer a tiempo. Por eso Bigtable cicla majors por todos los tablets.`, h1:`Pista 1: ¿qué contienen las non-major que no se puede tirar sin resucitar datos? (§5.4, p.6)`, h2:`Pista 2: solo la que reescribe TODAS en una SSTable limpia sale sin deletes. ¿Cuál es?`, rubric:`Rúbrica (5pts): 2 decisión (major) + 2 mecanismo (deletion entries, resurrección) + 1 trade-off (I/O de fondo vs borrado a tiempo).`},
-{ title:'Caso 6 · Bloque 64KB vs 8KB (tuning)', prompt:`Workload random de 1KB: con 64KB haces 1212 reads/s y 75MB/s desde GFS.<br><br><strong>¿Qué cambias y qué trade-off asumes?</strong>`, solution:`Bajas a <strong>8KB</strong> por locality group: menos amplificación en random (más ops/s, menos red/CPU).<br>Trade-off: pierdes en <strong>scans/secuencial</strong> (menos prefetch por read, más seeks). No hay talla única: el paper lo deja <strong>por locality group</strong>.`, h1:`Pista 1: 1KB con bloque 64KB, ¿cuántos bytes viajan por read? Haz 1212 × 64KB (§7, p.8–9).`, h2:`Pista 2: con 8KB la amplificación cae de 64× a 8×. ¿Qué pierdes en scans a cambio?`, rubric:`Rúbrica (5pts): 2 decisión (8KB) + 2 mecanismo (amplificación, 75MB/s) + 1 trade-off (random vs scans, por locality group).`}
+{ title:'Caso 6 · Bloque 64KB vs 8KB (tuning)', prompt:`Workload random de 1KB: con 64KB haces 1212 reads/s y 75MB/s desde GFS.<br><br><strong>¿Qué cambias y qué trade-off asumes?</strong>`, solution:`Bajas a <strong>8KB</strong> por locality group: menos amplificación en random (más ops/s, menos red/CPU).<br>Trade-off: pierdes en <strong>scans/secuencial</strong> (menos prefetch por read, más seeks). No hay talla única: el paper lo deja <strong>por locality group</strong>.`, h1:`Pista 1: 1KB con bloque 64KB, ¿cuántos bytes viajan por read? Haz 1212 × 64KB (§7, p.8–9).`, h2:`Pista 2: con 8KB la amplificación cae de 64× a 8×. ¿Qué pierdes en scans a cambio?`, rubric:`Rúbrica (5pts): 2 decisión (8KB) + 2 mecanismo (amplificación, 75MB/s) + 1 trade-off (random vs scans, por locality group).`},
+{ title:'Caso 7 · ¿Relacional o Bigtable? (trabajo relacionado)', prompt:`Tu equipo discute tres opciones para un store de perfiles de usuario (acciones con timestamp, lecturas y escrituras frecuentes, sin joins SQL):<br>(A) Oracle RAC con SQL<br>(B) DHT tipo Chord en WAN<br>(C) Bigtable-style (fila=userid, familia por acción).<br><br><strong>¿Cuál eliges y qué trade-off citas del paper?</strong>`, solution:`<strong>C.</strong> El paper (§10) sitúa Bigtable como shared-nothing con interfaz low-level y buen read/write — exactamente el patrón de Personalized Search (§8).<br>(A) gana SQL/tx pero pagas modelo relacional completo que no usas.<br>(B) resuelve WAN/Byzantine que no son tu problema en datacenter.<br>Trade-off 19: control de layout + escala vs joins/SQL.`, h1:`Pista 1: Personalized Search usa fila=userid y familia por acción (§8). ¿Qué sistema del paper encaja?`, h2:`Pista 2: §10 descarta DHTs (otra meta) y contrasta RAC (relacional completo). ¿Qué queda?`, rubric:`Rúbrica (5pts): 2 decisión (C) + 2 mecanismo (§8 diseño + §10 contraste) + 1 trade-off (low-level vs SQL).`}
 ];
 const GLOSSARY = [
 ['Bloom filter','Filtro probabilístico por locality group: dice "seguro que no" o "quizá sí" para fila/columna en una SSTable. Trade-off: RAM + falsos positivos vs seeks evitados; inexistentes casi nunca tocan disco. (§6, p.7)'],
@@ -618,7 +671,22 @@ const GLOSSARY = [
 ['Tablet','Rango de filas (~100-200MB). Unidad de distribución y balanceo. 10-1000 por server. Split/merge online. (§5, p.4)'],
 ['Tablet server','Sirve sus tablets (reads/writes), parte las grandes. Un log por server; doble minor al mover para recovery sin replay. (§5, p.4–5 · §6, p.7–8)'],
 ['Timestamp + GC','Versiones por celda (int64, microseg o cliente). Orden descendente. GC: últimas n o recientes (ej. 7 días / 3 versiones Webtable). (§2, p.2)'],
-['Webtable','Ejemplo guía: fila = URL invertida, contents: (3 versiones por crawl) + anchor: (una col por referrer). (§2, p.2, Fig.1, p.2)']
+['Webtable','Ejemplo guía: fila = URL invertida, contents: (3 versiones por crawl) + anchor: (una col por referrer). (§2, p.2, Fig.1, p.2)'],
+['ACL','Access Control List: lista de escritores/lectores por familia o tabla, tipicamente en Chubby y cacheada. (§4–5)'],
+['Boxwood','Infra de bajo nivel (consenso, locks, chunks, B-tree). Meta: construir FS/DB encima. Bigtable es el store directo para apps. (§10, p.12)'],
+['Cluster management','Sistema compartido Google: scheduling, recursos, monitoreo de fallas. Bigtable corre en el mismo pool. (§4, p.3)'],
+['Copy-on-write','Solo el memtable es mutable; por fila se copia al escribir para permitir reads concurrentes. (§6, p.8)'],
+['Deletion entry','Marca de borrado que sobrevive en non-major compactions para no resucitar datos viejos. Solo major las elimina. (§5.4, p.6)'],
+['DHT','Distributed Hash Table (CAN/Chord/…). WAN, peers no confiables — preocupaciones que Bigtable no tiene como meta. (§10, p.12)'],
+['Event log (tablet)','Log de eventos por tablet en METADATA para debug (movimientos, splits). (§5.1, p.4)'],
+['In-memory (locality group)','SSTables del grupo se cargan lazy a RAM; luego reads sin disco. Solo hot+pequeño (ej. location de METADATA, Earth serving). (§6, p.6)'],
+['LSM-tree','Log-Structured Merge: buffer + merge de archivos ordenados. Analogía del paper a memtable/SSTable. (§10, p.12)'],
+['Paxos','Algoritmo de consenso; Chubby lo usa entre 5 réplicas para mayoría viva. (§4, p.3)'],
+['Prefetch (METADATA)','Cliente lee ubicación de varias tablets por cada acceso a METADATA para amortizar RTTs. (§5.1, p.4)'],
+['Quota (familias)','Límite de aislamiento por cliente tras compartir tablas con muchas familias (93 en Personalized Search). (§8, p.11)'],
+['Redo point','Punto en el commit log desde el cual reaplicar mutaciones al recuperar un tablet. (§5.3, p.5)'],
+['Shared-nothing','Cada server tiene su subset de datos (como tablets); sin disco compartido entre servers. Contraste: Oracle RAC shared-disk. (§10)'],
+['Tablet split','Partición de un rango de filas demasiado grande (~100-200MB default). Hijos comparten SSTables del padre (inmutabilidad). (§5–6)']
 ];
 const CHEATSHEET = `
 <div class="card accent-blue"><h3 style="margin-top:0;">Modelo</h3><p style="font-size:14px;"><code>(fila, columna, tiempo) → string</code> (bytes sin interpretar). Filas lexicográficas → <strong>tablets</strong> 100-200MB. Atomicidad <strong>single-row</strong>. Familias: pocas (control), columnas infinitas. Timestamps descendentes + GC (n o recientes).</p><p style="font-size:14px;">Host invertido <code>com.google.maps</code> = localidad + compresión.</p></div>
@@ -629,6 +697,123 @@ const CHEATSHEET = `
 <div class="card accent-pink"><h3 style="margin-top:0;">Perf + lecciones</h3><p style="font-size:14px;">1 server: scan 15385, mem-read 10811, writes ~8.5K, seq-read 4425, rand-read 1212 (64KB×1KB). 1→500: +100× (mem 300×, rand 100× por red). Mover throttled (&lt;1s). Apps: Analytics/Earth/Search. Lecciones: fallos raros, retrasa features, monitorea, simplicidad.</p></div>
 <div class="card accent-teal"><h3 style="margin-top:0;"> Puente GFS ↔ Bigtable</h3><p style="font-size:14px;">SSTables + commit logs <strong>son archivos GFS</strong> (chunks 64MB ×3). Master fuera de datos en ambos. Leases+serial (GFS) vs single-row+Chubby (Bigtable). Append > overwrite en los dos. Chunk 64MB / tablet 100-200MB / bloque 64KB. <strong>GFS no usa Chubby.</strong></p></div>
 `;
+/* ---- Glossary tip bubbles ---- */
+function buildTipIndex(){
+  const map = new Map();
+  GLOSSARY.forEach(function(td){
+    const term = td[0];
+    const def = td[1];
+    map.set(term.toLowerCase(), {term:term, def:def});
+    const bare = term.split(':')[0].trim();
+    if (bare && bare.toLowerCase() !== term.toLowerCase() && !map.has(bare.toLowerCase())) {
+      map.set(bare.toLowerCase(), {term:term, def:def});
+    }
+  });
+  const aliases = {
+    'sstable':'SSTable', 'sstables':'SSTable',
+    'memtable':'Memtable', 'memtables':'Memtable',
+    'bloom':'Bloom filter', 'bloom filter':'Bloom filter', 'bloom filters':'Bloom filter',
+    'chubby':'Chubby', 'gfs':'GFS',
+    'column family':'Column family', 'column families':'Column family', 'familias de columnas':'Column family',
+    'locality group':'Locality group', 'locality groups':'Locality group',
+    'commit log':'Commit log', 'group commit':'Group commit',
+    'tablet server':'Tablet server', 'tablet servers':'Tablet server',
+    'root tablet':'Root tablet', 'row key':'Row key', 'row keys':'Row key',
+    'single-row':'Single-row transaction', 'single-row transaction':'Single-row transaction',
+    'scan cache':'Scan Cache', 'block cache':'Block Cache',
+    'metadata':'METADATA', 'webtable':'Webtable',
+    'mapreduce':'MapReduce', 'sawzall':'Sawzall',
+    'compaction':'Compaction: major', 'compactions':'Compaction: major',
+    'minor compaction':'Compaction: minor', 'merging compaction':'Compaction: merging', 'major compaction':'Compaction: major',
+    'paxos':'Paxos', 'lsm':'LSM-tree', 'lsm-tree':'LSM-tree',
+    'boxwood':'Boxwood', 'dht':'DHT', 'dhts':'DHT',
+    'acl':'ACL', 'acls':'ACL', 'quota':'Quota (familias)', 'cuotas':'Quota (familias)',
+    'prefetch':'Prefetch (METADATA)', 'deletion entries':'Deletion entry', 'deletion entry':'Deletion entry',
+    'redo points':'Redo point', 'redo point':'Redo point',
+    'shared-nothing':'Shared-nothing', 'in-memory':'In-memory (locality group)',
+    'tablet':'Tablet', 'tablets':'Tablet', 'master':'Master'
+  };
+  Object.keys(aliases).forEach(function(a){
+    const canon = aliases[a];
+    const hit = map.get(canon.toLowerCase()) || GLOSSARY.find(function(td){ return td[0] === canon; });
+    if (hit) {
+      const entry = Array.isArray(hit) ? {term:hit[0], def:hit[1]} : hit;
+      map.set(a, entry);
+    }
+  });
+  return map;
+}
+let TIP_INDEX = null;
+function tipTermsSorted(){
+  if (!TIP_INDEX) TIP_INDEX = buildTipIndex();
+  return Array.from(TIP_INDEX.keys()).sort(function(a,b){ return b.length - a.length; });
+}
+function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\const $ = s => document.querySelector(s);'); }
+function enhanceTips(root){
+  if (!root) return;
+  if (!TIP_INDEX) TIP_INDEX = buildTipIndex();
+  const terms = tipTermsSorted();
+  if (!terms.length) return;
+  const re = new RegExp('\\b(' + terms.map(escapeRe).join('|') + ')\\b', 'gi');
+  const skip = {SCRIPT:1, STYLE:1, CODE:1, PRE:1, TEXTAREA:1, BUTTON:1, A:1};
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node){
+      const p = node.parentElement;
+      if (!p) return NodeFilter.FILTER_REJECT;
+      if (p.closest('.tip-term, .tip-bubble, code, pre, button, .opt, .qtag, .kicker')) return NodeFilter.FILTER_REJECT;
+      if (skip[p.tagName]) return NodeFilter.FILTER_REJECT;
+      if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(function(textNode){
+    const text = textNode.nodeValue;
+    re.lastIndex = 0;
+    if (!re.test(text)) return;
+    re.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0; let m;
+    while ((m = re.exec(text))) {
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const raw = m[0];
+      const entry = TIP_INDEX.get(raw.toLowerCase());
+      if (!entry) { frag.appendChild(document.createTextNode(raw)); last = m.index + raw.length; continue; }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tip-term';
+      btn.setAttribute('aria-label', 'Definición: ' + entry.term);
+      btn.appendChild(document.createTextNode(raw));
+      const bubble = document.createElement('span');
+      bubble.className = 'tip-bubble';
+      bubble.setAttribute('role', 'tooltip');
+      const refMatch = entry.def.match(/(\(§[^)]+\))\s*$/);
+      const body = refMatch ? entry.def.replace(/\s*\(§[^)]+\)\s*$/, '') : entry.def;
+      bubble.innerHTML = '<span class="tip-k">' + entry.term + '</span>' + body + (refMatch ? '<span class="tip-ref">' + refMatch[1].slice(1,-1) + '</span>' : '');
+      btn.appendChild(bubble);
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        const open = btn.classList.contains('is-open');
+        document.querySelectorAll('.tip-term.is-open').forEach(function(t){ t.classList.remove('is-open'); });
+        if (!open) {
+          btn.classList.add('is-open');
+          const r = btn.getBoundingClientRect();
+          if (r.top < 120) btn.classList.add('tip-below'); else btn.classList.remove('tip-below');
+        }
+      });
+      frag.appendChild(btn);
+      last = m.index + raw.length;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    textNode.parentNode.replaceChild(frag, textNode);
+  });
+}
+document.addEventListener('click', function(){
+  document.querySelectorAll('.tip-term.is-open').forEach(function(t){ t.classList.remove('is-open'); });
+});
+
 const $ = s => document.querySelector(s);
 const PAPER_SHUFFLE_ID = 'bigtable';
 function hashSeedStr(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
@@ -646,7 +831,7 @@ let done = (function(){ try{return JSON.parse(localStorage.getItem('bigtable-don
 let miniAnswers = (function(){ try{return JSON.parse(localStorage.getItem('bigtable-mini')||'{}');}catch(e){return {};} })();
 let quizScores = (function(){ try{const a=JSON.parse(localStorage.getItem('bigtable-quiz')||'[]'); return Array.isArray(a)?a:[];}catch(e){return [];} })();
 function saveMiniAnswer(moduleId, choiceIndex){ miniAnswers[moduleId]=choiceIndex; try{localStorage.setItem('bigtable-mini', JSON.stringify(miniAnswers));}catch(e){} }
-function applyMiniAnswer(m, mo, choiceIndex, correctA){ [...mo.children].forEach(x=>x.disabled=true); const ex=$('#miniExplain'); const b=mo.children[choiceIndex]; if(choiceIndex===correctA){ b.classList.add('correct'); ex.innerHTML='<span class="why">✓ Correcto.</span> '+m.mini.why; } else { b.classList.add('wrong'); mo.children[correctA].classList.add('correct'); ex.innerHTML='<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> '+m.mini.why; } ex.classList.add('show'); }
+function applyMiniAnswer(m, mo, choiceIndex, correctA){ [...mo.children].forEach(x=>x.disabled=true); const ex=$('#miniExplain'); const b=mo.children[choiceIndex]; if(choiceIndex===correctA){ b.classList.add('correct'); ex.innerHTML='<span class="why">✓ Correcto.</span> '+m.mini.why; } else { b.classList.add('wrong'); mo.children[correctA].classList.add('correct'); ex.innerHTML='<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> '+m.mini.why; } ex.classList.add('show'); enhanceTips(ex); }
 function revealMiniAnswer(m, mo, choiceIndex, correctA){ if(miniAnswers[m.id]!==undefined) return; saveMiniAnswer(m.id, choiceIndex); applyMiniAnswer(m, mo, choiceIndex, correctA); }
 function updateProgress(){ const total = MODULES.length; const finished = MODULES.filter(m=>done[m.id]).length; $('#progressFill').style.width = Math.round((finished/total)*100) + '%'; }
 function markDone(id){ done[id]=true; localStorage.setItem('bigtable-done', JSON.stringify(done)); renderModuleNav(); updateProgress(); }
@@ -654,17 +839,17 @@ function unmarkDone(id){ delete done[id]; localStorage.setItem('bigtable-done', 
 let currentModule = 0;
 function renderModuleNav(){ const nav=$('#moduleNav'); nav.innerHTML=''; MODULES.forEach((m,i)=>{ const b=document.createElement('button'); b.className='module-link'+(i===currentModule?' active':''); b.innerHTML='<span class="idx">'+String(i).padStart(2,'0')+'</span><span>'+m.title+'</span>'+(done[m.id]?'<span class="check">✓</span>':''); b.onclick=()=>{currentModule=i; renderModuleNav(); renderModule();}; nav.appendChild(b); }); }
 function renderModule(){ const m=MODULES[currentModule]; const c=$('#moduleContent'); c.innerHTML='<span class="kicker" style="color:var(--'+m.accent+');">'+m.tag+'</span><h2>'+m.title+'</h2><p class="lede">'+m.summary+'</p><div class="done-banner" style="'+(done[m.id]?'display:flex;':'display:none;')+'">✓ Módulo completado</div>'+m.html+'<div class="card accent-'+m.accent+'" style="margin-top:26px;"><div class="kicker" style="color:var(--'+m.accent+');">Mini-check rápido</div><p style="font-weight:600; color:var(--text); margin:8px 0;">'+m.mini.q+'</p><div id="miniOpts"></div><div class="explain" id="miniExplain"></div></div><div class="module-pager"><button class="btn ghost" id="prevBtn"'+(currentModule===0?' disabled style="opacity:.4;cursor:default;"':'')+'>← Anterior</button><button class="btn '+(done[m.id]?'ghost':'teal')+'" id="doneBtn">'+(done[m.id]?'Desmarcar':'✓ Marcar como completado')+'</button><button class="btn" id="nextBtn"'+(currentModule===MODULES.length-1?' disabled style="opacity:.4;cursor:default;"':'')+'>Siguiente →</button></div>';
-const sm=shuffledMini(m); const mo=$('#miniOpts'); sm.opts.forEach((opt,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=opt; b.onclick=()=>revealMiniAnswer(m,mo,i,sm.a); mo.appendChild(b); }); if(miniAnswers[m.id]!==undefined) applyMiniAnswer(m,mo,miniAnswers[m.id],sm.a);
+const sm=shuffledMini(m); enhanceTips(c); const mo=$('#miniOpts'); sm.opts.forEach((opt,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=opt; b.onclick=()=>revealMiniAnswer(m,mo,i,sm.a); mo.appendChild(b); }); if(miniAnswers[m.id]!==undefined) applyMiniAnswer(m,mo,miniAnswers[m.id],sm.a);
 $('#prevBtn').onclick=()=>{ if(currentModule>0){ currentModule--; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
 $('#nextBtn').onclick=()=>{ if(currentModule<MODULES.length-1){ currentModule++; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
 $('#doneBtn').onclick=()=>{ if(done[m.id]){ unmarkDone(m.id); } else { markDone(m.id); } renderModule(); }; }
 const quiz = { rendered:false, answers:{},
-render(){ this.rendered=true; const c=$('#quizContainer'); c.innerHTML=''; QUIZ.forEach((q,qi)=>{ const sq=shuffledQuizItem(qi); const card=document.createElement('div'); card.className='question-card'; card.id='q'+qi; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--'+q.c+'-soft); color:var(--'+q.c+');">'+q.tag+'</span><span style="color:var(--dim); font-size:13px;">Pregunta '+(qi+1)+' de '+QUIZ.length+'</span></div><div class="qtext">'+q.q+'</div><div class="opts"></div><div class="explain"></div>'; const box=card.querySelector('.opts'); sq.opts.forEach((opt,oi)=>{ const b=document.createElement('button'); b.className='opt'; b.innerHTML=opt; b.onclick=()=>this.answer(qi,oi); box.appendChild(b); }); c.appendChild(card); }); this.refreshChip(); },
-answer(qi,oi){ if(this.answers[qi]!==undefined) return; this.answers[qi]=oi; const sq=shuffledQuizItem(qi); const q=QUIZ[qi]; const card=$('#q'+qi); card.querySelectorAll('.opt').forEach((b,i)=>{ b.disabled=true; if(i===sq.a) b.classList.add('correct'); if(i===oi&&oi!==sq.a) b.classList.add('wrong'); }); const ex=card.querySelector('.explain'); ex.innerHTML='<span class="why">'+(oi===sq.a?'✓ Correcto':'✗ Incorrecto')+'.</span> '+q.why; ex.classList.add('show'); this.refreshChip(); if(Object.keys(this.answers).length===QUIZ.length){ this.finish(); } },
+render(){ this.rendered=true; const c=$('#quizContainer'); c.innerHTML=''; QUIZ.forEach((q,qi)=>{ const sq=shuffledQuizItem(qi); const card=document.createElement('div'); card.className='question-card'; card.id='q'+qi; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--'+q.c+'-soft); color:var(--'+q.c+');">'+q.tag+'</span><span style="color:var(--dim); font-size:13px;">Pregunta '+(qi+1)+' de '+QUIZ.length+'</span></div><div class="qtext">'+q.q+'</div><div class="opts"></div><div class="explain"></div>'; const box=card.querySelector('.opts'); sq.opts.forEach((opt,oi)=>{ const b=document.createElement('button'); b.className='opt'; b.innerHTML=opt; b.onclick=()=>this.answer(qi,oi); box.appendChild(b); }); c.appendChild(card); }); enhanceTips(c); this.refreshChip(); },
+answer(qi,oi){ if(this.answers[qi]!==undefined) return; this.answers[qi]=oi; const sq=shuffledQuizItem(qi); const q=QUIZ[qi]; const card=$('#q'+qi); card.querySelectorAll('.opt').forEach((b,i)=>{ b.disabled=true; if(i===sq.a) b.classList.add('correct'); if(i===oi&&oi!==sq.a) b.classList.add('wrong'); }); const ex=card.querySelector('.explain'); ex.innerHTML='<span class="why">'+(oi===sq.a?'✓ Correcto':'✗ Incorrecto')+'.</span> '+q.why; ex.classList.add('show'); enhanceTips(ex); this.refreshChip(); if(Object.keys(this.answers).length===QUIZ.length){ this.finish(); } },
 refreshChip(){ const n=Object.keys(this.answers).length; const ok=Object.keys(this.answers).filter(k=>this.answers[k]===shuffledQuizItem(+k).a).length; $('#scoreChip').textContent=ok+' / '+n+' correctas ('+QUIZ.length+' totales)'; },
 finish(){ const ok=Object.keys(this.answers).filter(k=>this.answers[k]===shuffledQuizItem(+k).a).length; const pct=Math.round(ok/QUIZ.length*100); const r=$('#quizResult'); r.classList.add('show'); $('#quizPercent').textContent=pct+'%'; $('#gradeFill').style.width=pct+'%'; let msg; if(pct===100) msg='Perfecto: Dominas Bigtable y sus trade-offs.'; else if(pct>=80) msg='Muy bien: Repasa solo las de trade-off falladas.'; else if(pct>=60) msg='Vas bien. Relee los bloques de los módulos.'; else msg='Vuelve a Aprende: fíjate en citas + trade-offs antes de reintentar.'; $('#quizMsg').textContent=msg; r.scrollIntoView({behavior:'smooth'}); quizScores.push(pct); if(quizScores.length>20) quizScores=quizScores.slice(-20); try{localStorage.setItem('bigtable-quiz', JSON.stringify(quizScores));}catch(e){} },
 reset(){ this.answers={}; this.rendered=false; $('#quizResult').classList.remove('show'); $('#scoreChip').textContent='0 / 0 correctas'; this.render(); window.scrollTo({top:0,behavior:'smooth'}); } };
-function renderCases(){ const c=$('#casesContainer'); c.innerHTML=''; CASES.forEach((cs,i)=>{ const card=document.createElement('div'); card.className='case-card'; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso '+(i+1)+'</span></div><h3 style="margin-top:4px;">'+cs.title+'</h3><div class="case-step">'+cs.prompt+'</div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn ghost small hint-btn"> Pista 1</button><button class="btn ghost small hint-btn"> Pista 2</button></div><div class="explain hint-ex"></div><button class="btn teal small reveal-btn" style="margin-top:8px;">Ver solución</button><div class="explain sol-ex" style="margin-top:12px;"></div>'; const hex=card.querySelector('.hint-ex'); const hbtns=card.querySelectorAll('.hint-btn'); hbtns[0].onclick=()=>{ hex.innerHTML='<span class="why">Pista 1:</span> '+cs.h1; hex.classList.add('show'); hbtns[0].style.display='none'; }; hbtns[1].onclick=()=>{ hex.innerHTML='<span class="why">Pista 2:</span> '+cs.h2; hex.classList.add('show'); hbtns[1].style.display='none'; }; const ex=card.querySelector('.sol-ex'); const btn=card.querySelector('.reveal-btn'); btn.onclick=()=>{ ex.innerHTML='<span class="why">Solución:</span> '+cs.solution+'<br><br><span class="why"> '+(cs.rubric||'Rúbrica (5pts): 2 decisión + 2 mecanismo + 1 trade-off.')+'</span>'; ex.classList.add('show'); btn.style.display='none'; }; c.appendChild(card); }); }
+function renderCases(){ const c=$('#casesContainer'); c.innerHTML=''; CASES.forEach((cs,i)=>{ const card=document.createElement('div'); card.className='case-card'; card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso '+(i+1)+'</span></div><h3 style="margin-top:4px;">'+cs.title+'</h3><div class="case-step">'+cs.prompt+'</div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn ghost small hint-btn"> Pista 1</button><button class="btn ghost small hint-btn"> Pista 2</button></div><div class="explain hint-ex"></div><button class="btn teal small reveal-btn" style="margin-top:8px;">Ver solución</button><div class="explain sol-ex" style="margin-top:12px;"></div>'; const hex=card.querySelector('.hint-ex'); const hbtns=card.querySelectorAll('.hint-btn'); hbtns[0].onclick=()=>{ hex.innerHTML='<span class="why">Pista 1:</span> '+cs.h1; hex.classList.add('show'); hbtns[0].style.display='none'; }; hbtns[1].onclick=()=>{ hex.innerHTML='<span class="why">Pista 2:</span> '+cs.h2; hex.classList.add('show'); hbtns[1].style.display='none'; }; const ex=card.querySelector('.sol-ex'); const btn=card.querySelector('.reveal-btn'); btn.onclick=()=>{ ex.innerHTML='<span class="why">Solución:</span> '+cs.solution+'<br><br><span class="why"> '+(cs.rubric||'Rúbrica (5pts): 2 decisión + 2 mecanismo + 1 trade-off.')+'</span>'; ex.classList.add('show'); btn.style.display='none'; }; c.appendChild(card); }); enhanceTips(c); }
 function renderGlossary(filter){ filter=filter||''; const list=$('#glossaryList'); list.innerHTML=''; const f=filter.toLowerCase(); GLOSSARY.filter(function(td){ return td[0].toLowerCase().includes(f)||td[1].toLowerCase().includes(f); }).forEach(function(td){ const div=document.createElement('div'); div.className='gloss-term'; div.innerHTML='<h3><code>'+td[0]+'</code></h3><div class="def">'+td[1]+'</div>'; list.appendChild(div); }); if(!list.children.length){ list.innerHTML='<p>Sin resultados.</p>'; } }
 $('#glossarySearch').addEventListener('input', function(e){ renderGlossary(e.target.value); });
 $('#cheatsheetContent').innerHTML = CHEATSHEET;
@@ -872,6 +1057,9 @@ finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playin
   animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ Lectura filtrada.</b> Bloom '+(this.bloom?'ON':'OFF')+' + bloque '+this.block+'KB ⇒ <b>'+this.seeks()+' seek(s)</b>: el trade-off que más cae en el quiz.',this.cap,'Lectura completa (Bloom '+(this.bloom?'ON':'OFF')+', '+this.block+'KB): '+this.seeks()+' seek(s).'); },
 reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>Animar lectura</b>: Bloom → cachés → seeks. Prueba el toggle Bloom y el slider de bloque.',this.cap,'Pulsa "Animar lectura" para empezar.'); } };
 renderModuleNav(); renderModule(); renderCases(); renderGlossary(''); updateProgress();
+enhanceTips($('#view-inicio'));
+enhanceTips($('#view-animaciones'));
+enhanceTips($('#cheatsheetContent'));
 </script>
 </body>
 </html>
