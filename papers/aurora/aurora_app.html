@@ -884,7 +884,32 @@ themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light')
    PROGRESO (localStorage)
 ============================================================ */
 let done = (function(){ try{return JSON.parse(localStorage.getItem('aurora-done')||'{}');}catch(e){return {};} })();
+let miniAnswers = (function(){ try{return JSON.parse(localStorage.getItem('aurora-mini')||'{}');}catch(e){return {};} })();
 let quizScores = (function(){ try{const a=JSON.parse(localStorage.getItem('aurora-quiz')||'[]'); return Array.isArray(a)?a:[];}catch(e){return [];} })();
+
+function saveMiniAnswer(moduleId, choiceIndex){
+  miniAnswers[moduleId] = choiceIndex;
+  try{ localStorage.setItem('aurora-mini', JSON.stringify(miniAnswers)); }catch(e){}
+}
+function applyMiniAnswer(m, mo, choiceIndex){
+  [...mo.children].forEach(x=>x.disabled=true);
+  const ex = $('#miniExplain');
+  const b = mo.children[choiceIndex];
+  if(choiceIndex===m.mini.a){
+    b.classList.add('correct');
+    ex.innerHTML = `<span class="why">✓ Correcto.</span> ${m.mini.why}`;
+  } else {
+    b.classList.add('wrong');
+    mo.children[m.mini.a].classList.add('correct');
+    ex.innerHTML = `<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> ${m.mini.why}`;
+  }
+  ex.classList.add('show');
+}
+function revealMiniAnswer(m, mo, choiceIndex){
+  if(miniAnswers[m.id] !== undefined) return;
+  saveMiniAnswer(m.id, choiceIndex);
+  applyMiniAnswer(m, mo, choiceIndex);
+}
 
 function updateProgress(){
   const total = MODULES.length;
@@ -949,21 +974,12 @@ function renderModule(){
     const b = document.createElement('button');
     b.className = 'opt';
     b.textContent = opt;
-    b.onclick = ()=>{
-      [...mo.children].forEach(x=>x.disabled=true);
-      const ex = $('#miniExplain');
-      if(i===m.mini.a){
-        b.classList.add('correct');
-        ex.innerHTML = `<span class="why">✓ Correcto.</span> ${m.mini.why}`;
-      } else {
-        b.classList.add('wrong');
-        mo.children[m.mini.a].classList.add('correct');
-        ex.innerHTML = `<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> ${m.mini.why}`;
-      }
-      ex.classList.add('show');
-    };
+    b.onclick = ()=> revealMiniAnswer(m, mo, i);
     mo.appendChild(b);
   });
+  if(miniAnswers[m.id] !== undefined){
+    applyMiniAnswer(m, mo, miniAnswers[m.id]);
+  }
 
   $('#prevBtn').onclick = ()=>{ if(currentModule>0){ currentModule--; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
   $('#nextBtn').onclick = ()=>{ if(currentModule<MODULES.length-1){ currentModule++; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
