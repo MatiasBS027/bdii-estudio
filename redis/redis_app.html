@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redis · BDII Estudio — Architecture Notes / Redis Explained</title>
+<title>Redis · BDII Estudio — Architecture Notes / Redis Explained (Mahdi Yusuf)</title>
 <style>
 /* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
    Tesis: apuntes de curso compuestos como página editorial — titulares serif,
@@ -361,7 +361,7 @@ body.light .module-outline{background:linear-gradient(var(--bg) 70%, transparent
   <div class="topbar">
     <a class="hub-link" href="../index.html">← Hub</a><span class="suite-stamp">BDII Estudio</span>
     <div class="brand"><div class="logo">R</div><div><div>Redis</div>
-        <small>BDII Estudio · Architecture Notes · Redis Explained</small></div></div>
+        <small>BDII Estudio · Architecture Notes / Redis Explained</small></div></div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
       <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
       <button class="tab" role="tab" aria-selected="false" data-view="aprende">Aprende</button>
@@ -379,10 +379,10 @@ body.light .module-outline{background:linear-gradient(var(--bg) 70%, transparent
 <section id="view-inicio" class="view active">
   <div class="hero">
     <div>
-      <p class="dateline">Apuntes de estudio · Basado en <cite>Redis Explained</cite> · Architecture Notes (Mahdi Yusuf) · PDF curso BDII</p>
-      <h1 class="title">Un servidor de <em>estructuras de datos</em> en memoria</h1>
-      <p class="lede">Redis es más que un caché: un <strong>data structure server</strong> con topologías Single / HA / Sentinel / Cluster y persistencia RDB/AOF opcional.</p>
-      <p>Esta app cubre Architecture Notes + el PDF del curso: Memcached vs Redis, replicación (ID + offset), quorum Sentinel, 16K hashslots, fork/COW — con citas EN, tips, animaciones y casos.</p>
+      <p class="dateline">Apuntes de estudio · Basado en <cite>Redis Explained</cite> · Architecture Notes · Mahdi Yusuf, 11 ago 2022</p>
+      <h1 class="title">Un servidor de <em>estructuras de datos</em> que vive en <em>memoria</em></h1>
+      <p class="lede">Redis (<strong>RE</strong>mote <strong>DI</strong>ctionary <strong>S</strong>ervice) es un <strong>data structure server</strong>: casi siempre un cache delante de una base "real", pero con las topologías y la persistencia correctas puede ser <strong>base primaria</strong>. Su regla de oro según el artículo: la velocidad va primero y las garantías de consistencia, después.</p>
+      <p>Esta app cubre el artículo completo: <strong>Redis vs Memcached, instancia única, HA con réplicas (replication ID + offset), Sentinel y quórum, Cluster con 16K hashslots y gossip, y los modelos de persistencia (RDB, AOF, fork y copy-on-write)</strong>, con citas en inglés, explicación didáctica en español, animaciones y casos.</p>
       <div class="hero-cta">
         <button class="btn" onclick="go('aprende')">Comenzar a aprender →</button>
         <button class="linklike" onclick="go('quiz')">Ir directo al quiz →</button>
@@ -396,59 +396,39 @@ body.light .module-outline{background:linear-gradient(var(--bg) 70%, transparent
       </div>
     </div>
     <div class="hero-cards">
-      <div class="card accent-blue" style="margin:0;"><div class="kicker">No solo caché</div><p style="margin:6px 0 0; font-size:14.5px;">Strings, hashes, lists, sets, sorted sets + pub/sub, colas y HA. Speed first; durabilidad configurable.</p></div>
-      <div class="card accent-teal" style="margin:0;"><div class="kicker">La idea central en 1 línea</div><p style="margin:6px 0 0; font-size:14.5px;">Memoria primero; réplicas async; Cluster reparte <strong>16384 hashslots</strong>; Sentinel vota failover con quorum.</p></div>
+      <div class="card accent-blue" style="margin:0;"><div class="kicker">Cache o base primaria</div><p style="margin:6px 0 0; font-size:14.5px;">"Redis blurred the lines between a cache and datastore": mismo motor, riesgos distintos según <strong>topología</strong> (single, HA, Sentinel, Cluster) y <strong>persistencia</strong>.</p></div>
+      <div class="card accent-teal" style="margin:0;"><div class="kicker">La idea central en 1 línea</div><p style="margin:6px 0 0; font-size:14.5px;">Comando en <strong>memoria</strong>, réplicas por <strong>offset</strong>, failover por <strong>quórum</strong>, reparto por <strong>16K hashslots</strong>, y snapshots por <strong>fork + copy-on-write</strong>.</p></div>
     </div>
   </div>
   <div class="stat-grid">
+    <div class="stat"><div class="n">6 años</div><div class="l">Memcached (2003) precede a Redis (2009)</div></div>
     <div class="stat"><div class="n">16K</div><div class="l">hashslots en Redis Cluster</div></div>
-    <div class="stat"><div class="n">≥3</div><div class="l">Sentinels recomendados (quorum 2)</div></div>
-    <div class="stat"><div class="n">RDB</div><div class="l">snapshots · AOF = log de writes</div></div>
-    <div class="stat"><div class="n">COW</div><div class="l">fork + copy-on-write al persistir</div></div>
+    <div class="stat"><div class="n">3 / 2</div><div class="l">sentinels mínimos / quórum recomendado</div></div>
+    <div class="stat"><div class="n">24 TiB</div><div class="l">RAM máxima por servidor citada (AWS)</div></div>
   </div>
   <h2>¿Cómo usar esta app?</h2>
   <p class="lede">Tres pasos, en orden. Cada uno prepara el siguiente.</p>
   <ol class="path">
-    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">7 módulos (Architecture Notes + PDF). Hover en términos del glosario.</span></span></button></li>
-    <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">Single, HA, Sentinel, Cluster hashslots y fork/COW.</span></span></button></li>
-    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">Preguntas sobre topologías, Sentinel, Cluster y persistencia + casos prácticos.</span></span></button></li>
+    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">7 módulos (cobertura completa del artículo). Pasa el cursor o toca un término subrayado para ver la burbuja del glosario.</span></span></button></li>
+    <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">Instancia única, replicación por offset, failover por quórum, hashslots y fork con copy-on-write.</span></span></button></li>
+    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">38 preguntas (fundamentos, Memcached, single, HA, Sentinel, Cluster, persistencia, trade-offs) + 8 casos. Si fallas, el hueco es de estudio: repasa el módulo sugerido.</span></span></button></li>
   </ol>
 </section>
 <section id="view-aprende" class="view">
   <span class="kicker">Ruta de aprendizaje</span>
   <h2>Aprende Redis desde cero</h2>
-  <p class="lede">Sigue los módulos en orden. Fuente: Architecture Notes (Redis Explained) + PDF del curso. Términos subrayados abren el glosario.<strong>subrayado punteado</strong>: hover o tap abre la burbuja. Los <strong>Trade-off</strong> son los que más caen en el quiz.</p>
+  <p class="lede">Sigue los módulos en orden. Los términos del glosario aparecen con <strong>subrayado punteado</strong>: hover o tap abre la burbuja. Los <strong>Trade-off</strong> son los que más caen en el quiz.</p>
   <div class="aprende-layout"><nav class="module-nav" id="moduleNav"></nav><div class="module-content" id="moduleContent"></div></div>
 </section>
 <section id="view-animaciones" class="view">
   <span class="kicker">Laboratorio visual</span>
   <h2>Animaciones interactivas</h2>
-  <p class="lede">Topologías y persistencia de Redis. Cada animación tiene play/paso y narrador.</p>
-  <div class="card accent-blue" id="anim-single"><h3>1 · Instancia única: memoria → RDB/AOF</h3>
-    <p style="font-size:14px;">Comando en memoria; fork escribe snapshot o AOF.</p>
-    <div class="controls"><button class="btn small" onclick="animSingle.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animSingle.play()">Reproducir</button><button class="btn small ghost" onclick="animSingle.reset()">Reiniciar</button></div>
-    <figure><svg id="svgGraph" viewBox="0 0 720 340" role="img"></svg><figcaption>Single · <span id="graphCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
-    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m2')">Leer en Aprende → Módulo 2</button></p></div>
-  <div class="card accent-purple" id="anim-ha"><h3>2 · HA: replication ID + offset</h3>
-    <p style="font-size:14px;">Primary envía comandos; réplica hace sync parcial o full (RDB).</p>
-    <div class="controls"><button class="btn small" onclick="animHA.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animHA.play()">Reproducir</button><button class="btn small ghost" onclick="animHA.reset()">Reiniciar</button></div>
-    <figure><svg id="svgCheck" viewBox="0 0 720 360" role="img"></svg><figcaption>HA · <span id="checkCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
-    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m3')">Leer en Aprende → Módulo 3</button></p></div>
-  <div class="card accent-teal" id="anim-sentinel"><h3>3 · Sentinel: quorum y failover</h3>
-    <p style="font-size:14px;">Varios Sentinel votan; promueven un secundario a primary.</p>
-    <div class="controls"><button class="btn small" onclick="animSentinel.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animSentinel.play()">Reproducir</button><button class="btn small ghost" onclick="animSentinel.reset()">Reiniciar</button></div>
-    <figure><svg id="svgEnemy" viewBox="0 0 720 300" role="img"></svg><figcaption>Sentinel · <span id="enemyCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
-    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m4')">Leer en Aprende → Módulo 4</button></p></div>
-  <div class="card accent-orange" id="anim-cluster"><h3>4 · Cluster: 16K hashslots y reshard</h3>
-    <p style="font-size:14px;">Clave → hashslot → shard; al añadir M3 se mueven slots, no se rehashea cada key.</p>
-    <div class="controls"><button class="btn small" onclick="animCluster.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animCluster.play()">Reproducir</button><button class="btn small ghost" onclick="animCluster.reset()">Reiniciar</button></div>
-    <figure><svg id="svgZookie" viewBox="0 0 720 340" role="img"></svg><figcaption>Cluster · <span id="zookieCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
-    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m5')">Leer en Aprende → Módulo 5</button></p></div>
-  <div class="card accent-gold" id="anim-fork"><h3>5 · Fork + copy-on-write</h3>
-    <p style="font-size:14px;">El hijo ve un snapshot; el padre escribe páginas nuevas (COW).</p>
-    <div class="controls"><button class="btn small" onclick="animFork.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animFork.play()">Reproducir</button><button class="btn small ghost" onclick="animFork.reset()">Reiniciar</button></div>
-    <figure><svg id="svgArch" viewBox="0 0 720 360" role="img"></svg><figcaption>Fork · <span id="archCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
-    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m6')">Leer en Aprende → Módulo 6</button></p></div>
+  <p class="lede">Pulsa los botones y observa el sistema en movimiento. Cada animación muestra su estado (play / pausa / listo), barra de progreso y narrador paso a paso. Los controles extra cambian el escenario.</p>
+  <div class="card accent-teal" id="anim-single"><h3>1 · Instancia única: comando, memoria y fork</h3><p style="font-size:14px;">Un comando entra, se procesa en RAM y, si hay persistencia, un hijo creado por fork escribe RDB/AOF. Apaga la persistencia y mira qué pasa en un reinicio.</p><div class="controls"><button class="btn small" onclick="animSingle.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animSingle.play()">Reproducir</button><button class="btn small ghost" onclick="animSingle.reset()">Reiniciar</button></div><div class="controls"><label style="display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--text); cursor:pointer;"><input type="checkbox" id="persistToggle" checked style="width:17px; height:17px; accent-color:var(--teal);"> Persistencia ON/OFF</label></div><figure><svg id="svgSingle" viewBox="0 0 720 330" role="img" aria-label="1 · Instancia única: comando, memoria y fork"></svg><figcaption>Instancia única · <span id="singleCaption">Pulsa "Siguiente paso".</span></figcaption></figure><p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m2')">Leer en Aprende → Módulo 2 · Single Redis Instance</button></p></div>
+  <div class="card accent-orange" id="anim-ha"><h3>2 · Replicación: replication ID + offset</h3><p style="font-size:14px;">El primario sube su offset con cada comando. Una réplica que reconecta recibe partial sync (delta) o full sync (RDB + buffer), y al promoverse hay un nuevo ID.</p><div class="controls"><button class="btn small" onclick="animHa.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animHa.play()">Reproducir</button><button class="btn small ghost" onclick="animHa.reset()">Reiniciar</button></div><div class="controls"><label style="display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--text);">Réplica 2 reconecta con: <select id="haScenario" style="background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:5px 8px; font-size:13.5px;"><option value="partial">mismo replication ID (partial)</option><option value="full">ID desconocido (full)</option></select></label></div><figure><svg id="svgHa" viewBox="0 0 720 330" role="img" aria-label="2 · Replicación: replication ID + offset"></svg><figcaption>Replicación · <span id="haCaption">Pulsa "Siguiente paso".</span></figcaption></figure><p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m3')">Leer en Aprende → Módulo 3 · Redis HA</button></p></div>
+  <div class="card accent-purple" id="anim-sentinel"><h3>3 · Sentinel: quórum y failover</h3><p style="font-size:14px;">Tres sentinels vigilan al primario. Con quórum 2, el failover solo ocurre si al menos dos coinciden en que cayó. Mueve el control y observa.</p><div class="controls"><button class="btn small" onclick="animSentinel.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animSentinel.play()">Reproducir</button><button class="btn small ghost" onclick="animSentinel.reset()">Reiniciar</button></div><div class="controls"><label style="display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--text);">Sentinels que ven caído al primario: <input type="range" id="sentVotes" min="1" max="3" step="1" value="3" style="width:120px;"> <b id="sentVotesLbl">3 de 3</b></label></div><figure><svg id="svgSentinel" viewBox="0 0 720 330" role="img" aria-label="3 · Sentinel: quórum y failover"></svg><figcaption>Sentinel · <span id="sentinelCaption">Pulsa "Siguiente paso".</span></figcaption></figure><p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m4')">Leer en Aprende → Módulo 4 · Redis Sentinel</button></p></div>
+  <div class="card accent-pink" id="anim-cluster"><h3>4 · Cluster: hashslots y reshard M1-M2-M3</h3><p style="font-size:14px;">La clave cae en un hashslot fijo; añadir M3 solo mueve slots. Elige una clave y mira si cambia de dueño. Al final, gossip y promoción de S1.</p><div class="controls"><button class="btn small" onclick="animCluster.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animCluster.play()">Reproducir</button><button class="btn small ghost" onclick="animCluster.reset()">Reiniciar</button></div><div class="controls"><label style="display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--text);">Clave: <select id="clusterKey" style="background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:5px 8px; font-size:13.5px;"><option value="foo">foo (slot 12182)</option><option value="bar">bar (slot 5061)</option><option value="hello">hello (slot 866)</option></select></label></div><figure><svg id="svgCluster" viewBox="0 0 720 340" role="img" aria-label="4 · Cluster: hashslots y reshard M1-M2-M3"></svg><figcaption>Cluster · <span id="clusterCaption">Pulsa "Siguiente paso".</span></figcaption></figure><p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m5')">Leer en Aprende → Módulo 5 · Redis Cluster</button></p></div>
+  <div class="card accent-gold" id="anim-fork"><h3>5 · Fork y copy-on-write durante el snapshot</h3><p style="font-size:14px;">Padre e hijo comparten páginas; solo se copian las que el padre modifica mientras el hijo escribe el RDB. Elige cuántas páginas se modifican.</p><div class="controls"><button class="btn small" onclick="animFork.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animFork.play()">Reproducir</button><button class="btn small ghost" onclick="animFork.reset()">Reiniciar</button></div><div class="controls"><label style="display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--text);">Páginas modificadas por el padre: <input type="range" id="forkWrites" min="0" max="4" step="1" value="1" style="width:120px;"> <b id="forkWritesLbl">1 / 4</b></label></div><figure><svg id="svgFork" viewBox="0 0 720 330" role="img" aria-label="5 · Fork y copy-on-write durante el snapshot"></svg><figcaption>Fork y copy-on-write durante el snapshot · <span id="forkCaption">Pulsa "Siguiente paso".</span></figcaption></figure><p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m6')">Leer en Aprende → Módulo 6 · Persistencia (fork + COW)</button></p></div>
 </section>
 <section id="view-quiz" class="view">
   <span class="kicker">Comprueba tu aprendizaje</span>
@@ -497,8 +477,8 @@ body.light .module-outline{background:linear-gradient(var(--bg) 70%, transparent
 <section id="view-glosario" class="view">
   <span class="kicker">Referencia rápida</span>
   <h2>Glosario bilingüe</h2>
-  <p class="lede">Misma fuente que las burbujas del Aprende. Escribe para filtrar (ej: Sentinel, RDB, quorum).</p>
-  <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término (ej: sentinel, hashslot, AOF)…">
+  <p class="lede">Misma fuente que las burbujas del Aprende. Escribe para filtrar (ej: quorum, hashslot, fsync).</p>
+  <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: quorum, hashslot, fork)…">
   <div id="glossaryList"></div>
 </section>
 <section id="view-cheatsheet" class="view">
@@ -512,169 +492,323 @@ body.light .module-outline{background:linear-gradient(var(--bg) 70%, transparent
   <div id="cheatsheetContent"></div>
 </section>
 </main>
-<footer>Herramienta de estudio sobre Redis Explained (Architecture Notes) y el PDF del curso BDII. Leer → animar → practicar.</footer>
+<footer>Herramienta de estudio sobre "Redis Explained" (Architecture Notes, Mahdi Yusuf, 2022). Leer → animar → practicar.</footer>
 <script>
 const MODULES = [
 { id:'m0', tag:'Módulo 0', accent:'gold', title:'Qué es Redis: servidor de estructuras de datos',
-summary:'REmote DIctionary Service: más que un caché clave-valor.',
+summary:'REmote DIctionary Service, data structure server, cache delante de la DB real o base primaria, casos de uso y por qué la memoria cambia las reglas.',
 html: `
-<p class="lede">Redis es un servidor de base de datos clave-valor de código abierto. La descripción más precisa: un <strong>servidor de estructuras de datos</strong>.</p>
-<div class="callout info"><div class="lbl">Architecture Notes · Redis Explained</div>"Redis (‘REmote DIctionary Service’) is an open-source key-value database server. The most accurate description of Redis is that it's a <strong>data structure server</strong>."</div>
-<p><strong>Traducción didáctica:</strong> en lugar de filas que ordenas después, Redis te da estructuras (strings, hashes, lists, sets, sorted sets) listas para usar. Empezó como caché tipo Memcached y evolucionó a pub/sub, streaming, colas y, con HA, incluso DB primaria en ciertos workloads.</p>
-<p>Casos típicos de caché: datos que cambian poco y se piden mucho; o datos menos críticos que cambian seguido (sesiones, leaderboards, dashboards).</p>
-<div class="trade"><b>Trade-off 0 · Memoria primero.</b> Ganas: latencia sub-ms. Pierdes: el dataset debe caber (o particionarse) en RAM; la durabilidad es opcional y asíncrona.</div>
-<div class="callout warn"><div class="lbl">Error común</div>Decir que Redis "solo es caché". Puede serlo — y también DB primaria con plugins/HA, según el caso.</div>
+<p class="lede">Redis nació como un almacén clave-valor en memoria, pero lo que lo hizo popular es otra cosa: te da <strong>estructuras de datos ya hechas</strong> en el servidor. Este módulo fija el vocabulario base: qué es, para qué se usa y por qué la RAM lo hace tan rápido.</p>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained (Mahdi Yusuf, 2022) · "What is Redis?"</div>"Redis (<strong>RE</strong>mote <strong>DI</strong>ctionary <strong>S</strong>ervice) is an open-source <strong>key-value database server</strong>. The most accurate description of Redis is that it's a <strong>data structure server</strong>."</div>
+<p><strong>Traducción didáctica:</strong> el nombre es "servicio remoto de diccionario": un diccionario (clave → valor) al que accedes por red. Pero el artículo insiste en que la descripción más exacta es <strong>data structure server</strong>: el valor no es un blob opaco, puede ser una lista, un conjunto, un hash, etc. Esa naturaleza explica gran parte de su adopción entre desarrolladores.</p>
+<h3>Datos en la estructura que necesitas desde el inicio</h3>
+<div class="callout info"><div class="lbl">Cita · "What is Redis?"</div>"Rather than iterating over, sorting, and ordering rows, what if the data was in <strong>data structures you wanted from the ground up</strong>? Early on, it was used much like Memcached, but as Redis improved, it became viable for many other use cases, including <strong>publish-subscribe mechanisms, streaming, and queues</strong>."</div>
+<p><strong>Traducción didáctica:</strong> en una base relacional recorres, ordenas y filtras filas. En Redis el dato ya vive en la forma que necesitas (por ejemplo, algo ya ordenado para un ranking). Al principio se usaba "como Memcached" (cache simple); al madurar sirvió también para pub/sub, streaming y colas.</p>
+<h3>Cache delante de otra base de datos</h3>
+<div class="callout info"><div class="lbl">Cita · "What is Redis?"</div>"Primarily, Redis is an <strong>in-memory database used as a cache in front of another "real" database</strong> like MySQL or PostgreSQL to help improve application performance. It leverages the speed of memory and alleviates load off the central application database for: (1) data that changes infrequently and is requested often; (2) data that is less mission-critical and is frequently evolving."</div>
+<ul style="color:var(--muted);">
+<li><strong>Datos que cambian poco y se piden mucho:</strong> cada lectura que sirve Redis es una lectura que la base central no hace.</li>
+<li><strong>Datos menos críticos y muy cambiantes:</strong> si se pierden, se reconstruyen; no es el fin del mundo.</li>
+<li><strong>Ejemplos del artículo:</strong> caches de sesión o de datos, <em>leaderboards</em> (tablas de posiciones) y analítica agregada ("roll-up") para dashboards.</li>
+</ul>
+<h3>Cache o base primaria: la línea difusa</h3>
+<div class="callout info"><div class="lbl">Cita · "What is Redis?"</div>"However, for many use cases, Redis offers enough guarantees that it can be used as a <strong>full-fledged primary database</strong>. Coupled with Redis plug-ins and its various High Availability (HA) setups, Redis as a database has become incredibly useful for certain scenarios and workloads."<br>"Redis <strong>blurred the lines between a cache and datastore</strong>."</div>
+<p><strong>Traducción didáctica:</strong> la misma tecnología puede ser un cache desechable (si se pierde, se rehidrata desde MySQL/PostgreSQL) o la base primaria (si se pierde, perdiste el dato). Lo que cambia es la <strong>topología</strong> (módulos 2 a 5) y el <strong>modelo de persistencia</strong> (módulo 6) que configures.</p>
+<h3>Por qué la memoria es tan rápida</h3>
+<div class="callout info"><div class="lbl">Cita · "What is Redis?"</div>"Important note to understand here is that <strong>reading and manipulating data in memory is much faster than anything possible in traditional datastores using SSDs or HDDs</strong>."</div>
+<p><strong>[Didáctico / clase]</strong> El artículo enlaza la tabla clásica de latencias de Jeff Dean (la imagen no aparece en el texto). Órdenes de magnitud aproximados: referencia a memoria principal ~100 ns; leer 1 MB secuencial de RAM ~250 µs; seek de disco ~10 ms. De ahí que "memoria vs disco" sea un salto de varios órdenes de magnitud, no un porcentaje.</p>
+<div class="trade"><b>Trade-off 1 · RAM primero.</b> Ganas: latencia sub-milisegundo y alivio de la base central. Pagas: la memoria es más cara y limitada que el disco, y la durabilidad deja de ser automática (hay que configurarla, módulo 6).</div>
+<div class="trade"><b>Trade-off 2 · Cache delante de la DB real vs Redis como primaria.</b> Ganas (cache): simplicidad, datos desechables, la fuente de verdad sigue a salvo. Ganas (primaria): una sola pieza de infraestructura. Pagas (primaria): tienes que decidir HA, persistencia y qué pérdida toleras.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Decir que "Redis es solo un cache" o, al revés, que "reemplaza a cualquier base relacional". El artículo dice las dos cosas con matices: <strong>principalmente</strong> cache delante de una base "real", pero con las garantías y topologías correctas puede ser primaria para ciertas cargas.</div>
 `,
-mini:{q:'¿Cuál es la descripción más precisa de Redis según Architecture Notes?', opts:['Solo un caché LRU','Un servidor de estructuras de datos','Un RDBMS con SQL','Un filesystem'], a:1, why:'El artículo insiste: data structure server, no solo caché.'} },
-{ id:'m1', tag:'Módulo 1', accent:'blue', title:'Redis vs Memcached',
-summary:'Misma familia (caché en memoria), capacidades distintas.',
+mini:{q:'Según el artículo, ¿cuál es la descripción más exacta de Redis?', opts:['Una base relacional en memoria con SQL','Un data structure server (servidor de estructuras de datos) clave-valor','Un sistema de archivos distribuido','Un balanceador de carga'], a:1, why:'En "What is Redis?" el autor dice que la descripción más exacta es data structure server: el valor es una estructura (lista, set, hash...), no un blob opaco. Esa naturaleza explica su adopción.'} },
+
+{ id:'m1', tag:'Módulo 1', accent:'blue', title:'Memcached vs Redis: tabla y modelo de hilos',
+summary:'Cuándo Memcached era el estándar, tabla de capacidades fila por fila, LRU vs políticas, single-threaded vs multithreaded.',
 html: `
-<p class="lede">Memcached (2003) fue el caché de facto; Redis (2009) añadió tipos, persistencia y topologías.</p>
+<p class="lede">Redis nació comparándose con Memcached, el cache de facto de su época. Este módulo recorre la tabla de capacidades del artículo (las 12 filas) y la diferencia de modelo de hilos, que es la que más se pregunta.</p>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained · recuadro "Memcached"</div>"Memcached was created by <strong>Brad Fitzpatrick in 2003, predating Redis by six years</strong>. It originally started as a Perl project and was later rewritten in C. It was the de facto caching tool of its day. The main differentiating point between it and Redis is its <strong>lack of data types and its limited eviction policy of just LRU</strong> (least recently used)."</div>
+<p><strong>Traducción didáctica:</strong> Memcached (2003) es seis años anterior a Redis (2009). Es un cache de pares simples. Dos diferencias de fondo: <strong>no tiene tipos de datos</strong> y su política de desalojo (<em>eviction</em>) es solo <strong>LRU</strong>: cuando falta memoria, expulsa lo usado menos recientemente.</p>
+<div class="callout info"><div class="lbl">Cita · "What is Redis?"</div>"Originally Redis was most commonly compared to Memcached, which <strong>lacked any nonvolatile persistence at the time</strong>."</div>
+<h3>La tabla de capacidades (las 12 filas)</h3>
+<p>El artículo la publica como imagen; en Substack el texto quedó aplastado en una sola línea, pero el contenido es este:</p>
 <table><tr><th>Capacidad</th><th>Memcached</th><th>Redis</th></tr>
-<tr><td>Latencia sub-ms</td><td>Sí</td><td>Sí</td></tr>
-<tr><td>Facilidad para developers</td><td>Sí</td><td>Sí</td></tr>
-<tr><td>Particionado de datos</td><td>Sí</td><td>Sí</td></tr>
-<tr><td>Muchos lenguajes</td><td>Sí</td><td>Sí</td></tr>
-<tr><td>Estructuras avanzadas</td><td>No</td><td>Sí</td></tr>
-<tr><td>Multithreaded</td><td>Sí</td><td>No (single-threaded)</td></tr>
-<tr><td>Snapshots / replicación / tx / pub-sub / Lua / geo</td><td>No</td><td>Sí</td></tr></table>
-<div class="trade"><b>Trade-off 1 · Single-thread vs multi-thread.</b> Redis: modelo simple y estructuras ricas. Memcached: paralelismo CPU en caché puro, pero menos features.</div>
+<tr><td>Sub-millisecond latency</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Developer ease of use</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Data partitioning</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Support for a broad set of programming languages</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Advanced data structures</td><td>-</td><td>Sí</td></tr>
+<tr><td>Multithreaded architecture</td><td>Sí</td><td>-</td></tr>
+<tr><td>Snapshots</td><td>-</td><td>Sí</td></tr>
+<tr><td>Replication</td><td>-</td><td>Sí</td></tr>
+<tr><td>Transactions</td><td>-</td><td>Sí</td></tr>
+<tr><td>Pub/Sub</td><td>-</td><td>Sí</td></tr>
+<tr><td>Lua scripting</td><td>-</td><td>Sí</td></tr>
+<tr><td>Geospatial support</td><td>-</td><td>Sí</td></tr></table>
+<p><strong>Cómo leerla:</strong> las primeras cuatro filas son el "piso común" de un cache (rápido, fácil, particionable, muchos lenguajes): empatan. De ahí en adelante Redis suma siete capacidades (estructuras avanzadas, snapshots, replicación, transacciones, Pub/Sub, Lua, geoespacial). La <strong>única fila donde gana Memcached</strong> es la arquitectura multihilo.</p>
+<h3>Single-threaded vs multithreaded y el clúster</h3>
+<div class="callout info"><div class="lbl">Cita · recuadro "Memcached"</div>"Another difference is that <strong>Redis is single-threaded while Memcached is multithreaded</strong>. Memcached might be performant in a strictly caching environment but <strong>requires some setup in a distributed cluster, while Redis has support for this out of the box</strong>."</div>
+<p><strong>Traducción didáctica:</strong> Memcached aprovecha varios núcleos por instancia; Redis ejecuta los comandos en un solo hilo. En un entorno de puro cache, Memcached rinde bien, pero armar un clúster distribuido exige configuración adicional; Redis trae ese soporte de fábrica (módulo 5). Como Redis es single-threaded, la persistencia usa <strong>fork</strong> para no bloquear el hilo principal (módulo 6).</p>
+<p><strong>[Didáctico / clase]</strong> Un solo hilo evita locks entre comandos: cada comando es atómico respecto a los demás. El costo es que un comando lento retrasa al resto y que un solo núcleo limita el rendimiento por instancia (se escala con más instancias/shards).</p>
+<div class="trade"><b>Trade-off 3 · Single-threaded (Redis) vs multithreaded (Memcached).</b> Ganas (Redis): modelo simple, comandos atómicos sin locks, mismo código de clúster y persistencia. Pagas: una instancia usa un núcleo para comandos. Ganas (Memcached): usa todos los núcleos en puro cache. Pagas: sin tipos, sin persistencia, clúster a mano.</div>
+<div class="trade"><b>Trade-off 4 · Cache simple vs data structure server.</b> Ganas (Memcached): superficie mínima y predecible. Pagas: sin snapshots, replicación, transacciones, Pub/Sub, Lua ni geoespacial. Con Redis es al revés: más capacidades, más cosas que operar.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Decir "Redis es multithreaded y Memcached single-threaded" (es al revés), o que Memcached persiste datos (en la tabla Snapshots y Replication son "-" para Memcached).</div>
 `,
-mini:{q:'¿Qué tiene Redis que Memcached no?', opts:['Latencia sub-ms','Estructuras avanzadas + snapshots + replicación','Particionado','Muchos lenguajes'], a:1, why:'La tabla del artículo: estructuras, snapshots, replication, transactions, pub/sub, Lua, geo.'} },
-{ id:'m2', tag:'Módulo 2', accent:'purple', title:'Instancia única',
-summary:'El despliegue más simple: un solo Redis.',
-html: `
-<p class="lede">Single Redis Instance: setup mínimo. Si cae, fallan todas las llamadas a Redis.</p>
-<div class="callout info"><div class="lbl">Architecture Notes</div>"If this instance fails or is unavailable, all client calls to Redis will fail…"</div>
-<p>Los comandos se procesan <strong>primero en memoria</strong>. Con persistencia, un proceso forkeado escribe RDB o AOF.</p>
-<div class="trade"><b>Trade-off 2 · Simpleza vs SPOF.</b> Ganas: operación trivial. Pierdes: punto único de fallo.</div>
-`,
-mini:{q:'En instancia única, si Redis cae…', opts:['Las réplicas responden','Fallan las llamadas de clientes a Redis','Sentinel elige otro primary al instante','El AOF evita el downtime'], a:1, why:'Sin HA/Sentinel/Cluster, la instancia es SPOF.'} },
-{ id:'m3', tag:'Módulo 3', accent:'teal', title:'Redis HA y replicación',
-summary:'Primary + réplicas: replication ID, offset, sync parcial vs completa.',
-html: `
-<p class="lede">HA: primary sincroniza secundarios. Escalan lecturas y permiten failover.</p>
-<p>Cada primary tiene <strong>replication ID</strong> + <strong>offset</strong>. Poco desfase → sync parcial. Sin ancestro común → <strong>full sync</strong> (RDB + buffer).</p>
-<div class="callout info"><div class="lbl">Architecture Notes</div>"If two instances have the same replication ID and offset, they have precisely the same data."</div>
-<div class="trade"><b>Trade-off 3 · Réplicas asíncronas.</b> Ganas: lecturas y failover. Pierdes: ventana de pérdida de writes.</div>
-`,
-mini:{q:'¿Cuándo hace falta full sync?', opts:['Siempre','Cuando no hay replication ID/offset común utilizable','Nunca','Solo con Sentinel'], a:1, why:'Sin ancestro común se pide RDB completo.'} },
-{ id:'m4', tag:'Módulo 4', accent:'orange', title:'Redis Sentinel',
-summary:'Monitoreo, discovery, quorum y failover automático.',
-html: `
-<p class="lede">Sentinel es un sistema distribuido de procesos para HA (el protector no debe ser SPOF).</p>
-<p>Responsabilidades: Monitoring, Notification, Failover, Configuration/discovery del primary.</p>
-<p><strong>Quorum:</strong> votos mínimos para failover. Recomendación: ≥3 nodos, quorum 2.</p>
-<div class="callout warn"><div class="lbl">Pitfalls</div>Old primary en minoría → writes perdidos. Mitigación: exigir ack de ≥1 réplica.</div>
-<div class="trade"><b>Trade-off 4 · Failover automático vs pérdida de writes.</b> Ganas: recuperación. Pierdes: durabilidad no garantizada en el corte.</div>
-`,
-mini:{q:'Sentinel NO hace…', opts:['Monitoreo','Guardar el dataset de Redis','Failover','Decir a clientes quién es el primary'], a:1, why:'Sentinel coordina HA; los datos están en las instancias Redis.'} },
-{ id:'m5', tag:'Módulo 5', accent:'gold', title:'Redis Cluster y hashslots',
-summary:'Sharding horizontal con 16K hashslots, gossip y resharding.',
-html: `
-<p class="lede">Cuando el dataset no cabe en una máquina: Cluster reparte shards.</p>
-<p>Solución al resharding: <strong>16384 hashslots</strong>. Clave → slot → shard. Al añadir nodos se mueven slots (no se rehashea cada key).</p>
-<p>Ejemplo: M1 0–8191, M2 8192–16383; con M3 se reparticionan los rangos de slots.</p>
-<p><strong>Gossip</strong> para salud; mal configurado → split brain. Regla: primarios impares + 2 réplicas c/u.</p>
-<div class="trade"><b>Trade-off 5 · Escala horizontal vs complejidad.</b> Ganas: más RAM/throughput. Pierdes: multi-key limitado a mismo slot.</div>
-`,
-mini:{q:'¿Cuántos hashslots tiene Redis Cluster?', opts:['1024','16384 (16K)','ilimitados','64'], a:1, why:'Architecture Notes: 16K hashslots.'} },
-{ id:'m6', tag:'Módulo 6', accent:'pink', title:'Persistencia: RDB, AOF, fork y COW',
-summary:'Velocidad primero; durabilidad configurable.',
-html: `
-<p class="lede">"Redis is fast and all consistency guarantees come second to speed."</p>
-<table><tr><th>Modo</th><th>Qué hace</th><th>Trade-off</th></tr>
-<tr><td><strong>Ninguno</strong></td><td>Solo RAM</td><td>Máxima velocidad; pierdes todo al reiniciar</td></tr>
-<tr><td><strong>RDB</strong></td><td>Snapshots</td><td>Compacto; pierdes entre snapshots; fork puede pausar</td></tr>
-<tr><td><strong>AOF</strong></td><td>Log de writes + fsync</td><td>Más durable; más disco/I/O</td></tr>
-<tr><td><strong>Ambos</strong></td><td>RDB+AOF</td><td>En restart usa AOF (más completo)</td></tr></table>
-<p><strong>Fork + copy-on-write:</strong> hijo comparte páginas; escrituras del padre copian páginas tocadas.</p>
-<div class="trade"><b>Trade-off 6 · Durabilidad vs latencia.</b> fsync siempre = más seguro y más lento.</div>
-`,
-mini:{q:'Si RDB y AOF están activos, al reiniciar Redis usa…', opts:['Solo RDB','AOF (más completo)','Ninguno','Memcached'], a:1, why:'AOF es más completo para reconstruir.'} }
-];
+mini:{q:'En la tabla del artículo, ¿qué capacidad tiene Memcached y Redis NO?', opts:['Snapshots','Replicación','Arquitectura multihilo','Pub/Sub'], a:2, why:'La fila "Multithreaded architecture" es Yes para Memcached y "-" para Redis. Todas las demás diferencias favorecen a Redis (estructuras avanzadas, snapshots, replicación, transacciones, Pub/Sub, Lua, geoespacial).'} },
 
+{ id:'m2', tag:'Módulo 2', accent:'teal', title:'Single Redis Instance y persistencia (introducción)',
+summary:'La topología más simple: fortalezas, el punto único de falla y cómo los comandos pasan por memoria antes de que un fork escriba RDB/AOF.',
+html: `
+<p class="lede">Antes de distribuir nada, el artículo parte de una sola instancia. Es la base para entender los demás módulos: qué te da, qué te quita y cómo entra la persistencia.</p>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained · "Single Redis Instance"</div>"Single Redis instance is the most straightforward deployment of Redis. It allows users to set up and run small instances that can help them grow and speed up their services. However, this deployment isn't without shortcomings. For example, <strong>if this instance fails or is unavailable, all client calls to Redis will fail</strong> and therefore degrade the system's overall performance and speed."</div>
+<h3>Fortalezas y debilidades</h3>
+<ul style="color:var(--muted);">
+<li><strong>Fortaleza: simplicidad.</strong> Un proceso, poca configuración. Con memoria y CPU suficientes puede ser potente.</li>
+<li><strong>Fortaleza: ideal para cache.</strong> Un escenario de caching "could result in a significant performance boost with minimal setup". Con recursos suficientes se puede desplegar <strong>en la misma máquina que la aplicación</strong>.</li>
+<li><strong>Debilidad: punto único de falla.</strong> Si la instancia cae, todas las llamadas fallan y el sistema se degrada.</li>
+</ul>
+<h3>Comandos primero en memoria, luego fork</h3>
+<div class="callout info"><div class="lbl">Cita · "Single Redis Instance"</div>"<strong>Commands sent to Redis are first processed in memory.</strong> Then, if persistence is set up on these instances, there is a <strong>forked process on some interval</strong> that facilitates data persistence RDB (very compact point-in-time representation of Redis data) snapshots or AOF (append-only files)."</div>
+<p><strong>Traducción didáctica:</strong> el cliente manda un comando; Redis lo ejecuta en RAM y responde. Si configuraste persistencia, cada cierto intervalo se crea un <strong>proceso hijo (fork)</strong> que escribe a disco un snapshot <strong>RDB</strong> (representación compacta de un instante) o alimenta un <strong>AOF</strong> (archivo de solo-agregar). El detalle de ambos está en el módulo 6.</p>
+<div class="callout info"><div class="lbl">Cita · "Single Redis Instance"</div>"These two flows allow Redis to have long-term storage, support various replication strategies, and enable more complicated topologies. <strong>If Redis isn't set up to persist data, data is lost in case of a restart or failover.</strong> If the persistence is enabled on a restart, it loads all of the data in the RDB snapshot or AOF back into memory, and then the instance can support new client requests."</div>
+<p><strong>Traducción didáctica:</strong> sin persistencia, un reinicio o failover borra todo. Con persistencia, al arrancar Redis <strong>recarga a memoria</strong> el RDB/AOF y recién entonces atiende clientes. La persistencia también es el insumo de la replicación y de topologías más complejas (módulo 3).</p>
+<div class="trade"><b>Trade-off 5 · Una instancia vs topología distribuida.</b> Ganas: mínima complejidad operativa y de red; ideal para cache local. Pagas: si cae, todo cae (SPOF); sin réplicas ni failover automático.</div>
+<div class="trade"><b>Trade-off 6 · Persistencia activada vs desactivada.</b> Ganas (activada): sobrevives reinicios y habilitas réplicas. Pagas: fork periódico, I/O de disco y posible pérdida entre snapshots. Ganas (desactivada): máxima velocidad. Pagas: reinicio = datos perdidos.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que Redis "guarda en disco automáticamente" por ser base de datos. Por defecto del modelo del artículo, <strong>los comandos viven en memoria</strong>; la durabilidad es una decisión de configuración. Y confundir "tengo persistencia" con "no pierdo nada": entre snapshots sí se pierden datos.</div>
+`,
+mini:{q:'Con una sola instancia SIN persistencia configurada, ¿qué pasa en un reinicio?', opts:['Redis recupera todo desde la réplica','Se pierden los datos','Se recargan desde el AOF','Se recargan desde Sentinel'], a:1, why:'"If Redis isn\'t set up to persist data, data is lost in case of a restart or failover". Sin RDB/AOF no hay nada que recargar a memoria.'} },
+
+{ id:'m3', tag:'Módulo 3', accent:'orange', title:'Redis HA: primario, réplicas y replicación',
+summary:'Primary + secondary, buffer de salida a réplicas, qué es HA, replication ID + offset, partial sync vs full sync y promoción de una réplica.',
+html: `
+<p class="lede">La siguiente topología agrega una o más <strong>réplicas</strong> del primario. Ya estás en un sistema distribuido: aparecen la replicación, el lag y las decisiones de sincronización. La pareja <strong>replication ID + offset</strong> es el corazón de este módulo.</p>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained · "Redis HA"</div>"Another popular setup with Redis is the main deployment with a secondary deployment that is kept in sync with replication. As data is written to the main instance <strong>it sends copies of those commands to a replica client output buffer</strong> for secondary instances which facilitates replication. The secondary instances can be one or more instances in your deployment. These instances can help <strong>scale reads</strong> from Redis or provide <strong>failover</strong> in case the main is lost."</div>
+<p><strong>Traducción didáctica:</strong> cada escritura en el primario se copia como comando a un <em>buffer de salida del cliente-réplica</em>, que alimenta a las secundarias. Las réplicas sirven para dos cosas: <strong>escalar lecturas</strong> y <strong>tomar el relevo</strong> si el primario muere. Nota de vocabulario: el artículo dice "main/primary" y "secondary/replica" de forma intercambiable.</p>
+<h3>Qué es alta disponibilidad (HA)</h3>
+<div class="callout info"><div class="lbl">Cita · recuadro "High Availability"</div>"High availability (HA) is a characteristic of a system that aims to ensure an agreed level of operational performance, usually uptime, for a higher than average period. In these HA systems, it is essential to <strong>not have a single point of failure</strong> so systems can recover gracefully and quickly. This results in reliable crossover, so data isn't lost during the transition from primary to secondary, in addition to <strong>automatically detecting failure and recovery from it</strong>."</div>
+<p>Ojo: el artículo avisa que "we have now entered a distributed system that has many fallacies you need to consider. Things that were previously straightforward are now more complex". Una réplica sola <strong>no</strong> da HA completa: falta quien detecte la falla y promueva (módulo 4).</p>
+<h3>Replication ID y offset</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Replication"</div>"Every main instance of Redis has a <strong>replication ID and an offset</strong>. These two pieces of data are critical to figure out a point in time where a replica can continue its replication process or to determine if it needs to do a complete sync. <strong>This offset is incremented for every action that happens on the main Redis deployment.</strong>"</div>
+<p><strong>Traducción didáctica:</strong> el <em>replication ID</em> identifica "la historia de datos" del primario; el <em>offset</em> es un contador que sube con cada acción. Juntos dicen "en qué punto de qué historia estás". Si ID y offset coinciden entre dos instancias, tienen <strong>exactamente los mismos datos</strong>.</p>
+<h3>Partial sync vs full sync</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Replication"</div>"When the Redis replica instance is just a few offsets behind the main instance, it <strong>receives the remaining commands from the primary</strong>, which is then replayed on its dataset until it is in sync. If the two instances cannot agree on a replication ID or the offset is unknown to the main instance, the replica will then <strong>request a full synchronization</strong>. This involves a primary instance <strong>creating a new RDB snapshot and sending it over to the replica</strong>. While this transfer is happening, the main instance is <strong>buffering all the intermediate updates</strong> between the snapshot cut-off and current offset to send to the secondary once it is in sync with the snapshot."</div>
+<table><tr><th></th><th>Partial sync</th><th>Full sync</th></tr>
+<tr><td><strong>Cuándo</strong></td><td>Mismo replication ID (o ancestro conocido) y offset que el primario aún recuerda</td><td>IDs que no coinciden o offset desconocido para el primario</td></tr>
+<tr><td><strong>Qué se envía</strong></td><td>Solo los comandos que faltan</td><td>Un RDB nuevo completo + los cambios acumulados en buffer</td></tr>
+<tr><td><strong>Costo</strong></td><td>Bajo</td><td>"Expensive": snapshot (fork), transferencia y buffer en memoria</td></tr></table>
+<h3>Por qué hace falta el replication ID: promoción</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Replication"</div>"When a Redis instance is <strong>promoted to primary or restarts from scratch as a primary, it is given a new replication ID</strong>. This is used to infer the prior primary instance from which this newly promoted secondary was replicating. This allows for the ability to perform a <strong>partial synchronization (with other secondaries)</strong> since the new primary instance remembers its old replication ID."</div>
+<p><strong>Traducción didáctica:</strong> si solo existiera el offset, tras una promoción no sabrías si dos offsets son comparables. El ID dice si comparten <em>ancestro común</em>. Ejemplo del artículo: dos instancias con el mismo ID y offsets distintos por unos cientos de comandos → replay y quedan iguales. Si los IDs difieren por completo y <strong>no se conoce el ID previo</strong> (no hay ancestro común) del secundario que rejoin, toca un <strong>full sync caro</strong>. Si se conoce el ID previo, el offset vuelve a ser significativo y basta un partial sync.</p>
+<div class="trade"><b>Trade-off 7 · Replicación asíncrona.</b> Ganas: el primario no espera a las réplicas (baja latencia de escritura), y las réplicas escalan lecturas. Pagas: ventana de pérdida (comandos aún en el buffer) y lag de lectura en réplicas.</div>
+<div class="trade"><b>Trade-off 8 · Partial vs full sync.</b> Ganas (partial): resincronizar barato con solo el delta. Pagas: depende de que el primario aún conserve ese offset y de que el ID sea compatible. Si no, full sync: snapshot (fork), red y buffer.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Pensar que "réplica = backup" o que basta comparar offsets. Dos offsets iguales con replication IDs <strong>sin ancestro común</strong> no garantizan los mismos datos; y una réplica no sustituye a un backup (copia lo que el primario hace, incluso errores).</div>
+`,
+mini:{q:'Una réplica reconecta con un replication ID que el primario NO reconoce. ¿Qué ocurre?', opts:['Partial sync con los comandos faltantes','Full sync: el primario crea un RDB, lo envía y bufferiza los cambios intermedios','Se descarta la réplica sin más','El primario copia el offset de la réplica'], a:1, why:'Si no hay acuerdo en replication ID (o el offset es desconocido), la réplica pide full synchronization: nuevo RDB + buffer de updates intermedios hasta el offset actual.'} },
+
+{ id:'m4', tag:'Módulo 4', accent:'purple', title:'Redis Sentinel: monitoreo, quórum y failover',
+summary:'Procesos Sentinel distribuidos, 4 responsabilidades, quórum, mínimo 3 nodos, qué puede fallar (minoría con escrituras perdidas) y mitigación con réplicas mínimas.',
+html: `
+<p class="lede">Una réplica sin nadie que vigile no es alta disponibilidad. <strong>Sentinel</strong> es un grupo de procesos que vigila al primario y a las réplicas, decide por <strong>quórum</strong> que el primario cayó, dispara el failover y le dice a los clientes quién es el primario actual.</p>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained · "Redis Sentinel"</div>"Sentinel is a distributed system. As with all distributed systems, Sentinel comes with several advantages and disadvantages. Sentinel is designed in a way where there is <strong>a cluster of sentinel processes working together to coordinate state</strong> to provide high availability for Redis. After all you wouldn't want the system protecting you from failure to have its own single point of failure."</div>
+<p><strong>Traducción didáctica:</strong> si Sentinel fuera un único proceso, sería el nuevo SPOF. Por eso son <strong>varios procesos coordinados</strong>. Además hace de <em>service discovery</em>, como Zookeeper o Consul en otros sistemas: cuando un cliente nuevo quiere escribir, Sentinel le dice cuál es el primario actual.</p>
+<h3>Las cuatro responsabilidades</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Sentinel"</div>"1. <strong>Monitoring</strong> — ensuring main and secondary instances are working as expected. 2. <strong>Notification</strong> — notify system admins about occurrences in the Redis instances. 3. <strong>Failover management</strong> — Sentinel nodes can start a failover process if the primary instance isn't available and enough (quorum of) nodes agree that is true. 4. <strong>Configuration management</strong> — Sentinel nodes also serve as a point of discovery of the current main Redis instance."</div>
+<h3>Quórum</h3>
+<div class="callout info"><div class="lbl">Cita · recuadro "Quorum"</div>"A quorum is the <strong>minimum number of votes</strong> that a distributed system has to obtain in order to be allowed to perform an operation like failover. This number is configurable, but should be reflective of the number of nodes in said distributed system. Most distributed systems have sizes of <strong>three or five with quorums of two and three respectively</strong>. <strong>Odd number of nodes</strong> is preferred in case the system is required to break ties."</div>
+<p><strong>Traducción didáctica:</strong> detectar una falla exige que <strong>varios sentinels coincidan</strong> en que el primario no responde. Así un solo sentinel con mala red no provoca un failover falso. Con número impar de nodos nunca hay empate.</p>
+<p><strong>[Didáctico / clase]</strong> El artículo muestra una tabla (imagen) de servidores, quórum y fallas toleradas. Con mayoría estricta (⌊n/2⌋+1) queda así:</p>
+<table><tr><th>Sentinels (n)</th><th>Quórum (mayoría)</th><th>Fallas toleradas</th></tr>
+<tr><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>2</td><td>2</td><td>0</td></tr>
+<tr><td>3</td><td>2</td><td>1</td></tr>
+<tr><td>4</td><td>3</td><td>1</td></tr>
+<tr><td>5</td><td>3</td><td>2</td></tr>
+<tr><td>7</td><td>4</td><td>3</td></tr></table>
+<p>Fíjate: 4 sentinels toleran las mismas fallas que 3 (por eso se prefiere impar). 3 y 5 coinciden con lo que dice el artículo (quórum de 2 y 3).</p>
+<h3>Recomendaciones de despliegue</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Sentinel"</div>"As general guidance I would recommend <strong>running a sentinel node alongside each of your application servers</strong> (if possible) so you also don't need to factor in network reachability differences between sentinel nodes and clients who are actually using Redis. You can run Sentinel alongside the Redis instances or even on independent nodes, but that complicates things in different ways. <strong>I recommend at least running three nodes with a quorum of at least two.</strong>"</div>
+<h3>Qué puede salir mal</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Sentinel"</div>"1. What if the sentinel nodes <strong>fall out of quorum</strong>? 2. What if there is a <strong>network split which puts the old main instance in the minority group</strong>? What happens to those writes? (Spoiler: <strong>they are lost when the system recovers fully</strong>) 3. What happens if the <strong>network topologies of sentinel nodes and client nodes</strong> (application nodes) are misaligned?"</div>
+<p><strong>Traducción didáctica:</strong> en una partición de red, el primario viejo puede quedar con una minoría y seguir aceptando escrituras de clientes que lo alcanzan; mientras tanto, la mayoría promueve otra réplica. Al sanar la red, el primario viejo se degrada a réplica y <strong>sus escrituras de la minoría se pierden</strong>. Además, "there are <strong>no durability guarantees</strong>, especially since persistence to disk is asynchronous", y no sabes cuántas escrituras se pierden mientras los clientes siguen hablando con un primario que no sabe que fue reemplazado. Redis recomienda que al abrir conexiones nuevas se consulte quién es el primario.</p>
+<h3>Mitigación: exigir al menos una réplica</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Sentinel"</div>"There are a few ways to mitigate the level of losses if you <strong>force the main instance to replicate writes to a minimum of one secondary instance</strong>. Remember, all Redis replication is asynchronous and has its trade-offs. So it will need to independently track acknowledgement and if they aren't confirmed by at least one secondary, <strong>the main instance will stop accepting writes</strong>."</div>
+<p><strong>[Didáctico / clase]</strong> En Redis real se configura con <code>min-replicas-to-write</code> y <code>min-replicas-max-lag</code>. No convierte la replicación en síncrona: solo hace que un primario aislado de sus réplicas se niegue a aceptar escrituras.</p>
+<div class="trade"><b>Trade-off 9 · Quórum.</b> Ganas: evitas failovers falsos por un sentinel con mala red y rompes empates (impar). Pagas: sin mayoría disponible no hay failover; más nodos = más coordinación.</div>
+<div class="trade"><b>Trade-off 10 · Sentinel junto a cada app server vs nodos independientes.</b> Ganas (junto a la app): la visión de red del sentinel coincide con la del cliente. Pagas: más procesos que operar, y acoplas Sentinel al ciclo de vida de la app. Independientes: cambia el problema, no desaparece.</div>
+<div class="trade"><b>Trade-off 11 · Exigir al menos 1 réplica para aceptar escrituras.</b> Ganas: menos pérdida en particiones. Pagas: disponibilidad de escritura (el primario deja de aceptar si no hay réplica confirmando). Sigue sin ser durabilidad fuerte.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que Sentinel reparte los datos (eso es Cluster) o que con 2 sentinels basta. Con 2 sentinels y quórum 2, si cae uno ya no hay failover posible. Y suponer que failover automático = cero pérdida: la replicación es asíncrona, así que pueden perderse escrituras.</div>
+`,
+mini:{q:'¿Por qué Sentinel se despliega como varios procesos con quórum y no como uno solo?', opts:['Para repartir las claves entre ellos','Para que el sistema que protege contra fallas no sea él mismo un punto único de falla y las detecciones se confirmen por acuerdo','Para duplicar la velocidad de escritura','Para que cada sentinel guarde su propio RDB'], a:1, why:'Sentinel es un sistema distribuido: varios procesos coordinan estado y deciden por quórum que el primario cayó. Un solo sentinel sería otro SPOF y podría equivocarse por su propia red.'} },
+
+{ id:'m5', tag:'Módulo 5', accent:'pink', title:'Redis Cluster: shards, hashslots y gossip',
+summary:'Escalar horizontalmente, sharding algorítmico y su problema al resharding, 16K hashslots, mover slots, gossip, promoción, split brain y la receta de primarios impares con 2 réplicas.',
+html: `
+<p class="lede">Si los datos no caben en la memoria de una sola máquina, hay que <strong>repartirlos</strong>. Redis Cluster hace sharding horizontal; la pieza clave son los <strong>hashslots</strong>, una capa de indirección que hace barato añadir shards.</p>
+<h3>El límite de una sola máquina</h3>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained · "Redis Cluster"</div>"I am sure many have thought about what happens when you can't store all your data in memory on one machine. Currently, <strong>the maximum RAM available in a single server is 24 TiB</strong>, presently listed online at AWS. Granted, that's a lot, but for some systems, that isn't enough, even for a caching layer. <strong>Redis Cluster allows for the horizontal scaling of Redis.</strong>"</div>
+<div class="callout info"><div class="lbl">Cita · recuadro "Vertical and Horizontal Scaling"</div>"As your systems grow, you have three options. 1. Do less. 2. Scale up. 3. Scale out. [...] <strong>Vertical scaling</strong> is a technique where you get bigger and better machines to do the work faster [...]. Even if this is possible, you will eventually be limited by the hardware you use. [...] you will need to <strong>scale your system horizontally by spreading the workload across multiple smaller machines</strong> responsible for smaller parts of the whole."</div>
+<p><strong>Traducción didáctica:</strong> escalar verticalmente = máquina más grande (tiene techo, 24 TiB de RAM en AWS en 2022). Horizontalmente = muchas máquinas, cada una con un pedazo. Al repartir los datos hablamos de <strong>sharding</strong>: cada instancia primaria del clúster es un <strong>shard</strong>.</p>
+<h3>Sharding algorítmico y su problema</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Cluster"</div>"If we push a key to the cluster, how do we know which Redis instance (shard) is holding that data? [...] Redis Cluster uses <strong>algorithmic sharding</strong>. To find the shard for a given key, <strong>we hash the key and mod the total result by the number of shards</strong>. Then, using a <strong>deterministic hash function</strong>, meaning that a given key will always map to the same shard, we can reason about where a particular key will be when we read it in the future."</div>
+<div class="callout info"><div class="lbl">Cita · "Redis Cluster"</div>"What happens when we later want to add a new shard into the system? This process is called <strong>resharding</strong>. Assuming the key 'foo' was mapped to shard zero after introducing a new shard, it may map to shard five. However, <strong>moving data around to reflect the new shard mapping would be slow and unrealistic</strong> if we need to grow the system quickly. It also has adverse effects on the availability of the Redis Cluster."</div>
+<p><strong>Traducción didáctica:</strong> <code>shard = hash(clave) mod N</code>. Funciona mientras N no cambie. Si N cambia, <em>la mayoría de las claves cambia de shard</em> y habría que moverlas casi todas: lento y dañino para la disponibilidad.</p>
+<h3>La solución: 16K hashslots</h3>
+<div class="callout info"><div class="lbl">Cita · "Redis Cluster"</div>"Redis Cluster has devised a solution to this problem called <strong>Hashslot</strong>, to which all data is mapped. <strong>There are 16K hashslot.</strong> This gives us a reasonable way to spread data across the cluster, and when we add new shards, <strong>we simply move hashslots across the systems</strong>. [...] This is possible <strong>without any downtime, and minimal performance hit</strong>."</div>
+<p><strong>Ejemplo del artículo (traducido):</strong></p>
+<table><tr><th>Estado</th><th>M1</th><th>M2</th><th>M3</th></tr>
+<tr><td>2 primarios</td><td>slots 0 a 8191</td><td>slots 8192 a 16383</td><td>-</td></tr>
+<tr><td>Se añade M3</td><td>slots 0 a 5460</td><td>slots 5461 a 10922</td><td>slots 10923 a 16383</td></tr></table>
+<p>Para ubicar <code>foo</code> se aplica un hash determinista y se toma módulo 16K: con dos primarios cae en M2. Al añadir M3, <strong>las claves de los slots que cambian de dueño se mueven, pero el hash de clave a slot no cambia</strong>, porque ya estaba dividido en slots. Ese "un nivel de indirección" resuelve el problema del resharding algorítmico: <code>clave → slot</code> es fijo; solo cambia <code>slot → shard</code>.</p>
+<p><strong>[Didáctico / clase]</strong> En Redis real el slot es <code>CRC16(clave) mod 16384</code> (16384 = 16K). Ejemplo conocido: <code>foo</code> cae en el slot 12182 (en M2 con 2 shards, en M3 con 3 shards del reparto de arriba).</p>
+<h3>Gossip, promoción y split brain</h3>
+<div class="callout info"><div class="lbl">Cita · "Gossiping"</div>"Redis Cluster uses <strong>gossiping</strong> to determine the entire cluster's health. In the illustration above, we have 3 M nodes and 3 S nodes. All these nodes constantly communicate to know which shards are available and ready to serve requests. <strong>If enough shards agree that M1 isn't responsive, they can decide to promote M1's secondary S1 into a primary</strong> to keep the cluster healthy. The number of nodes needed to trigger this is configurable, and it is essential to get this right. If you do it improperly, you can end up in situations where the cluster is split if it cannot break the tie when both sides of a partition are equal. This phenomenon is called <strong>split brain</strong>. As a general rule, it is essential to have an <strong>odd number of primary nodes and two replicas each</strong> for the most robust setup."</div>
+<p><strong>Traducción didáctica:</strong> no hay un Sentinel aparte: los propios nodos del clúster se "chismorrean" su estado y, si suficientes coinciden en que M1 no responde, promueven a su réplica S1. Si el umbral está mal puesto y una partición divide el clúster en mitades iguales, nadie desempata: <strong>split brain</strong>. Receta del artículo: número <strong>impar de primarios</strong> y <strong>dos réplicas por primario</strong>.</p>
+<div class="trade"><b>Trade-off 12 · Sharding algorítmico (hash mod N) vs hashslots.</b> Ganas (hashslots): añadir un shard = mover slots, sin remapear claves ni downtime. Pagas: una tabla slot→shard que mantener y mover datos al reasignar slots. El hash mod N es más simple pero hace el resharding caro.</div>
+<div class="trade"><b>Trade-off 13 · Umbral de acuerdo en gossip.</b> Ganas (umbral bien puesto): detectas fallas y promueves sin falsos positivos. Pagas: un umbral mal calibrado o un número par de primarios abre la puerta a split brain. Por eso: primarios impares y 2 réplicas cada uno.</div>
+<div class="trade"><b>Trade-off 14 · Más shards vs más coordinación.</b> Ganas: capacidad de memoria y de escritura que crecen con los nodos. Pagas: más nodos que se vigilan por gossip y datos repartidos (operaciones multi-clave ya no son triviales entre shards [didáctico]).</div>
+<div class="callout warn"><div class="lbl">Error común</div>Confundir "shard" con "hashslot": el shard es un primario (con sus réplicas); el hashslot es una de las 16K unidades de reparto que un shard posee. Y creer que al añadir M3 se re-hashean todas las claves: solo se reasignan slots.</div>
+`,
+mini:{q:'¿Qué problema del sharding hash(clave) mod N resuelven los hashslots?', opts:['El hash deja de ser determinista','Al cambiar N hay que remapear casi todas las claves; con slots solo se mueven los slots reasignados','Se elimina la necesidad de réplicas','Se evita el gossip'], a:1, why:'Con hash mod N, cambiar N cambia el shard de la mayoría de claves. Con 16K hashslots la clave siempre cae en el mismo slot; al reshardear solo se mueven slots (y sus claves) entre shards, sin downtime y con mínimo impacto.'} },
+
+{ id:'m6', tag:'Módulo 6', accent:'gold', title:'Modelos de persistencia: ninguna, RDB, AOF, ambos',
+summary:'Cuatro modelos de persistencia, fsync, qué usa Redis al reiniciar con ambos y cómo fork + copy-on-write hacen snapshots rápidos con poca memoria extra.',
+html: `
+<p class="lede">¿Qué pasa con tus datos si el proceso muere? Depende del modelo de persistencia. El artículo es directo con la prioridad de Redis: velocidad primero. Aquí están los cuatro modelos y la mecánica de <strong>fork + copy-on-write</strong>.</p>
+<div class="callout info"><div class="lbl">Cita · Architecture Notes / Redis Explained · "Redis Persistence Models"</div>"If we are going to use Redis to store any kind of data for safe keeping, it's important to understand how Redis is doing it. There are many use cases where if you were to lose the data Redis is storing is not the end of the world. Using it as a cache or in situations where its powering real-time analytics [...]. In other scenarios, we want to have some guarantees around data persistence and recovery."<br>"<strong>Redis is fast and all consistency guarantees come second to speed.</strong> This maybe a controversial topic, but it is true."</div>
+<h3>1. Sin persistencia</h3>
+<div class="callout info"><div class="lbl">Cita · "No persistence"</div>"If you wish, you can disable persistence altogether. This is <strong>the fastest way to run Redis and has no durability guarantees</strong>."</div>
+<h3>2. RDB (Redis Database)</h3>
+<div class="callout info"><div class="lbl">Cita · "RDB Files"</div>"The RDB persistence performs <strong>point-in-time snapshots</strong> of your dataset at specified intervals. The main downside to this mechanism is that <strong>data between snapshots will be lost</strong>. In addition, this storage mechanism also relies on <strong>forking the main process</strong>, and in a larger dataset, this may lead to a momentary delay in serving requests. That being said, <strong>RDB files are much faster being loaded in memory than AOF</strong>."</div>
+<h3>3. AOF (Append Only File)</h3>
+<div class="callout info"><div class="lbl">Cita · "AOF"</div>"The AOF persistence <strong>logs every write operation</strong> the server receives that will be played again at server startup, reconstructing the original dataset. This way of ensuring persistence is <strong>much more durable than RDB snapshots</strong> since it is an append-only file. As operations happen, <strong>we buffer them to the log, but they aren't persisted yet</strong>. This log consists of the actual commands we ran in order for replay when needed. Then when possible, <strong>we flush it to disk with fsync</strong> (when this runs is configurable), it will be persisted. The downside is that <strong>the format isn't compact and uses more disk than RDB files</strong>."</div>
+<div class="callout info"><div class="lbl">Cita · recuadro "fsync"</div>"fsync() transfers ("flushes") all modified in-core data [...] to the disk device [...] so that all changed information can be retrieved even if the system crashes or is rebooted. [...] when changes are made to file they are done to caches and <strong>calls to fsync() ensure they are persisted to disk</strong> and accessible later."</div>
+<p><strong>Traducción didáctica:</strong> escribir "al archivo" normalmente solo llega a cachés del sistema operativo; <code>fsync</code> fuerza el volcado al dispositivo. Cuándo se ejecuta es configurable: más frecuente = más durable y más lento. <strong>[Didáctico / clase]</strong> En Redis real la opción es <code>appendfsync</code> (always, everysec, no).</p>
+<h3>4. Ambos: RDB + AOF</h3>
+<div class="callout info"><div class="lbl">Cita · "Why not both?"</div>"It is possible to combine AOF and RDB in the same Redis instance. If durability in exchange for some speed is a tradeoff you are willing to make, I think this is an acceptable way to set up Redis. In the case of a restart, remember that <strong>if both are enabled, Redis will use AOF to reconstruct the data since it's the most complete</strong>."</div>
+<table><tr><th>Modelo</th><th>Durabilidad</th><th>Velocidad / costo</th><th>Al reiniciar</th></tr>
+<tr><td><strong>Ninguno</strong></td><td>Ninguna</td><td>La más rápida</td><td>Arranca vacío</td></tr>
+<tr><td><strong>RDB</strong></td><td>Pierdes lo posterior al último snapshot</td><td>Compacto, carga rápida; el fork puede causar un retraso breve</td><td>Carga el snapshot</td></tr>
+<tr><td><strong>AOF</strong></td><td>Mucho mayor (log de cada escritura; depende de fsync)</td><td>Más disco, formato no compacto, recarga más lenta que RDB</td><td>Reproduce el log</td></tr>
+<tr><td><strong>RDB + AOF</strong></td><td>La del AOF</td><td>Suma los costos de ambos</td><td>Usa el AOF (más completo)</td></tr></table>
+<h3>Fork y copy-on-write</h3>
+<div class="callout info"><div class="lbl">Cita · "Forking"</div>"Now that we understand the types of persistence, let's discuss how we actually go about doing it in a <strong>single threaded application</strong> like Redis. [...] <strong>Forking is a way for operating systems to create new processes by creating copies of themselves.</strong> With this, you get a new process ID and a few other bits of information and handles, so the newly forked process (child) can talk to the original process parent. [...] Redis is a process with tons of memory allocated to it, so how does it make a copy without running out of memory?"</div>
+<div class="callout info"><div class="lbl">Cita · "Forking"</div>"When you fork a process, <strong>the parent and child share memory</strong>, and in that child process Redis begins the snapshotting process. This is made possible by a memory sharing technique called <strong>copy-on-write</strong> — which passes references to the memory at the time the fork was created. <strong>If no changes occur while the child process is persisting to disk, no new allocations are made.</strong> In the case where there are changes, the kernel keeps track of references to each page, and if there are more than one to specific page <strong>the changes are written to new pages</strong>. The child process is fully unaware of the change and has a consistent memory snapshot. Therefore <strong>only a fraction of the memory is used</strong> and we are able to achieve a point in time snapshot of potentially gigabytes of memory extremely quickly and efficiently!"</div>
+<p><strong>Traducción didáctica:</strong> el hijo "ve" la memoria del padre tal como estaba al hacer fork, sin copiarla. Mientras nadie escribe, no se duplica nada. Si el padre modifica una <em>página</em> compartida, el kernel hace la copia de esa página: el padre trabaja en la nueva y el hijo conserva la vieja. Resultado: <strong>snapshot consistente</strong> con memoria extra proporcional a lo que se escribió durante el snapshot, no al tamaño total.</p>
+<div class="trade"><b>Trade-off 15 · RDB vs AOF.</b> Ganas (RDB): archivo compacto y recarga rápida. Pagas: pérdida de lo escrito entre snapshots y un fork que puede retrasar peticiones en datasets grandes. Ganas (AOF): mucha más durabilidad. Pagas: más disco, formato no compacto, recarga más lenta, y dependes de la política de fsync.</div>
+<div class="trade"><b>Trade-off 16 · Fork + copy-on-write.</b> Ganas: snapshot de gigabytes casi instantáneo y con poca RAM extra, sin parar al proceso single-thread. Pagas: con muchas escrituras durante el snapshot se copian más páginas (más RAM); en datasets grandes el propio fork puede causar un retraso momentáneo.</div>
+<div class="trade"><b>Trade-off 17 · Velocidad vs durabilidad (ambos modelos).</b> Ganas (combinar RDB + AOF): recuperación más completa. Pagas: velocidad. El artículo lo dice sin rodeos: las garantías de consistencia van después de la velocidad.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Creer que con RDB + AOF Redis restaura desde el RDB "porque carga más rápido": el artículo dice que si ambos están activos usa el <strong>AOF</strong> por ser el más completo. Y pensar que el fork duplica toda la RAM: gracias a copy-on-write solo se copian las páginas modificadas.</div>
+`,
+mini:{q:'Con RDB y AOF habilitados, ¿de cuál reconstruye Redis los datos al reiniciar?', opts:['Del RDB, porque carga más rápido','Del AOF, porque es el más completo','De ambos a la vez, combinados','De la réplica más cercana'], a:1, why:'"If both are enabled, Redis will use AOF to reconstruct the data since it\'s the most complete." El RDB es más rápido de cargar, pero puede carecer de lo escrito después del último snapshot.'} }
+];
 const QUIZ = [
-{tag:'Intro', c:'gold', q:'Redis se describe mejor como…', opts:['RDBMS SQL','Servidor de estructuras de datos','Solo Memcached clone','Object storage'], a:1, why:'Architecture Notes: data structure server.'},
-{tag:'Intro', c:'gold', q:'Un use case típico de Redis como caché…', opts:['Joins multi-tabla','Sesiones / datos leídos mucho y cambiados poco','Filesystem POSIX','2PC distribuido'], a:1, why:'Session/data caches y leaderboards.'},
-{tag:'Memcached', c:'blue', q:'Diferencia clave Redis vs Memcached…', opts:['Redis no tiene latencia baja','Redis tiene estructuras avanzadas y persistencia; Memcached es multi-thread caché simple','Memcached tiene AOF','Memcached tiene Sentinel'], a:1, why:'Tabla de capacidades del artículo.'},
-{tag:'Single', c:'purple', q:'Limitación de instancia única…', opts:['No cabe en un proceso','SPOF: si cae, fallan las llamadas','No puede hacer SET','No habla TCP'], a:1, why:'Single instance failure degrada la app.'},
-{tag:'HA', c:'teal', q:'replication ID + offset sirven para…', opts:['Cifrar datos','Saber si basta sync parcial o hace falta full sync','Elegir hashslot','Configurar fsync'], a:1, why:'Punto en el tiempo de la réplica.'},
-{tag:'HA', c:'teal', q:'Full sync implica…', opts:['Solo PING','Transferir RDB + buffer de updates intermedios','Borrar AOF','Apagar Sentinel'], a:1, why:'Primary crea RDB y buffer mientras transfiere.'},
-{tag:'Sentinel', c:'orange', q:'Quorum en Sentinel es…', opts:['Tamaño del AOF','Mínimo de votos para declarar fallo/failover','Número de hashslots','Replication ID'], a:1, why:'Definición de quorum del artículo.'},
-{tag:'Sentinel', c:'orange', q:'Recomendación de despliegue Sentinel…', opts:['1 nodo basta','Al menos 3 nodos con quorum 2','100 nodos obligatorios','Solo en el primary'], a:1, why:'Odd count / tolerate failures.'},
-{tag:'Cluster', c:'gold', q:'Hashslots en Redis Cluster…', opts:['64','16384','ilimitados','2'], a:1, why:'16K hashslots.'},
-{tag:'Cluster', c:'gold', q:'Al añadir un shard, Redis Cluster…', opts:['Rehashea todas las keys desde cero','Mueve hashslots entre nodos','Borra réplicas','Desactiva gossip'], a:1, why:'Indirection via slots.'},
-{tag:'Cluster', c:'gold', q:'Split brain se mitiga con…', opts:['Más AOF','Número impar de primarios + réplicas y quorum bien puesto','Apagar gossip','Un solo Sentinel'], a:1, why:'Artículo: odd primaries, 2 replicas each.'},
-{tag:'Persistencia', c:'pink', q:'Desventaja principal de RDB…', opts:['No cabe en disco','Pérdida de datos entre snapshots','No se puede cargar','Es más grande que AOF siempre'], a:1, why:'Point-in-time gaps.'},
-{tag:'Persistencia', c:'pink', q:'AOF…', opts:['Solo lee','Registra writes para replay al arrancar','Es multi-thread','Reemplaza Cluster'], a:1, why:'Append-only log of write ops.'},
-{tag:'Persistencia', c:'pink', q:'Con RDB+AOF, restart usa…', opts:['RDB','AOF','Ninguno','Sentinel'], a:1, why:'AOF more complete.'},
-{tag:'Fork', c:'pink', q:'Fork + COW permite…', opts:['Evitar TCP','Snapshot sin duplicar toda la RAM','Multi-thread Redis','SQL joins'], a:1, why:'Shared pages until write.'},
-{tag:'trade-off', c:'gold', q:'Trade-off central de Redis…', opts:['SQL vs NoSQL joins','Velocidad en memoria vs garantías de consistencia/durabilidad','Solo disco vs solo red','IPv4 vs IPv6'], a:1, why:'Speed first; durability optional/async.'},
-{tag:'Sentinel', c:'orange', q:'Sentinel como discovery…', opts:['Guarda SSTables','Indica a clientes el primary actual','Ejecuta Lua de negocio','Hashea slots'], a:1, why:'Configuration management / service discovery.'},
-{tag:'HA', c:'teal', q:'HA busca…', opts:['Máximo SQL','Uptime/operational performance sin SPOF','Solo snapshots diarios','Apagar réplicas'], a:1, why:'High availability definition in article.'},
-{tag:'Cluster', c:'gold', q:'Gossip en Cluster…', opts:['Comprime AOF','Nodos comparten salud del cluster','Es un tipo de dato','Solo corre en Memcached'], a:1, why:'Health via gossip.'},
-{tag:'Intro', c:'gold', q:'Redis puede usarse como DB primaria cuando…', opts:['Nunca','Hay HA/plugins y el workload encaja','Solo sin persistencia','Solo con SQL'], a:1, why:'Article: HA setups make Redis viable as primary for certain scenarios.'},
-{tag:'Memcached', c:'blue', q:'Memcached eviction clásica…', opts:['LFU only','LRU (limitada frente a Redis)','Never','Random only in Redis'], a:1, why:'Article: Memcached limited eviction LRU.'},
-{tag:'Persistencia', c:'pink', q:'fsync…', opts:['Hashea claves','Fuerza flush a disco de buffers del archivo','Elige primary','Cuenta quorum'], a:1, why:'fsync definition in article.'},
-{tag:'Single', c:'purple', q:'Sin persistencia al reiniciar…', opts:['Se carga AOF','Se pierden los datos en memoria','Cluster rebalancea','Sentinel restaura'], a:1, why:'No persistence = data loss on restart.'},
-{tag:'Cluster', c:'gold', q:'Sharding algorítmico ingenuo (hash % N) falla al…', opts:['Hacer GET','Añadir shards (resharding costoso)','Usar TCP','Abrir AOF'], a:1, why:'Why hashslots exist.'},
-{tag:'trade-off', c:'gold', q:'Forzar ack de ≥1 réplica en primary…', opts:['Elimina toda latencia','Reduce pérdida de writes a costa de dejar de aceptar writes si no hay ack','Borra hashslots','Apaga Sentinel'], a:1, why:'Mitigation mentioned for async replication losses.'},
-{tag:'Intro', c:'gold', q:'Pub/Sub y colas en Redis…', opts:['Imposibles','Casos de uso más allá del caché puro','Solo en Memcached','Solo en Cluster'], a:1, why:'Evolution beyond Memcached-like cache.'},
-{tag:'HA', c:'teal', q:'Al promover réplica a primary…', opts:['Mantiene el mismo replication ID siempre','Obtiene nuevo replication ID (recuerda el anterior)','Borra offset','Desactiva AOF'], a:1, why:'New ID on promotion; old remembered for partial sync.'},
-{tag:'Sentinel', c:'orange', q:'Si Sentinel pierde quorum…', opts:['Nada pasa','Puede no poder hacer failover de forma confiable','Se apaga Redis','Se crean hashslots'], a:1, why:'Pitfall list in article.'},
-{tag:'Fork', c:'pink', q:'Durante el snapshot, si el padre escribe…', opts:['Se aborta Redis','Kernel copia páginas modificadas (COW)','Se apaga el hijo','Se pierde el RDB'], a:1, why:'Copy-on-write explanation.'},
-{tag:'Persistencia', c:'pink', q:'RDB suele…', opts:['Ser más lento de cargar que AOF','Cargar en memoria más rápido que AOF','No poder usarse en réplicas','Requerir Cluster'], a:1, why:'Article: RDB files load faster than AOF.'}
+{tag:'Fundamentos', c:'blue', q:'¿Qué significa Redis y cuál es la descripción más exacta según el artículo?', opts:['Relational Data Integration System; un motor SQL en memoria','REmote DIctionary Service; un data structure server clave-valor de código abierto','Replicated Disk Storage; un filesystem distribuido','Reliable Distributed Service; un bus de mensajes'], a:1, why:'Módulo 0: RE-mote DI-ctionary S-ervice. El autor dice que lo más exacto es data structure server: el valor es una estructura (lista, set, hash...), no un blob opaco. Ganas operaciones ya hechas en el servidor; pagas pensar en estructuras en lugar de filas y SQL.'},
+{tag:'Fundamentos', c:'blue', q:'¿Cuál es el uso PRINCIPAL de Redis según el artículo?', opts:['Base de datos analítica columnar','Cache en memoria delante de una base "real" como MySQL o PostgreSQL','Reemplazo del sistema de archivos','Motor de búsqueda de texto completo'], a:1, why:'Módulo 0: "primarily, an in-memory database used as a cache in front of another real database". Alivia la carga de la base central con datos que cambian poco y se piden mucho, o menos críticos y cambiantes. Ganas rendimiento; pagas gestionar la coherencia con la fuente de verdad.'},
+{tag:'Fundamentos', c:'blue', q:'¿Cuáles son ejemplos de datos del artículo que encajan en Redis como cache?', opts:['Facturas contables legales y auditorías','Caches de sesión o de datos, leaderboards y analítica "roll-up" para dashboards','Backups completos de otras bases','Binarios de aplicaciones'], a:1, why:'Módulo 0: ejemplos de sesión/data caches y leaderboard o roll-up analytics. Son datos reconstruibles o poco críticos, donde la velocidad de memoria vale más que la durabilidad absoluta.'},
+{tag:'Fundamentos', c:'blue', q:'¿Por qué se dice que Redis "blurred the lines between a cache and datastore"?', opts:['Porque no tiene claves','Porque con sus garantías, plug-ins y topologías HA puede ser también una base primaria, no solo un cache','Porque solo funciona en disco','Porque no usa memoria'], a:1, why:'Módulo 0: para muchos casos Redis ofrece garantías suficientes para ser base primaria. Qué tan "base" sea depende de topología (HA, Cluster) y persistencia (RDB/AOF); no es automático.'},
+{tag:'Memcached', c:'purple', q:'¿Qué capacidad de la tabla tiene Memcached pero Redis NO?', opts:['Replicación','Snapshots','Arquitectura multihilo (multithreaded)','Geospatial support'], a:2, why:'Módulo 1: la única fila donde gana Memcached es Multithreaded architecture. Redis suma snapshots, replicación, transacciones, Pub/Sub, Lua, geoespacial y estructuras avanzadas. Ganas simplicidad de hilos en Redis; pagas un núcleo por instancia para comandos.'},
+{tag:'Memcached', c:'purple', q:'¿Cuántas filas de la tabla Memcached vs Redis son "Yes" para ambos?', opts:['Cero','Cuatro: latencia sub-milisegundo, facilidad de uso, partición de datos y amplio soporte de lenguajes','Ocho','Las doce'], a:1, why:'Módulo 1: las cuatro primeras filas empatan (sub-millisecond latency, developer ease of use, data partitioning, broad language support). Las otras ocho filas son diferencias: siete a favor de Redis y una (multihilo) a favor de Memcached.'},
+{tag:'Memcached', c:'purple', q:'Sobre eviction, ¿qué dice el artículo de Memcached?', opts:['Tiene decenas de políticas','Su política de desalojo es limitada: solo LRU','No desaloja nunca','Solo usa FIFO'], a:1, why:'Módulo 1: Memcached tiene "lack of data types and limited eviction policy of just LRU". LRU expulsa lo usado menos recientemente cuando falta memoria; es simple pero poco flexible.'},
+{tag:'Memcached', c:'purple', q:'Modelo de hilos y clúster: ¿qué afirmación es correcta según el artículo?', opts:['Redis es multithreaded y Memcached single-threaded','Redis es single-threaded y Memcached multithreaded; Redis trae soporte de clúster de fábrica y Memcached requiere configuración','Ambos son single-threaded','Ambos requieren herramientas externas para clúster'], a:1, why:'Módulo 1: "Redis is single-threaded while Memcached is multithreaded"; Memcached rinde en puro cache pero necesita setup en clúster distribuido, mientras Redis lo soporta out of the box.'},
+{tag:'Memcached', c:'purple', q:'¿Cuántos años antes que Redis fue creado Memcached y por quién?', opts:['1 año antes; Salvatore Sanfilippo','6 años antes (2003); Brad Fitzpatrick','10 años antes; Jeff Dean','Mismo año; Mahdi Yusuf'], a:1, why:'Módulo 1 (recuadro): Memcached fue creado por Brad Fitzpatrick en 2003, seis años antes que Redis (2009). Empezó en Perl y luego se reescribió en C; fue el cache de facto de su época.'},
+{tag:'Single', c:'teal', q:'En una instancia única de Redis, si esta falla, ¿qué ocurre?', opts:['Los clientes se conectan automáticamente a una réplica','Todas las llamadas de clientes a Redis fallan y el sistema se degrada','Sentinel promueve otro nodo','Los datos se re-shardean en el clúster'], a:1, why:'Módulo 2: es un punto único de falla. Ganas simplicidad máxima; pagas que sin réplicas ni failover cualquier caída degrada al sistema completo.'},
+{tag:'Single', c:'teal', q:'¿Cómo se procesa un comando en una instancia Redis según el artículo?', opts:['Se escribe primero a disco y luego a memoria','Se procesa primero en memoria; si hay persistencia, un proceso hijo creado por fork la lleva a RDB/AOF','Se envía siempre a la réplica antes de responder','Se encola en Sentinel'], a:1, why:'Módulo 2: "commands sent to Redis are first processed in memory", y la persistencia la hace un proceso forked en intervalos. Ganas latencia de RAM; pagas durabilidad asíncrona.'},
+{tag:'Single', c:'teal', q:'Una instancia sin persistencia se reinicia. ¿Qué pasa con los datos?', opts:['Se recuperan automáticamente del cluster','Se pierden (tampoco se recuperan en un failover)','Se recargan del AOF','Se recargan de Sentinel'], a:1, why:'Módulo 2: "If Redis isn\'t set up to persist data, data is lost in case of a restart or failover". Con persistencia, al reiniciar carga el RDB/AOF a memoria y recién entonces atiende clientes.'},
+{tag:'HA', c:'orange', q:'¿Para qué sirven las réplicas en la topología Redis HA?', opts:['Solo para backups en frío','Escalar lecturas y proveer failover si se pierde el primario','Para almacenar un shard distinto cada una','Para ejecutar Sentinel'], a:1, why:'Módulo 3: las secundarias "help scale reads or provide failover in case the main is lost". Se alimentan de un replica client output buffer del primario. Ganas lecturas y relevo; pagas replicación asíncrona.'},
+{tag:'HA', c:'orange', q:'¿Qué dos datos identifican el punto de replicación de una instancia?', opts:['Hostname y puerto','Replication ID y offset','Slot y shard','Quórum y epoch'], a:1, why:'Módulo 3: "Every main instance of Redis has a replication ID and an offset". El offset se incrementa con cada acción del primario; el ID identifica la historia de datos. Mismo ID y mismo offset = exactamente los mismos datos.'},
+{tag:'HA', c:'orange', q:'Una réplica está unos pocos offsets atrás y comparte el replication ID. ¿Qué sync ocurre?', opts:['Full sync con un nuevo RDB','Partial sync: recibe del primario los comandos que faltan y los reproduce','Se descarta la réplica','Se reinicia el primario'], a:1, why:'Módulo 3: si está a pocos offsets, recibe los comandos restantes y los reproduce hasta quedar al día. Ganas resincronizar barato; pagas depender de que el primario aún conserve ese rango de offsets.'},
+{tag:'HA', c:'orange', q:'En un full sync, ¿qué hace el primario mientras transfiere el RDB?', opts:['Detiene todas las escrituras','Bufferiza las actualizaciones intermedias entre el corte del snapshot y el offset actual para enviarlas después','Descarta los comandos nuevos','Apaga la persistencia'], a:1, why:'Módulo 3: crea un RDB nuevo, lo envía y mientras tanto acumula en buffer los cambios entre el corte del snapshot y el offset actual; al terminar el snapshot, los envía y la replicación sigue normal.'},
+{tag:'HA', c:'orange', q:'¿Para qué sirve el replication ID cuando se promueve una réplica a primaria?', opts:['Para elegir qué clave se mueve','Para que el nuevo primario recuerde el ID anterior y pueda hacer partial sync con otras secundarias (ancestro común)','Para cifrar la replicación','Para contar el quórum'], a:1, why:'Módulo 3: el promovido recibe un nuevo ID y recuerda el viejo, lo que permite partial sync con las demás secundarias. Sin ancestro común conocido, toca un full sync caro.'},
+{tag:'trade-off', c:'gold', mod:'m3', q:'Trade-off: la replicación de Redis es asíncrona. ¿Qué se gana y qué se paga?', opts:['Se gana consistencia fuerte; se paga latencia','Se gana latencia de escritura baja y lecturas escalables; se paga una ventana de pérdida y lag en réplicas','No hay ningún costo','Se gana durabilidad total; se paga RAM'], a:1, why:'Módulo 3 y 4: "all Redis replication is asynchronous and has its trade-offs". El primario no espera a las réplicas (rápido), pero si cae antes de replicar, esas escrituras pueden perderse tras el failover.'},
+{tag:'Sentinel', c:'purple', q:'¿Cuáles son las cuatro responsabilidades de Sentinel?', opts:['Sharding, hashslots, gossip y resharding','Monitoring, notification, failover management y configuration management','Fork, RDB, AOF y fsync','Cache, eviction, LRU y TTL'], a:1, why:'Módulo 4: monitoreo (¿funcionan primarios/secundarios?), notificación a admins, gestión de failover (si un quórum coincide) y gestión de configuración (descubrimiento del primario actual).'},
+{tag:'Sentinel', c:'purple', q:'¿Qué es el quórum en Sentinel?', opts:['El número de réplicas por shard','El mínimo de votos que el sistema debe obtener para poder ejecutar una operación como el failover','El tamaño del buffer de replicación','El número de slots por nodo'], a:1, why:'Módulo 4: quorum = minimum number of votes to perform an operation like failover. Evita que un solo sentinel con mala conexión provoque un failover falso. Pagas: sin mayoría no hay failover.'},
+{tag:'Sentinel', c:'purple', q:'¿Por qué se prefiere un número IMPAR de nodos en sistemas con quórum?', opts:['Porque ocupan menos memoria','Para poder romper empates (tie)','Porque los pares no pueden replicar','Porque el fork requiere impares'], a:1, why:'Módulo 4: "odd number of nodes is preferred in case the system is required to break ties". Tamaños típicos: 3 con quórum 2 y 5 con quórum 3. Con 4 nodos toleras lo mismo que con 3.'},
+{tag:'Sentinel', c:'purple', q:'¿Qué recomienda el artículo como mínimo para Sentinel?', opts:['1 nodo con quórum 1','Al menos 3 nodos con un quórum de al menos 2','2 nodos con quórum 2','10 nodos con quórum 6'], a:1, why:'Módulo 4: "at least running three nodes with a quorum of at least two", idealmente un sentinel junto a cada servidor de aplicación para alinear la visión de red con la de los clientes.'},
+{tag:'Sentinel', c:'purple', q:'Partición de red: el primario viejo queda en la minoría y sigue recibiendo escrituras. ¿Qué pasa con ellas al sanar la red?', opts:['Se fusionan automáticamente sin pérdida','Se pierden cuando el sistema se recupera por completo','Se replican doblemente','Se mueven a otro slot'], a:1, why:'Módulo 4: "Spoiler: they are lost when the system recovers fully". La mayoría promovió otra réplica; el primario viejo se degrada y su historia divergente se descarta. Ganas disponibilidad; pagas durabilidad.'},
+{tag:'trade-off', c:'gold', mod:'m4', q:'Trade-off: forzar al primario a replicar a al menos 1 secundaria antes de aceptar escrituras…', opts:['Hace la replicación síncrona y elimina toda pérdida','Reduce la pérdida en particiones, pero el primario deja de aceptar escrituras si no hay confirmación; la replicación sigue siendo asíncrona','No tiene efecto sobre la pérdida','Solo mejora las lecturas'], a:1, why:'Módulo 4: el primario rastrea los acks y, si ninguna secundaria confirma, deja de aceptar escrituras. Ganas menor pérdida; pagas disponibilidad de escritura. No es durabilidad fuerte.'},
+{tag:'trade-off', c:'gold', mod:'m4', q:'Trade-off: ¿por qué NO basta con 2 sentinels?', opts:['Porque Sentinel exige 7 nodos','Con quórum 2, si cae uno ya no se alcanza el quórum y no hay failover; 3 nodos con quórum 2 toleran 1 falla','Porque 2 sentinels duplican la memoria','Porque dos sentinels siempre se contradicen'], a:1, why:'Módulo 4 (tabla didáctica): n=2 → quórum 2 → 0 fallas toleradas; n=3 → quórum 2 → 1 falla. El nodo extra es el costo de poder seguir haciendo failover.'},
+{tag:'Cluster', c:'pink', q:'¿Qué problema de escala resuelve Redis Cluster?', opts:['Hacer el fork más rápido','Los datos no caben en la memoria de una sola máquina: permite escalar horizontalmente con sharding','Reducir la latencia de red local','Eliminar la necesidad de réplicas'], a:1, why:'Módulo 5: el máximo de RAM en un servidor (24 TiB en AWS según el artículo) puede no bastar ni para un cache. Scale out reparte los datos entre shards; scale up tiene techo de hardware.'},
+{tag:'Cluster', c:'pink', q:'Sharding algorítmico: ¿cómo se halla el shard de una clave?', opts:['Se pregunta a Sentinel','Se hashea la clave con una función determinista y se toma módulo del número de shards','Se elige un shard al azar','Se busca en un índice secundario central'], a:1, why:'Módulo 5: "hash the key and mod the total result by the number of shards". Determinista: la misma clave cae siempre en el mismo shard. El problema surge al cambiar el número de shards.'},
+{tag:'Cluster', c:'pink', q:'¿Cuántos hashslots tiene Redis Cluster y qué ventaja dan?', opts:['16 slots; evitan el fork','16K (16384) slots; al añadir shards solo se mueven slots, sin remapear todas las claves ni downtime','1024 slots; reemplazan a las réplicas','256 slots; cifran los datos'], a:1, why:'Módulo 5: hay 16K hashslots a los que se mapea todo el dato. Resharding = mover hashslots entre primarios, con mínimo impacto y sin downtime. El hash de clave→slot no cambia.'},
+{tag:'Cluster', c:'pink', q:'Con M1 (0-8191) y M2 (8192-16383) se añade M3. ¿Cuál es el nuevo reparto del artículo?', opts:['M1 0-4095, M2 4096-8191, M3 8192-16383','M1 0-5460, M2 5461-10922, M3 10923-16383','M1 0-8191, M2 8192-12287, M3 12288-16383','No cambia ningún rango'], a:1, why:'Módulo 5: los slots se redistribuyen en tres rangos casi iguales (5461, 5462 y 5461 slots). Solo las claves de los slots que cambian de dueño se mueven; la función clave→slot no cambia.'},
+{tag:'Cluster', c:'pink', q:'¿Cómo detecta Redis Cluster que un primario falló?', opts:['Un servicio externo ZooKeeper','Gossip: los nodos se comunican constantemente y, si suficientes coinciden en que M1 no responde, promueven a su secundaria S1','Un cron cada minuto en el cliente','El balanceador de carga'], a:1, why:'Módulo 5: gossiping para conocer la salud de todo el clúster; el número de nodos que deben coincidir es configurable. Mal configurado puede causar split brain.'},
+{tag:'Cluster', c:'pink', q:'¿Qué es split brain y cómo lo evita la recomendación del artículo?', opts:['Un fork duplicado; con más RAM','El clúster se divide y no puede desempatar cuando ambos lados de la partición son iguales; se recomienda número impar de primarios y dos réplicas cada uno','Una falla de disco; con RAID','Un error de LRU; con más claves'], a:1, why:'Módulo 5: con partición en mitades iguales no hay desempate. Impar de primarios + 2 réplicas cada uno es la configuración más robusta según el autor.'},
+{tag:'trade-off', c:'gold', mod:'m5', q:'Trade-off: hashslots vs hash(clave) mod N…', opts:['Hashslots no ganan nada','Ganas resharding barato (mover slots sin remapear claves); pagas una capa de indirección (tabla slot→shard) y migrar datos al reasignar slots','Ganas menos memoria; pagas CPU','Ganas durabilidad; pagas red'], a:1, why:'Módulo 5: "this one level of misdirection solves the resharding issue with algorithmic sharding". Con mod N casi todo cambia al cambiar N; con slots solo cambian los slots reasignados.'},
+{tag:'Persistencia', c:'teal', q:'¿Qué hace el modelo RDB y cuál es su principal desventaja?', opts:['Registra cada comando; usa más disco','Toma snapshots point-in-time a intervalos; se pierden los datos entre snapshots','Replica a todos los nodos; es lento','Desactiva el fork; no persiste'], a:1, why:'Módulo 6: RDB = point-in-time snapshots. Desventajas: pérdida entre snapshots y el fork del proceso principal puede causar un retraso momentáneo con datasets grandes. Ventaja: carga mucho más rápido que AOF.'},
+{tag:'Persistencia', c:'teal', q:'¿Cómo funciona AOF y qué rol tiene fsync?', opts:['Guarda un snapshot comprimido; fsync lo comprime','Registra cada escritura (comandos) para reproducirlos al arrancar; fsync fuerza el volcado del buffer a disco y su frecuencia es configurable','Replica a otro nodo; fsync elige el primario','Vacía la memoria; fsync la reinicia'], a:1, why:'Módulo 6: las operaciones se bufferizan al log y "no están persistidas todavía" hasta que fsync las vuelca. Más durable que RDB, pero formato no compacto y más disco.'},
+{tag:'Persistencia', c:'teal', q:'Con RDB y AOF activos a la vez, ¿qué usa Redis al reiniciar?', opts:['El RDB, por ser más rápido','El AOF, por ser el más completo','El más reciente por fecha','Ninguno: arranca vacío'], a:1, why:'Módulo 6: "if both are enabled, Redis will use AOF to reconstruct the data since it\'s the most complete". Combinar da más durabilidad a cambio de algo de velocidad.'},
+{tag:'Persistencia', c:'teal', q:'Redis es un proceso con mucha memoria. ¿Cómo hace el snapshot sin copiar toda la RAM?', opts:['Pausa Redis y copia a disco','Hace fork: padre e hijo comparten memoria y solo se copian las páginas que cambian (copy-on-write)','Duplica todos los datos en una réplica','Comprime la RAM en caliente'], a:1, why:'Módulo 6: al hacer fork, el hijo comparte la memoria con el padre. Si no hay cambios no hay nuevas asignaciones; si una página compartida se modifica, el kernel escribe los cambios en una página nueva y el hijo conserva su vista consistente.'},
+{tag:'trade-off', c:'gold', mod:'m6', q:'Trade-off: RDB vs AOF para una carga de leaderboards que no tolera perder mucho pero tampoco quiere archivos enormes…', opts:['RDB siempre: nunca pierde nada','AOF da más durabilidad pero usa más disco y recarga más lento; RDB es compacto y rápido de cargar pero pierde lo posterior al último snapshot; ambos juntos = más durable y menos veloz','AOF siempre: es más compacto','Ninguno: Redis no persiste'], a:1, why:'Módulo 6: AOF = más durable, formato no compacto, más disco; RDB = compacto, carga rápida, pierde entre snapshots y requiere fork. Combinar acepta durabilidad a cambio de velocidad; al reiniciar manda el AOF.'},
+{tag:'trade-off', c:'gold', mod:'m6', q:'Trade-off: desactivar la persistencia por completo…', opts:['Da durabilidad fuerte pero lentitud','Es la forma más rápida de correr Redis pero sin garantías de durabilidad','No cambia nada','Obliga a usar Cluster'], a:1, why:'Módulo 6: "the fastest way to run Redis and has no durability guarantees". Aceptable en un cache puro o analítica en tiempo real donde perder datos no es el fin del mundo.'}
 ];
-
 const CASES = [
-{ title:'Caso 1 · ¿Caché o primaria?', prompt:'Tu app necesita sesiones con TTL y un leaderboard en tiempo real. ¿Redis caché delante de Postgres basta, o Redis como store principal del leaderboard?', solution:'<strong>Híbrido típico:</strong> sesiones/caché en Redis; leaderboard con sorted sets puede vivir en Redis como fuente de verdad del ranking si aceptas el modelo de durabilidad (AOF/RDB + HA). Postgres sigue para datos transaccionales duros.', h1:'¿Qué estructuras usa un leaderboard?', h2:'¿Qué garantiza (o no) la persistencia async?', rubric:'Rúbrica: 2 decisión + 2 mecanismo + 1 trade-off.'},
-{ title:'Caso 2 · SPOF en producción', prompt:'Solo hay un Redis single instance en el mismo host que la API. El host reinicia. ¿Qué pasa y qué topología propones?', solution:'Sin persistencia: datos de caché perdidos y latencia sube al origen. Con RDB/AOF: tarda en reload. Propón HA+réplica o Sentinel (≥3) según SLA.', h1:'¿Qué es SPOF aquí?', h2:'¿Sentinel vs solo réplica?', rubric:'Rúbrica 2/2/1.'},
-{ title:'Caso 3 · Sync parcial vs full', prompt:'Una réplica estuvo offline 2 días. Vuelve. ¿Partial o full sync? ¿Por qué duele el full?', solution:'Si el primary ya no tiene el backlog de offsets → full sync: RDB grande + buffer. Duele CPU/red/latencia en primary.', h1:'¿Qué son replication ID y offset?', h2:'¿Qué envía un full sync?', rubric:'Rúbrica 2/2/1.'},
-{ title:'Caso 4 · Quorum Sentinel', prompt:'2 Sentinels, quorum 2. Un Sentinel queda aislado. ¿Puede haber failover falso o bloqueo?', solution:'Con 2 nodos y quorum 2, un aislamiento puede impedir quorum o crear decisiones frágiles. Mejor 3/2.', h1:'Define quorum.', h2:'¿Por qué número impar?', rubric:'Rúbrica 2/2/1.'},
-{ title:'Caso 5 · Añadir shard', prompt:'Cluster 2 primarios. Añades M3. ¿Se rehashean todas las keys?', solution:'No: se migran hashslots. Clave→slot estable; cambian slot→nodo.', h1:'¿Cuántos slots?', h2:'Ejemplo M1/M2/M3 del artículo.', rubric:'Rúbrica 2/2/1.'},
-{ title:'Caso 6 · RDB vs AOF', prompt:'Analytics en tiempo real: perder 1 minuto de datos es OK; reinicios deben ser rápidos. ¿RDB, AOF o ambos?', solution:'RDB (o RDB+AOF con fsync laxo) encaja: snapshots y carga rápida. Si necesitas casi no perder writes → AOF con fsync más frecuente (más latencia).', h1:'¿Qué pierdes entre snapshots RDB?', h2:'¿Qué usa Redis al restart si ambos?', rubric:'Rúbrica 2/2/1.'},
-{ title:'Caso 7 · Split brain', prompt:'Partición de red: dos mitades con igual número de primarios. ¿Riesgo?', solution:'Split brain: dos primarios aceptando writes. Mitigar con odd primaries + réplicas y quorum/gossip bien configurados.', h1:'¿Qué es gossip?', h2:'Regla de odd primaries.', rubric:'Rúbrica 2/2/1.'}
+{ title:'Caso 1 · ¿Cache o base primaria? (leaderboard vs saldos)', prompt:`Tu equipo propone usar Redis para dos cosas: (A) el <strong>leaderboard</strong> de un juego, que se recalcula desde los eventos, y (B) los <strong>saldos de cuentas</strong> de pago, que no se pueden perder.<br><br><strong>¿En cuál usarías Redis como cache y en cuál tendrías que pensar mucho antes de usarlo como primario? ¿Qué configuración exigirías?</strong>`, solution:`<strong>(A)</strong> encaja como cache o analítica "roll-up": si se pierde, se reconstruye desde la fuente. El artículo lo cita como ejemplo (leaderboards, session caches).<br><strong>(B)</strong> requiere garantías: como primario necesitarías HA (réplicas + Sentinel o Cluster), persistencia (AOF o RDB+AOF) y asumir que la replicación es asíncrona (puede perderse algo en un failover). Para saldos críticos lo prudente es que la fuente de verdad siga siendo una base "real" (MySQL/PostgreSQL) y Redis delante.<br>Trade-off: velocidad de memoria vs durabilidad; Redis prioriza velocidad ("all consistency guarantees come second to speed").`, h1:`Pista 1: ¿qué tipo de datos menciona el artículo para cache (datos menos críticos o que cambian poco y se piden mucho)? (Módulo 0)`, h2:`Pista 2: si lo usas como primario, ¿qué te falta? Piensa en réplicas, failover y en qué modelo de persistencia sobrevive a un reinicio. (Módulos 3, 4 y 6)`, rubric:`Rúbrica (5pts): 2 decisión (A cache, B con cuidado/DB real) + 2 mecanismo (HA + persistencia + replicación asíncrona) + 1 trade-off (velocidad vs durabilidad).`},
+{ title:'Caso 2 · Redis o Memcached para un cache de sesiones', prompt:`Necesitas un cache de sesiones de usuario. Memcached ya está en la empresa. El equipo quiere (1) que las sesiones sobrevivan a un reinicio del cache y (2) poder levantar un clúster distribuido sin demasiado trabajo.<br><br><strong>¿Redis o Memcached? Usa la tabla del artículo.</strong>`, solution:`<strong>Redis.</strong> Para (1) necesitas persistencia: la tabla muestra <em>Snapshots</em> solo en Redis (y Memcached "lacked any nonvolatile persistence"). Para (2) el artículo dice que Redis tiene soporte de clúster out of the box, mientras Memcached "requires some setup in a distributed cluster".<br>Trade-off: Memcached es multithreaded (aprovecha varios núcleos por instancia) y suficiente si solo quieres cache puro; Redis es single-threaded pero más completo (réplicas, estructuras, Pub/Sub).`, h1:`Pista 1: en la tabla, ¿qué filas aparecen solo en Redis y cuál es la única que gana Memcached? (Módulo 1)`, h2:`Pista 2: ¿cuál de los dos tiene clúster de fábrica según el recuadro de Memcached?`, rubric:`Rúbrica (5pts): 2 decisión (Redis) + 2 mecanismo (snapshots/persistencia y clúster out of the box) + 1 trade-off (multihilo de Memcached vs capacidades de Redis).`},
+{ title:'Caso 3 · Réplica que reconecta: ¿partial o full sync?', prompt:`Una réplica pierde conexión 5 segundos. Al volver, informa el <strong>mismo replication ID</strong> y un offset <strong>200 comandos atrás</strong> que el primario aún conserva. Otra réplica, recién añadida, no comparte ningún replication ID con el primario.<br><br><strong>¿Qué sync recibe cada una y qué cuesta?</strong>`, solution:`<strong>Réplica 1: partial sync.</strong> Mismo ID + offset conocido → el primario envía los ~200 comandos que faltan y la réplica los reproduce.<br><strong>Réplica 2: full sync.</strong> Sin acuerdo de replication ID, el primario crea un <strong>RDB nuevo</strong> (fork), lo envía y bufferiza los cambios intermedios entre el corte del snapshot y el offset actual para enviarlos después.<br>Trade-off: partial es barato; full es caro (snapshot, transferencia, memoria de buffer).`, h1:`Pista 1: ¿cuándo coinciden dos instancias exactamente en datos? (ID y offset) (Módulo 3)`, h2:`Pista 2: si el primario no reconoce el ID, ¿qué debe construir y qué guarda mientras lo transfiere?`, rubric:`Rúbrica (5pts): 2 decisión (partial / full) + 2 mecanismo (ID+offset, RDB + buffer) + 1 trade-off (costo del full sync).`},
+{ title:'Caso 4 · Promoción de réplica y replication ID', prompt:`El primario muere y la réplica A se promueve. Las réplicas B y C seguían al primario viejo y estaban a pocos offsets. Alguien sugiere "forzar full sync de B y C con A para estar seguros".<br><br><strong>¿Es necesario? ¿Qué mecanismo lo evita?</strong>`, solution:`<strong>No es necesario.</strong> Al promoverse, A recibe un <strong>nuevo replication ID</strong> pero <strong>recuerda el anterior</strong>. B y C reconocen ese ancestro común y, con el offset, A puede darles un <strong>partial sync</strong> solo con lo que les falta.<br>Si no se conociera el ID previo, no habría ancestro común y sí tocaría un full sync caro.<br>Trade-off: el ID extra evita snapshots innecesarios; a cambio hay que mantener esa historia de IDs.`, h1:`Pista 1: ¿qué recibe una instancia al ser promovida a primaria? (Módulo 3)`, h2:`Pista 2: ¿qué ventaja da recordar el ID viejo para las demás secundarias?`, rubric:`Rúbrica (5pts): 2 decisión (no full sync) + 2 mecanismo (nuevo ID + recuerda el viejo + offset) + 1 trade-off (partial barato vs full caro).`},
+{ title:'Caso 5 · Sentinel: ¿cuántos nodos y qué se pierde?', prompt:`Tienes 1 primario y 2 réplicas, y quieres failover automático. Propones <strong>2 sentinels</strong> con quórum 2. Además, durante una partición de red el primario viejo quedó en la minoría y siguió aceptando escrituras.<br><br><strong>(a) ¿Qué problema tiene la configuración? (b) ¿Qué pasó con esas escrituras? (c) ¿Cómo reduces la pérdida y a qué costo?</strong>`, solution:`<strong>(a)</strong> Con 2 sentinels y quórum 2, si cae uno no hay quórum y el failover es imposible; el artículo recomienda al menos <strong>3 nodos con quórum de 2</strong> (impar para romper empates).<br><strong>(b)</strong> Se <strong>pierden cuando el sistema se recupera</strong> por completo: la mayoría ya promovió otra réplica.<br><strong>(c)</strong> Forzar que el primario replique a <strong>al menos 1 secundaria</strong> y deje de aceptar escrituras si no hay confirmación. Costo: pierdes disponibilidad de escritura en aislamiento; la replicación sigue siendo asíncrona.`, h1:`Pista 1: ¿cuántas fallas tolera n=2 con quórum 2? ¿y n=3? (Módulo 4)`, h2:`Pista 2: ¿qué haría que un primario aislado deje de aceptar escrituras? (Módulo 4, "mitigación")`, rubric:`Rúbrica (5pts): 2 decisión (3 sentinels, quórum 2) + 2 mecanismo (escrituras de la minoría perdidas; min 1 réplica confirmando) + 1 trade-off (disponibilidad vs pérdida).`},
+{ title:'Caso 6 · Agregar un shard sin remapear claves', prompt:`Tu clúster tiene M1 (slots 0-8191) y M2 (8192-16383). La clave <code>foo</code> cae en M2. Añades M3 y el equipo teme que "haya que recalcular el hash de todas las claves" y quedar sin servicio.<br><br><strong>¿Qué se mueve realmente y por qué no hay downtime?</strong>`, solution:`El hash de clave → hashslot <strong>no cambia</strong> (16K slots fijos). Solo cambia qué shard posee cada slot: M1 0-5460, M2 5461-10922, M3 10923-16383. Se mueven los slots reasignados y las claves que contienen; el resto no se toca.<br>Con sharding algorítmico <code>hash mod N</code>, al cambiar N <em>casi todas</em> las claves cambiarían de shard: lento, irreal y dañino para la disponibilidad.<br>Trade-off: una capa de indirección (slot→shard) a cambio de resharding barato y sin downtime ("minimal performance hit").`, h1:`Pista 1: ¿qué cambia en el mapeo al añadir M3: clave→slot o slot→shard? (Módulo 5)`, h2:`Pista 2: compara con hash mod N cuando N pasa de 2 a 3.`, rubric:`Rúbrica (5pts): 2 decisión (solo se mueven slots) + 2 mecanismo (16K slots, indirección, rangos nuevos) + 1 trade-off (indirección vs remapeo masivo).`},
+{ title:'Caso 7 · Diseña un clúster robusto (split brain)', prompt:`Un colega propone un clúster con <strong>4 primarios</strong> y 1 réplica cada uno, repartidos mitad y mitad en dos zonas. Una partición separa las zonas.<br><br><strong>¿Qué riesgo ves y cómo lo rediseñas según el artículo?</strong>`, solution:`Con 4 primarios (par) una partición puede dejar <strong>mitades iguales</strong>: ningún lado reúne mayoría para decidir (o ambos deciden por su cuenta) → <strong>split brain</strong>; el clúster no puede desempatar.<br>Rediseño: <strong>número impar de primarios</strong> (por ejemplo 3) y <strong>dos réplicas por primario</strong>; el umbral de acuerdo del gossip debe ser coherente con el tamaño ("essential to get this right").<br>Trade-off: más nodos y más memoria/costo por la robustez.`, h1:`Pista 1: ¿qué pasa si una partición divide el clúster en partes iguales? (Módulo 5, "Gossiping")`, h2:`Pista 2: ¿cuál es la regla general que da el artículo sobre primarios y réplicas?`, rubric:`Rúbrica (5pts): 2 decisión (impar + 2 réplicas) + 2 mecanismo (gossip, umbral, empate) + 1 trade-off (costo vs robustez).`},
+{ title:'Caso 8 · Elige persistencia: RDB, AOF o ambos', prompt:`Tres servicios usan Redis: (1) un cache de páginas que se rehidrata desde la DB, (2) una cola interna donde perder los últimos segundos duele, (3) un leaderboard que aguanta perder unos minutos pero debe reiniciar rápido. Además, el dataset es grande y el dueño teme que el fork "duplique la RAM".<br><br><strong>¿Qué modelo eliges para cada uno y qué le respondes sobre el fork?</strong>`, solution:`<strong>(1) Ninguna persistencia:</strong> la más rápida, y perder el cache no es grave.<br><strong>(2) AOF</strong> (o RDB+AOF) con fsync suficientemente frecuente: más durable, a cambio de más disco y recarga más lenta; si ambos están activos, al reiniciar manda el AOF.<br><strong>(3) RDB:</strong> snapshots compactos y carga rápida; se acepta perder lo posterior al último snapshot.<br><strong>Fork:</strong> con copy-on-write, padre e hijo comparten páginas; solo se copian las páginas que el padre modifica mientras dura el snapshot, así que se usa una fracción de la memoria. Con datasets grandes el fork puede causar un retraso momentáneo.`, h1:`Pista 1: ¿qué modelo es "el más rápido, sin durabilidad" y cuál "carga más rápido que AOF"? (Módulo 6)`, h2:`Pista 2: ¿cuándo se asignan páginas nuevas durante un snapshot con copy-on-write?`, rubric:`Rúbrica (5pts): 2 decisión (ninguna / AOF / RDB) + 2 mecanismo (fsync, snapshots, COW) + 1 trade-off (velocidad vs durabilidad, retraso del fork).`}
 ];
-
 const GLOSSARY = [
-['Redis','Servidor open-source de estructuras de datos en memoria (REmote DIctionary Service). (Architecture Notes)'],
-['Memcached','Caché multi-thread predador de Redis; sin estructuras avanzadas ni persistencia rica. (Architecture Notes)'],
-['RDB','Redis Database: snapshot point-in-time compacto; pérdida entre snapshots. (Architecture Notes)'],
-['AOF','Append Only File: log de writes para replay; más durable, menos compacto. (Architecture Notes)'],
-['fsync','Syscall que fuerza flush de buffers de archivo a disco. (Architecture Notes)'],
-['Replication ID','Identificador de la línea de replicación del primary. (Architecture Notes)'],
-['Offset de replicación','Contador de acciones en el primary; base del sync parcial. (Architecture Notes)'],
-['Sincronización parcial','Réplica recibe comandos faltantes por offset. (Architecture Notes)'],
-['Sincronización completa','Transferencia de RDB + buffer cuando no hay ancestro común. (Architecture Notes)'],
-['Redis Sentinel','Procesos distribuidos: monitor, notify, failover, discovery. (Architecture Notes)'],
-['Quorum','Mínimo de votos para operaciones como failover. (Architecture Notes)'],
-['Redis Cluster','Modo sharded horizontal con 16K hashslots. (Architecture Notes)'],
-['Hashslot','Una de 16384 ranuras; las keys mapean a slots, los slots a shards. (Architecture Notes)'],
-['Sharding','Partir el dataset entre instancias/shards. (Architecture Notes)'],
-['Resharding','Redistribuir slots al añadir/quitar shards. (Architecture Notes)'],
-['Gossiping','Protocolo de rumor entre nodos para salud del cluster. (Architecture Notes)'],
-['Split brain','Partición donde dos lados creen ser primarios. (Architecture Notes)'],
-['Primary','Instancia que acepta writes en una topología HA/Cluster. (Architecture Notes)'],
-['Replica','Copia que sigue al primary (antes secondary). (Architecture Notes)'],
-['Fork','Crear proceso hijo compartiendo memoria inicialmente. (Architecture Notes)'],
-['Copy-on-write','Páginas compartidas hasta escritura; entonces se copian. (Architecture Notes)'],
-['Pub/Sub','Patrón publicación-suscripción soportado por Redis. (Architecture Notes)'],
-['Single-threaded','Modelo de Redis: un hilo de comandos (simplifica estructuras). (Architecture Notes)'],
-['High Availability','Diseño para uptime: sin SPOF, detección y recuperación. (Architecture Notes)'],
-['Data structure server','Descripción canónica de Redis frente a “solo caché”. (Architecture Notes)']
+['Redis (REmote DIctionary Service)','Servidor clave-valor de código abierto; lo más exacto es llamarlo data structure server. Primario como cache en memoria delante de MySQL/PostgreSQL, pero puede ser base primaria. (§ What is Redis?)'],
+['Data structure server','Servidor cuyo valor es una estructura (lista, set, hash...) ya organizada en el servidor, en vez de iterar y ordenar filas. Explica la adopción de Redis. (§ What is Redis?)'],
+['Cache','Copia rápida de datos frecuentes delante de la base real para aliviarla. Datos que cambian poco y se piden mucho, o menos críticos y cambiantes. Ej: sesión, leaderboard. (§ What is Redis?)'],
+['Leaderboard','Tabla de posiciones; caso típico de Redis como cache/analítica en tiempo real donde perder datos no es grave. (§ What is Redis?)'],
+['Primary database','Redis usado como base primaria: requiere HA, persistencia y aceptar que la replicación es asíncrona. Trade-off: velocidad vs durabilidad. (§ What is Redis?)'],
+['Memcached','Cache de Brad Fitzpatrick (2003), seis años anterior a Redis. Multihilo, sin tipos de datos, solo LRU, sin snapshots ni replicación. (§ Memcached)'],
+['LRU','Least Recently Used: política de desalojo que expulsa lo usado menos recientemente; la única de Memcached. (§ Memcached)'],
+['Eviction policy','Regla para decidir qué claves expulsar cuando falta memoria; en Memcached solo LRU. (§ Memcached)'],
+['Single-threaded','Redis ejecuta comandos en un solo hilo: sin locks entre comandos, un núcleo por instancia. Por eso usa fork para persistir. Memcached es multihilo. (§ Memcached)'],
+['Multithreaded','Arquitectura multihilo: la única capacidad de la tabla que tiene Memcached y Redis no. (§ Memcached)'],
+['Pub/Sub','Publish-subscribe: mensajería por canales; capacidad de Redis ausente en Memcached. (§ What is Redis?)'],
+['Lua scripting','Ejecución de scripts Lua en el servidor; capacidad de Redis, no de Memcached. (§ Memcached)'],
+['Geospatial','Soporte de datos geoespaciales; capacidad exclusiva de Redis en la tabla. (§ Memcached)'],
+['Single Redis instance','Despliegue más simple: un solo proceso. Fácil y rápido para cache, pero si cae fallan todas las llamadas (SPOF). (§ Single Redis Instance)'],
+['Persistence','Guardar datos a disco para sobrevivir reinicios: ninguna, RDB, AOF o ambos. Sin ella, un reinicio o failover pierde los datos. (§ Single Redis Instance)'],
+['Replication','Copia de comandos del primario a secundarias vía replica client output buffer; escala lecturas y habilita failover. Es asíncrona. (§ Redis HA)'],
+['Primary (main)','Instancia que recibe escrituras y las replica. El artículo la llama main o primary. (§ Redis HA)'],
+['Replica (secondary)','Instancia que sigue al primario; sirve lecturas y puede ser promovida. (§ Redis HA)'],
+['Replica client output buffer','Buffer del primario donde se encolan copias de los comandos para las secundarias. (§ Redis HA)'],
+['High availability (HA)','Sistema sin punto único de falla, que detecta fallas y se recupera sin perder datos en la transición. Una réplica sola no basta. (§ Redis HA)'],
+['Replication ID','Identificador de la historia de datos de un primario; cambia al promover o reiniciar como primario; permite reconocer ancestro común. (§ Redis Replication)'],
+['Replication offset','Contador que sube con cada acción del primario; junto con el replication ID ubica el punto exacto de replicación. (§ Redis Replication)'],
+['Partial sync','Resincronización barata: la réplica recibe solo los comandos que le faltan cuando ID y offset son reconocibles. (§ Redis Replication)'],
+['Full sync','Resincronización cara: el primario crea un RDB nuevo, lo envía y bufferiza los updates intermedios. Ocurre si no hay acuerdo de ID u offset. (§ Redis Replication)'],
+['Failover','Promoción de una réplica cuando el primario no está disponible; en Sentinel se inicia si un quórum coincide. (§ Redis Sentinel)'],
+['Sentinel','Grupo de procesos que monitorean, notifican, gestionan failover y configuración (descubrimiento del primario). Trade-off: quórum y pérdida de escrituras en particiones. (§ Redis Sentinel)'],
+['Quorum','Mínimo de votos para ejecutar una operación como failover; típico 3 nodos con quórum 2, 5 con 3; impar para romper empates. (§ Redis Sentinel)'],
+['Service discovery','Que el cliente pregunte quién es el primario actual; Sentinel lo hace como Zookeeper o Consul en otros sistemas. (§ Redis Sentinel)'],
+['Network split','Partición de red: el primario viejo puede quedar en la minoría y sus escrituras se pierden al recuperarse el sistema. (§ Redis Sentinel)'],
+['Min replicas to write','Exigir que al menos una secundaria confirme; si no, el primario deja de aceptar escrituras. Reduce pérdida, no la elimina. (§ Redis Sentinel)'],
+['Redis Cluster','Sharding horizontal de Redis: datos repartidos en primarios (shards) con réplicas, 16K hashslots y gossip. (§ Redis Cluster)'],
+['Vertical scaling','Escalar con máquinas más grandes (scale up); tiene techo de hardware (24 TiB de RAM en AWS según el artículo). (§ Redis Cluster)'],
+['Horizontal scaling','Repartir la carga entre muchas máquinas más pequeñas (scale out). (§ Redis Cluster)'],
+['Shard','Cada instancia primaria del clúster, responsable de una parte de los datos. (§ Redis Cluster)'],
+['Algorithmic sharding','Hash determinista de la clave y módulo del número de shards; al cambiar N casi todo se remapea. (§ Redis Cluster)'],
+['Hashslot','Una de las 16K unidades de reparto del clúster; la clave siempre cae en el mismo slot y los shards se mueven slots. (§ Redis Cluster)'],
+['Resharding','Mover hashslots entre primarios al añadir o quitar shards, sin downtime y con mínimo impacto. (§ Redis Cluster)'],
+['Gossip','Los nodos del clúster se comunican constantemente su estado; si suficientes coinciden en que un primario no responde, promueven a su secundaria. (§ Gossiping)'],
+['Split brain','El clúster queda dividido sin poder desempatar cuando ambos lados de una partición son iguales. Evitar con primarios impares + 2 réplicas. (§ Gossiping)'],
+['RDB','Redis Database: snapshots point-in-time a intervalos. Compacto y carga rápida; se pierde lo posterior al último snapshot; usa fork. (§ Redis Persistence Models)'],
+['AOF','Append Only File: registra cada escritura para reproducirla al arrancar. Más durable, más disco, formato no compacto. Gana al RDB al reiniciar si ambos están activos. (§ Redis Persistence Models)'],
+['fsync','Llamada del sistema que fuerza a disco los cambios que solo estaban en cachés; su frecuencia en AOF es configurable. (§ Redis Persistence Models)'],
+['Point-in-time snapshot','Copia consistente de la memoria en un instante, posible gracias a fork + copy-on-write. (§ Forking)'],
+['Fork','El sistema operativo crea un proceso hijo copia del padre (nuevo PID); Redis lo usa para persistir sin bloquear. (§ Forking)'],
+['Copy-on-write','Padre e hijo comparten páginas de memoria; solo se copia una página cuando alguien la modifica. El hijo conserva su vista consistente. (§ Forking)'],
+['Memory page','Unidad de memoria que el kernel referencia; con COW, las páginas modificadas se escriben en páginas nuevas. (§ Forking)'],
+['Deterministic hash','Misma clave, mismo resultado siempre; permite razonar dónde estará una clave al leerla. (§ Redis Cluster)']
 ];
-
 const CHEATSHEET = `
-<div class="card accent-gold"><h3 style="margin-top:0;">Qué es</h3><p style="font-size:14px;"><strong>Data structure server</strong> en memoria. Caché y/o primaria según HA y durabilidad.</p></div>
-<div class="card accent-blue"><h3 style="margin-top:0;">vs Memcached</h3><p style="font-size:14px;">Redis: estructuras + persistencia + réplica + pub/sub. Memcached: multi-thread, LRU simple.</p></div>
-<div class="card accent-purple"><h3 style="margin-top:0;">Topologías</h3><p style="font-size:14px;"><strong>Single</strong> (SPOF) · <strong>HA</strong> (ID+offset) · <strong>Sentinel</strong> (quorum/failover) · <strong>Cluster</strong> (16K slots + gossip).</p></div>
-<div class="card accent-teal"><h3 style="margin-top:0;">Replicación</h3><p style="font-size:14px;">Partial vs full sync. Async → posible pérdida. Mitigar con min replicas ack.</p></div>
-<div class="card accent-orange"><h3 style="margin-top:0;">Sentinel</h3><p style="font-size:14px;">Monitor · notify · failover · discovery. ≥3 nodos, quorum 2. Cuidado split/minoría.</p></div>
-<div class="card accent-gold"><h3 style="margin-top:0;">Cluster</h3><p style="font-size:14px;">16384 hashslots; reshard mueve slots. Gossip; odd primaries + 2 réplicas.</p></div>
-<div class="card accent-pink"><h3 style="margin-top:0;">Persistencia</h3><p style="font-size:14px;">None / RDB / AOF / ambos (restart→AOF). Fork+COW. Speed &gt; consistency guarantees.</p></div>
+<div class="card accent-gold"><h3 style="margin-top:0;">Qué es Redis</h3><p style="font-size:14px;"><strong>RE</strong>mote <strong>DI</strong>ctionary <strong>S</strong>ervice · <strong>data structure server</strong> · cache delante de MySQL/PostgreSQL (sesiones, leaderboards, roll-ups), pero puede ser <strong>base primaria</strong>. Memoria vs SSD/HDD: órdenes de magnitud. Fuente: <em>Architecture Notes / Redis Explained</em> (Mahdi Yusuf, 2022).</p></div>
+<div class="card accent-blue"><h3 style="margin-top:0;">Memcached vs Redis</h3><p style="font-size:14px;">Memcached (Fitzpatrick, 2003): sin tipos, solo <strong>LRU</strong>, <strong>multithreaded</strong>, clúster a mano. Redis (2009): <strong>single-threaded</strong>, estructuras avanzadas, snapshots, replicación, transacciones, Pub/Sub, Lua, geo, clúster out of the box. Empatan: latencia sub-ms, facilidad, partición, lenguajes.</p></div>
+<div class="card accent-teal"><h3 style="margin-top:0;">Single instance</h3><p style="font-size:14px;">Comando → <strong>memoria</strong> → fork periódico → RDB/AOF. Simple, ideal cache (incluso en la misma máquina que la app). <strong>SPOF</strong>: si cae, fallan todas las llamadas. Sin persistencia = datos perdidos en reinicio o failover; con persistencia recarga RDB/AOF a RAM.</p></div>
+<div class="card accent-orange"><h3 style="margin-top:0;">HA: replicación</h3><p style="font-size:14px;">Primario → <strong>replica client output buffer</strong> → réplicas (escalan lecturas + failover). <strong>Replication ID + offset</strong>; mismo ID y offset = mismos datos. <strong>Partial sync</strong> = comandos faltantes. <strong>Full sync</strong> = RDB nuevo + buffer. Promoción: nuevo ID, recuerda el viejo. Replicación asíncrona.</p></div>
+<div class="card accent-purple"><h3 style="margin-top:0;">Sentinel</h3><p style="font-size:14px;">Monitoring · Notification · Failover · Configuration (discovery). <strong>Quórum</strong>: 3 nodos/2, 5/3; impar. Mín. 3 sentinels, quórum 2; junto a cada app server. Riesgos: perder quórum, <strong>escrituras de la minoría perdidas</strong>, topología de red desalineada. Mitigar: exigir ≥1 réplica (el primario deja de aceptar si no confirma).</p></div>
+<div class="card accent-pink"><h3 style="margin-top:0;">Cluster</h3><p style="font-size:14px;">Scale out (24 TiB RAM máx. por server). <strong>Shard</strong> = primario. hash mod N → resharding caro. <strong>16K hashslots</strong>: clave→slot fijo; mover slots. 2 shards 0-8191 / 8192-16383; 3 shards 0-5460 / 5461-10922 / 10923-16383. <strong>Gossip</strong> para salud y promoción; <strong>split brain</strong>: primarios impares + 2 réplicas c/u.</p></div>
+<div class="card accent-gold"><h3 style="margin-top:0;">Persistencia</h3><p style="font-size:14px;"><strong>Ninguna</strong>: más rápida, sin durabilidad. <strong>RDB</strong>: snapshots, compacto, carga rápida, pierde entre snapshots, fork. <strong>AOF</strong>: log de escrituras, más durable, más disco, <strong>fsync</strong> configurable. <strong>Ambos</strong>: al reiniciar manda AOF. <strong>Fork + copy-on-write</strong>: páginas compartidas, solo se copian las modificadas; snapshot consistente casi gratis. "Consistency comes second to speed".</p></div>
 `;
-
 /* ---- Glossary tip bubbles ---- */
 function buildTipIndex(){
   const map = new Map();
@@ -688,18 +822,33 @@ function buildTipIndex(){
     }
   });
   const aliases = {
-    'redis':'Redis', 'rdb':'RDB', 'aof':'AOF',
-    'sentinel':'Redis Sentinel', 'redis sentinel':'Redis Sentinel',
-    'redis cluster':'Redis Cluster', 'cluster':'Redis Cluster',
-    'hashslot':'Hashslot', 'hashslots':'Hashslot', 'hash slot':'Hashslot',
-    'replication id':'Replication ID', 'offset':'Offset de replicación',
-    'quorum':'Quorum', 'gossip':'Gossiping', 'gossiping':'Gossiping',
-    'split brain':'Split brain', 'fork':'Fork', 'copy-on-write':'Copy-on-write', 'cow':'Copy-on-write',
-    'fsync':'fsync', 'memcached':'Memcached',
-    'primary':'Primary', 'replica':'Replica', 'secondary':'Replica',
-    'partial sync':'Sincronización parcial', 'full sync':'Sincronización completa',
-    'sharding':'Sharding', 'resharding':'Resharding',
-    'data structure server':'Data structure server', 'pub/sub':'Pub/Sub', 'pubsub':'Pub/Sub'
+    'data structure server':'Data structure server',
+    'cache':'Cache', 'caches':'Cache', 'caché':'Cache', 'leaderboard':'Leaderboard', 'leaderboards':'Leaderboard',
+    'primary database':'Primary database', 'base primaria':'Primary database',
+    'memcached':'Memcached', 'lru':'LRU', 'eviction':'Eviction policy', 'eviction policy':'Eviction policy',
+    'single-threaded':'Single-threaded', 'un solo hilo':'Single-threaded', 'multithreaded':'Multithreaded', 'multihilo':'Multithreaded',
+    'pub/sub':'Pub/Sub', 'lua scripting':'Lua scripting', 'geospatial':'Geospatial',
+    'single redis instance':'Single Redis instance', 'instancia única':'Single Redis instance',
+    'persistence':'Persistence', 'persistencia':'Persistence',
+    'replication':'Replication', 'replicación':'Replication', 'replicacion':'Replication',
+    'primary':'Primary (main)', 'primario':'Primary (main)', 'main instance':'Primary (main)',
+    'replica':'Replica (secondary)', 'replicas':'Replica (secondary)', 'réplica':'Replica (secondary)', 'réplicas':'Replica (secondary)', 'secondary':'Replica (secondary)', 'secundaria':'Replica (secondary)', 'secundarias':'Replica (secondary)',
+    'replica client output buffer':'Replica client output buffer',
+    'high availability':'High availability (HA)', 'alta disponibilidad':'High availability (HA)',
+    'replication id':'Replication ID', 'replication offset':'Replication offset', 'offset':'Replication offset',
+    'partial sync':'Partial sync', 'partial synchronization':'Partial sync', 'full sync':'Full sync', 'full synchronization':'Full sync',
+    'failover':'Failover', 'sentinel':'Sentinel', 'sentinels':'Sentinel',
+    'quorum':'Quorum', 'quórum':'Quorum', 'service discovery':'Service discovery',
+    'network split':'Network split', 'partición de red':'Network split',
+    'min replicas to write':'Min replicas to write',
+    'redis cluster':'Redis Cluster', 'vertical scaling':'Vertical scaling', 'horizontal scaling':'Horizontal scaling',
+    'shard':'Shard', 'shards':'Shard', 'sharding':'Algorithmic sharding', 'algorithmic sharding':'Algorithmic sharding',
+    'hashslot':'Hashslot', 'hashslots':'Hashslot', 'hash slot':'Hashslot', 'hash slots':'Hashslot',
+    'resharding':'Resharding', 'reshard':'Resharding', 'gossip':'Gossip', 'gossiping':'Gossip',
+    'split brain':'Split brain', 'deterministic hash':'Deterministic hash',
+    'rdb':'RDB', 'aof':'AOF', 'fsync':'fsync',
+    'point-in-time':'Point-in-time snapshot', 'snapshot':'Point-in-time snapshot', 'snapshots':'Point-in-time snapshot',
+    'fork':'Fork', 'forking':'Fork', 'copy-on-write':'Copy-on-write', 'memory page':'Memory page'
   };
   Object.keys(aliases).forEach(function(a){
     const canon = aliases[a];
@@ -808,15 +957,15 @@ function prepareShuffledMCQ(opts,correctIndex,seedKey){ const indices=opts.map((
 function shuffledQuizItem(qi){ const q=QUIZ[qi]; return prepareShuffledMCQ(q.opts,q.a,PAPER_SHUFFLE_ID+'|quiz|'+qi); }
 function shuffledMini(m){ return prepareShuffledMCQ(m.mini.opts,m.mini.a,PAPER_SHUFFLE_ID+'|mini|'+m.id); }
 const MODULE_ANIMS = {
-  m2: [{id:'anim-single', label:'Instancia única + persistencia'}],
-  m3: [{id:'anim-ha', label:'HA / replicación'}],
-  m4: [{id:'anim-sentinel', label:'Sentinel + quorum'}],
-  m5: [{id:'anim-cluster', label:'Cluster hashslots'}],
-  m6: [{id:'anim-fork', label:'Fork + copy-on-write'}]
+  m2: [{id:'anim-single', label:'Comando → memoria → fork'}],
+  m3: [{id:'anim-ha', label:'Replicación offset / sync'}],
+  m4: [{id:'anim-sentinel', label:'Sentinel: quórum y failover'}],
+  m5: [{id:'anim-cluster', label:'Hashslots y reshard'}],
+  m6: [{id:'anim-fork', label:'Fork + copy-on-write'}, {id:'anim-single', label:'Persistencia en instancia única'}]
 };
 const QUIZ_MODULE_HINT = {
-  'Intro':'m0', 'Memcached':'m1', 'Single':'m2', 'HA':'m3', 'Replicación':'m3',
-  'Sentinel':'m4', 'Cluster':'m5', 'Persistencia':'m6', 'trade-off':'m6', 'Fork':'m6'
+  'trade-off':'m3', 'Fundamentos':'m0', 'Memcached':'m1', 'Single':'m2', 'HA':'m3',
+  'Sentinel':'m4', 'Cluster':'m5', 'Persistencia':'m6'
 };
 
 function loadJSON(key, fallback){
@@ -1246,7 +1395,7 @@ const quiz = {
       rem.innerHTML = '<p style="margin:0 0 8px;"><strong>Falladas ('+wrongNow.length+'):</strong></p>' +
         wrongNow.map(qi=>{
           const tag = QUIZ[qi].tag;
-          const mid = QUIZ_MODULE_HINT[tag] || 'm5';
+          const mid = QUIZ[qi].mod || QUIZ_MODULE_HINT[tag] || 'm0';
           return '<a href="#q'+qi+'" onclick="event.preventDefault(); const el=document.getElementById(\'q'+qi+'\'); if(el) el.scrollIntoView({behavior:\'smooth\'});">#'+(qi+1)+' '+tag+'</a>' +
             ' <button type="button" class="linklike" style="padding:0;font-size:12.5px;" onclick="goModule(\''+mid+'\')">→ '+mid+'</button>';
         }).join('<br>');
@@ -1328,7 +1477,6 @@ $('#cheatsheetContent').innerHTML = CHEATSHEET;
 $('#continueBtn').addEventListener('click', resumeStudy);
 
 let animsRendered = false;
-function initAnims(){ if(animsRendered) return; animsRendered=true; animSingle.init(); animHA.init(); animSentinel.init(); animCluster.init(); animFork.init(); }
 
 function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
 const NODE={w:132,h:44,rx:10};
@@ -1395,199 +1543,151 @@ function glowIdx(svg, idxs){
 function flowOn(svg, on){
   svg.querySelectorAll('path').forEach(function(p){ const d=p.getAttribute('d')||''; if(d.length<30) return; if(on) p.classList.add('flow'); else p.classList.remove('flow'); });
 }
-const animSingle = { idx:0, timer:null, playing:false,
-steps:[
-  '<b>Paso 1/4 · Cliente → Redis.</b> Un solo proceso recibe el comando (GET/SET). Single-threaded: un comando a la vez.',
-  '<b>Paso 2/4 · Memoria primero.</b> El cambio vive en RAM. Sin persistencia, un reinicio lo borra.',
-  '<b>Paso 3/4 · Fork.</b> Si hay RDB/AOF, Redis hace fork: el hijo escribe a disco mientras el padre sigue sirviendo.',
-  '<b>Paso 4/4 · SPOF.</b> Si esta instancia cae, fallan todas las llamadas. ✓'
-],
-titles:['1/4 cliente','2/4 memoria','3/4 fork','4/4 SPOF ✓'],
-init(){ this.svg=$('#svgGraph'); svgDefs(this.svg);
-  this.ch=animChrome('svgGraph',4,'Pulsa <b>Reproducir</b>: instancia única + persistencia.');
-  this.playBtn=document.querySelector('[onclick="animSingle.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
-  this.cap=$('#graphCaption'); this.draw();
-  animSetUI(this.ch,this.playBtn,'idle',0,4,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
-draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
-  s.appendChild(nodeBox(120,160,'cliente',cGold,cGold));
-  s.appendChild(nodeBox(360,160,'Redis (RAM)',cBlue,cBlue));
-  s.appendChild(nodeBox(600,80,'hijo fork',cTeal,cTeal));
-  s.appendChild(nodeBox(600,240,'disco RDB/AOF',cOrange,cOrange));
-  arrow(s,178,160,302,160,cGold,'comando');
-  arrow(s,420,140,542,100,cTeal,'fork');
-  arrow(s,600,102,600,218,cOrange,'escribe');
-},
-advance(manual){ if(this.idx>=this.steps.length) return;
-  const s=this.steps[this.idx];
-  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,4,s,this.cap,s);
-  glowIdx(this.svg,[[0,1],[1],[1,2],[0,1,2,3]][this.idx]); svgCap(this.svg,this.titles[this.idx],320); flowOn(this.svg,this.playing&&!manual);
-  this.idx++;
-  if(this.idx>=this.steps.length) this.finish(); },
-play(){ if(this.playing){ this.pause(); return; }
-  if(this.idx>=this.steps.length) this.reset();
-  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,4); flowOn(this.svg,true);
-  const self=this; this.timer=setInterval(function(){ self.advance(false); },1400); },
-pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,4); },
-step(){ if(this.playing) this.pause(); this.advance(true); },
-finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
-  animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ Single instance.</b> Rápido y simple; SPOF si no hay HA.',this.cap,'Instancia única: memoria → fork → disco.'); },
-reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>Reproducir</b>: instancia única + persistencia.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+function bx(s,x,y,w,h,label,color,on,sub,dashed){ const g=el('g',{}); const r=el('rect',{x:x-w/2,y:y-h/2,width:w,height:h,rx:8,fill:color,'fill-opacity':on?0.32:0.12,stroke:color,'stroke-width':on?2.6:1.2}); if(dashed) r.setAttribute('stroke-dasharray','5 4'); g.appendChild(r); const t=el('text',{x:x,y:y+(sub?-3:4),'text-anchor':'middle',class:'tnode'}); t.textContent=label; g.append(t); if(sub){ const u=el('text',{x:x,y:y+13,'text-anchor':'middle',class:'tedge'}); u.textContent=sub; g.append(u); } s.appendChild(g); return g; }
+function lbl(s,x,y,str,color){ const t=el('text',{x:x,y:y,'text-anchor':'middle',class:'tedge'}); if(color) t.style.fill=color; t.textContent=str; s.appendChild(t); return t; }
+function makeStepAnim(cfg){
+  return { idx:0, timer:null, playing:false,
+  init(){ this.svg=document.getElementById(cfg.svgId); this.ch=animChrome(cfg.svgId,cfg.total,cfg.idle); this.playBtn=document.querySelector('[onclick="'+cfg.name+'.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML; this.cap=document.getElementById(cfg.capId); if(cfg.bind) cfg.bind(this); this.reset(); },
+  steps(){ return cfg.steps(); },
+  draw(i){ this.svg.innerHTML=''; cfg.draw(this.svg,i); },
+  show(i,state){ const st=this.steps()[i]; this.draw(i); svgCap(this.svg,st.t,cfg.h-12); animSetUI(this.ch,this.playBtn,state,i+1,cfg.total,st.n,this.cap,st.c); },
+  refresh(){ if(this.idx===0){ this.draw(-1); return; } const n=this.steps().length; const i=this.idx-1; this.show(i,this.idx>=n?'done':(this.playing?'playing':'paused')); if(this.idx>=n) this.finish(true); },
+  advance(manual){ const n=this.steps().length; if(this.idx>=n) return; this.show(this.idx,(this.playing&&!manual)?'playing':'paused'); flowOn(this.svg,this.playing&&!manual); this.idx++; if(this.idx>=n) this.finish(); },
+  play(){ if(this.playing){ this.pause(); return; } if(this.idx>=this.steps().length) this.reset(); this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,cfg.total); flowOn(this.svg,true); const self=this; this.timer=setInterval(function(){ self.advance(false); },cfg.ms||1700); },
+  pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,cfg.total); },
+  step(){ if(this.playing) this.pause(); this.advance(true); },
+  finish(keepFlow){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false); const st=this.steps()[this.steps().length-1]; animSetUI(this.ch,this.playBtn,'done',cfg.total,cfg.total,st.n+'<br>'+cfg.done(),this.cap,st.c); },
+  reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(-1); animSetUI(this.ch,this.playBtn,'idle',0,cfg.total,cfg.idle,this.cap,cfg.idleCap); } };
+}
+function chk(id){ const e=document.getElementById(id); return e?e.checked:true; }
+function val(id,d){ const e=document.getElementById(id); return e?e.value:d; }
 
-const animHA = { idx:0, timer:null, playing:false,
-steps:[
-  '<b>Paso 1/5 · Primary.</b> Tiene replication ID + offset. Cada write avanza el offset.',
-  '<b>Paso 2/5 · Réplica online.</b> Misma línea de ID: pide sync parcial (comandos faltantes).',
-  '<b>Paso 3/5 · Réplica offline larga.</b> Sin ancestro común → full sync: RDB + buffer.',
-  '<b>Paso 4/5 · Async.</b> El primary no espera ack: posible pérdida de writes recientes al failover.',
-  '<b>Paso 5/5 · Promoción.</b> La réplica promovida obtiene nuevo replication ID (recuerda el anterior). ✓'
-],
-titles:['1/5 primary','2/5 partial','3/5 full','4/5 async','5/5 promote ✓'],
-init(){ this.svg=$('#svgCheck'); svgDefs(this.svg);
-  this.ch=animChrome('svgCheck',5,'Pulsa <b>Reproducir</b>: HA / replicación.');
-  this.playBtn=document.querySelector('[onclick="animHA.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
-  this.cap=$('#checkCaption'); this.draw();
-  animSetUI(this.ch,this.playBtn,'idle',0,5,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
-draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
-  s.appendChild(nodeBox(200,140,'primary',cBlue,cBlue));
-  s.appendChild(nodeBox(520,80,'réplica A',cTeal,cTeal));
-  s.appendChild(nodeBox(520,220,'réplica B',cTeal,cTeal));
-  arrow(s,258,120,462,90,cTeal,'repl stream');
-  arrow(s,258,160,462,220,cTeal,'repl stream');
-  const t=el('text',{x:200,y:220,'text-anchor':'middle',class:'tedge'}); t.textContent='ID + offset'; s.append(t);
-},
-advance(manual){ if(this.idx>=this.steps.length) return;
-  const s=this.steps[this.idx];
-  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,5,s,this.cap,s);
-  glowIdx(this.svg,[[0],[0,1],[0,2],[0,1,2],[1]][this.idx]); svgCap(this.svg,this.titles[this.idx],330); flowOn(this.svg,this.playing&&!manual);
-  this.idx++;
-  if(this.idx>=this.steps.length) this.finish(); },
-play(){ if(this.playing){ this.pause(); return; }
-  if(this.idx>=this.steps.length) this.reset();
-  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,5); flowOn(this.svg,true);
-  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
-pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,5); },
-step(){ if(this.playing) this.pause(); this.advance(true); },
-finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
-  animSetUI(this.ch,this.playBtn,'done',5,5,'<b>✓ HA.</b> Partial vs full sync; writes async → ventana de pérdida.',this.cap,'HA: ID + offset · partial/full · promote.'); },
-reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,5,'Pulsa <b>Reproducir</b>: HA / replicación.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+/* 1 · Single instance: comando -> memoria -> fork -> RDB/AOF */
+const animSingle = makeStepAnim({ name:'animSingle', svgId:'svgSingle', capId:'singleCaption', total:5, h:330,
+idle:'Pulsa <b>Reproducir</b> o avanza con <b>Siguiente paso</b>. Prueba apagar la persistencia con el interruptor.', idleCap:'Pulsa "Siguiente paso" o "Reproducir".',
+bind:function(a){ document.getElementById('persistToggle').onchange=function(){ a.refresh(); }; },
+steps:function(){ const P=chk('persistToggle'); return [
+ {n:'<b>Paso 1/5 · Comando.</b> El cliente envía <code>SET foo bar</code> al único proceso de Redis.', t:'Paso 1/5 · el comando llega a Redis', c:'El cliente envía SET foo bar.'},
+ {n:'<b>Paso 2/5 · Memoria.</b> "Commands sent to Redis are first processed in memory": <b>foo = bar</b> vive en RAM (latencia de memoria, no de disco).', t:'Paso 2/5 · se procesa en memoria', c:'foo = bar queda en RAM.'},
+ {n:'<b>Paso 3/5 · Respuesta.</b> Redis responde <b>OK</b> sin esperar al disco: la persistencia es asíncrona respecto al comando.', t:'Paso 3/5 · respuesta al cliente', c:'OK al cliente; el disco va por otro camino.'},
+ P?{n:'<b>Paso 4/5 · Fork.</b> Con persistencia configurada, "a forked process on some interval" se crea como <b>proceso hijo</b> (módulo 6: copy-on-write).', t:'Paso 4/5 · fork del proceso hijo', c:'Se crea el hijo por fork.'}
+  :{n:'<b>Paso 4/5 · Sin persistencia.</b> No hay fork ni escritura: lo único que existe es la RAM.', t:'Paso 4/5 · sin persistencia', c:'No hay fork: todo vive solo en RAM.'},
+ P?{n:'<b>Paso 5/5 · RDB / AOF.</b> El hijo escribe el snapshot <b>RDB</b> (o se añade al <b>AOF</b>) mientras el padre sigue atendiendo. Tras un reinicio se recarga a memoria.', t:'Paso 5/5 · RDB/AOF a disco', c:'El hijo escribe a disco.'}
+  :{n:'<b>Paso 5/5 · Reinicio.</b> "If Redis isn\'t set up to persist data, data is lost in case of a restart or failover": la instancia arranca <b>vacía</b>.', t:'Paso 5/5 · reinicio = RAM vacía', c:'Sin persistencia, los datos se pierden.'} ]; },
+done:function(){ return chk('persistToggle')?'<b>✓ Flujo completo.</b> Comando en RAM, respuesta rápida y persistencia por fork en segundo plano.':'<b>✓ Flujo completo.</b> Máxima velocidad, cero durabilidad: un reinicio o failover borra los datos.'; },
+draw:function(s,i){ const P=chk('persistToggle');
+ bx(s,90,90,120,56,'cliente',cGold,i===0||i===2);
+ bx(s,330,90,200,80,'Redis (hilo único)',cBlue,i===1,i>=1?'RAM: foo = bar':'RAM: (vacía)');
+ if(P&&i>=3) bx(s,330,230,200,54,'hijo (fork)',cOrange,i===3||i===4,'comparte memoria (COW)');
+ bx(s,590,230,150,64,'disco',P?cPurple:cDim,P&&i===4,P?'dump.rdb / appendonly.aof':'sin persistencia',!P);
+ if(i===0) arrow(s,150,85,230,85,cGold,'SET foo bar');
+ if(i===2) arrow(s,230,105,150,105,cTeal,'OK');
+ if(P&&i===3) arrow(s,330,130,330,203,cOrange,'fork');
+ if(P&&i===4) arrow(s,430,230,515,230,cPurple,'escribe');
+ if(!P&&i>=3) lbl(s,590,175,'nada va a disco',cBad);
+ if(!P&&i===4) lbl(s,330,230,'reinicio = RAM vacía',cBad);
+ if(P&&i===4) lbl(s,590,285,'al reiniciar: recarga a RAM',cDim); } });
 
-const animSentinel = { idx:0, timer:null, playing:false,
-steps:[
-  '<b>Paso 1/5 · Monitor.</b> Varios procesos Sentinel vigilan el primary (ping).',
-  '<b>Paso 2/5 · Sospecha.</b> Un Sentinel deja de ver al primary y propone “subjectively down”.',
-  '<b>Paso 3/5 · Quorum.</b> Si ≥ quorum (ej. 2 de 3) están de acuerdo → objectively down.',
-  '<b>Paso 4/5 · Failover.</b> Eligen una réplica y la promueven a primary.',
-  '<b>Paso 5/5 · Discovery.</b> Clientes preguntan a Sentinel quién es el primary actual. ✓'
-],
-titles:['1/5 monitor','2/5 SDOWN','3/5 quorum','4/5 failover','5/5 discovery ✓'],
-init(){ this.svg=$('#svgEnemy'); svgDefs(this.svg);
-  this.ch=animChrome('svgEnemy',5,'Pulsa <b>Reproducir</b>: Sentinel + quorum.');
-  this.playBtn=document.querySelector('[onclick="animSentinel.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
-  this.cap=$('#enemyCaption'); this.draw();
-  animSetUI(this.ch,this.playBtn,'idle',0,5,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
-draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
-  s.appendChild(nodeBox(360,50,'primary',cBlue,cBlue));
-  s.appendChild(nodeBox(140,180,'Sentinel 1',cOrange,cOrange));
-  s.appendChild(nodeBox(360,180,'Sentinel 2',cOrange,cOrange));
-  s.appendChild(nodeBox(580,180,'Sentinel 3',cOrange,cOrange));
-  s.appendChild(nodeBox(360,280,'réplica → new primary',cTeal,cTeal));
-  arrow(s,200,160,320,72,cDim,'ping');
-  arrow(s,360,158,360,72,cDim,'ping');
-  arrow(s,520,160,400,72,cDim,'ping');
-},
-advance(manual){ if(this.idx>=this.steps.length) return;
-  const s=this.steps[this.idx];
-  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,5,s,this.cap,s);
-  glowIdx(this.svg,[[1,2,3],[1],[1,2],[4],[1,2,3]][this.idx]); svgCap(this.svg,this.titles[this.idx],310); flowOn(this.svg,this.playing&&!manual);
-  this.idx++;
-  if(this.idx>=this.steps.length) this.finish(); },
-play(){ if(this.playing){ this.pause(); return; }
-  if(this.idx>=this.steps.length) this.reset();
-  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,5); flowOn(this.svg,true);
-  const self=this; this.timer=setInterval(function(){ self.advance(false); },1400); },
-pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,5); },
-step(){ if(this.playing) this.pause(); this.advance(true); },
-finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
-  animSetUI(this.ch,this.playBtn,'done',5,5,'<b>✓ Sentinel.</b> Monitor · quorum · failover · discovery. ≥3 nodos, quorum 2.',this.cap,'Sentinel: votos → promote → clients.'); },
-reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,5,'Pulsa <b>Reproducir</b>: Sentinel + quorum.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+/* 2 · HA: replication ID + offset, partial vs full sync, promotion */
+const animHa = makeStepAnim({ name:'animHa', svgId:'svgHa', capId:'haCaption', total:5, h:330,
+idle:'Pulsa <b>Reproducir</b> o avanza con <b>Siguiente paso</b>. Cambia el escenario de la réplica que reconecta: <b>mismo ID</b> o <b>ID desconocido</b>.', idleCap:'Pulsa "Siguiente paso" o "Reproducir".',
+bind:function(a){ document.getElementById('haScenario').onchange=function(){ a.refresh(); }; },
+steps:function(){ const full=val('haScenario','partial')==='full'; return [
+ {n:'<b>Paso 1/5 · Escritura.</b> El primario aplica el comando y sube su <b>offset</b> (100 → 101). Copia el comando al <b>replica client output buffer</b>.', t:'Paso 1/5 · el offset del primario sube', c:'Primario: replId A1, offset 101.'},
+ {n:'<b>Paso 2/5 · Réplica 1.</b> Recibe el comando y reproduce: mismo ID y mismo offset (101) = <b>mismos datos</b>. La Réplica 2 está desconectada en offset 100.', t:'Paso 2/5 · Réplica 1 al día', c:'Réplica 1: A1/101. Réplica 2 desconectada: 100.'},
+ full?{n:'<b>Paso 3/5 · Reconexión (ID desconocido).</b> La Réplica 2 se presenta con un replication ID que el primario no reconoce (Z9): "the replica will then request a <b>full synchronization</b>".', t:'Paso 3/5 · ID desconocido: pide full sync', c:'Réplica 2 reporta replId Z9 (desconocido).'}
+  :{n:'<b>Paso 3/5 · Reconexión (mismo ID).</b> La Réplica 2 reporta replId A1, offset 100. El primario ya está en 103 y aún conserva esos comandos: "just a few offsets behind".', t:'Paso 3/5 · mismo ID, offset conocido: partial', c:'Réplica 2 reporta A1/100; primario en 103.'},
+ full?{n:'<b>Paso 4/5 · Full sync.</b> El primario crea un <b>RDB nuevo</b> y lo envía; mientras tanto <b>bufferiza</b> los updates entre el corte del snapshot y el offset actual. Es la ruta cara.', t:'Paso 4/5 · RDB + buffer de updates', c:'RDB nuevo + buffer hacia la Réplica 2.'}
+  :{n:'<b>Paso 4/5 · Partial sync.</b> El primario envía solo los comandos 101 a 103; la réplica los reproduce hasta quedar en 103. Ruta barata.', t:'Paso 4/5 · se envían solo 101..103', c:'Solo se transfiere el delta.'},
+ {n:'<b>Paso 5/5 · Promoción.</b> Cae el primario y se promueve la Réplica 1: recibe un <b>nuevo replication ID</b> (B7) pero <b>recuerda A1</b>, así que las otras secundarias pueden hacer <b>partial sync</b> con ella.', t:'Paso 5/5 · promoción: nuevo ID, recuerda el anterior', c:'Réplica 1 pasa a primario (B7, prev A1).'} ]; },
+done:function(){ return val('haScenario','partial')==='full'?'<b>✓ Resumen.</b> ID u offset desconocido ⇒ full sync (snapshot + buffer). Promover genera nuevo ID y recuerda el viejo.':'<b>✓ Resumen.</b> ID conocido + offset disponible ⇒ partial sync barato. Promover genera nuevo ID y recuerda el viejo.'; },
+draw:function(s,i){ const full=val('haScenario','partial')==='full'; const dead=i>=4;
+ const off=i<0?100:(i===0||i===1)?101:103;
+ bx(s,130,150,170,70,'Primario',dead?cDim:cBlue,i===0,'replId A1 · offset '+off,dead);
+ if(dead) lbl(s,130,205,'caído',cBad);
+ bx(s,520,70,200,60,dead?'Réplica 1 = nuevo primario':'Réplica 1',dead?cTeal:cTeal,i===1||i===4,dead?'replId B7 (prev A1)':(i>=1?'A1 · offset 101':'A1 · offset 100'));
+ const r2sub=i<2?'desconectada · offset 100':(full?'replId Z9 · desconocido':'A1 · offset 100'); const r2fin=(i===3)?(full?'recibe RDB + buffer':'→ offset 103'):r2sub;
+ bx(s,520,240,200,60,'Réplica 2',full&&i>=2?cOrange:cPurple,i===2||i===3,i>=4?'offset 103 (al día)':r2fin,i<2);
+ if(i===0) lbl(s,330,100,'comando → replica client output buffer',cDim);
+ if(i===0||i===1) arrow(s,215,135,420,75,cBlue,'');
+ if(i===2) { arrow(s,420,235,215,165,cOrange,full?'¿Z9, ?':'A1, offset 100'); lbl(s,330,205,full?'primario: ID desconocido':'primario: ID ok, offset en buffer',cDim); }
+ if(i===3&&!full) arrow(s,215,165,420,235,cBlue,'comandos 101..103');
+ if(i===3&&full){ bx(s,330,290,170,36,'RDB nuevo + buffer',cOrange,true); arrow(s,215,170,250,290,cOrange,''); arrow(s,415,290,420,255,cOrange,'full sync'); }
+ if(i===4) { arrow(s,520,105,520,205,cTeal,'otras réplicas: partial sync'); } } });
 
-const animCluster = { idx:0, timer:null, playing:false,
-steps:[
-  '<b>Paso 1/5 · 16K slots.</b> El keyspace se divide en 16384 hashslots (no “hash % N nodos”).',
-  '<b>Paso 2/5 · Mapeo.</b> clave → CRC16 → slot → nodo (M1 tiene 0–8191, M2 8192–16383).',
-  '<b>Paso 3/5 · Añadir M3.</b> Se migran rangos de slots a M3; las keys no se rehashean una a una.',
-  '<b>Paso 4/5 · Gossip.</b> Los nodos comparten salud del cluster; mal configurado → split brain.',
-  '<b>Paso 5/5 · Regla.</b> Primarios impares + 2 réplicas c/u mitigan particiones. ✓'
-],
-titles:['1/5 16K','2/5 map','3/5 reshard','4/5 gossip','5/5 odd ✓'],
-init(){ this.svg=$('#svgZookie'); svgDefs(this.svg);
-  this.ch=animChrome('svgZookie',5,'Pulsa <b>Reproducir</b>: Cluster hashslots.');
-  this.playBtn=document.querySelector('[onclick="animCluster.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
-  this.cap=$('#zookieCaption'); this.draw(false);
-  animSetUI(this.ch,this.playBtn,'idle',0,5,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
-draw(withM3){ const s=this.svg; s.innerHTML=''; svgDefs(s);
-  s.appendChild(nodeBox(160,140,'M1 slots',cBlue,cBlue));
-  s.appendChild(nodeBox(360,140,'M2 slots',cTeal,cTeal));
-  if(withM3) s.appendChild(nodeBox(560,140,'M3 slots',cOrange,cOrange));
-  else s.appendChild(nodeBox(560,140,'(vacío)',cDim,cDim));
-  const t=el('text',{x:360,y:60,'text-anchor':'middle',class:'tnode'}); t.textContent='16384 hashslots'; s.append(t);
-  const t2=el('text',{x:360,y:250,'text-anchor':'middle',class:'tedge'}); t2.textContent=withM3?'slots migrados a M3':'clave → slot → shard'; s.append(t2);
-},
-advance(manual){ if(this.idx>=this.steps.length) return;
-  const s=this.steps[this.idx];
-  if(this.idx>=2) this.draw(true); else this.draw(false);
-  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,5,s,this.cap,s);
-  glowIdx(this.svg,[[0,1],[0],[0,1,2],[0,1,2],[0,1,2]][this.idx]); svgCap(this.svg,this.titles[this.idx],300); flowOn(this.svg,this.playing&&!manual);
-  this.idx++;
-  if(this.idx>=this.steps.length) this.finish(); },
-play(){ if(this.playing){ this.pause(); return; }
-  if(this.idx>=this.steps.length) this.reset();
-  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,5); flowOn(this.svg,true);
-  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
-pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,5); },
-step(){ if(this.playing) this.pause(); this.advance(true); },
-finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false); this.draw(true);
-  animSetUI(this.ch,this.playBtn,'done',5,5,'<b>✓ Cluster.</b> Reshard = mover slots. Gossip + odd primaries.',this.cap,'Cluster: 16K slots · reshard · gossip.'); },
-reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(false); animSetUI(this.ch,this.playBtn,'idle',0,5,'Pulsa <b>Reproducir</b>: Cluster hashslots.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+/* 3 · Sentinel: quorum failover */
+const animSentinel = makeStepAnim({ name:'animSentinel', svgId:'svgSentinel', capId:'sentinelCaption', total:5, h:330,
+idle:'Pulsa <b>Reproducir</b> o avanza con <b>Siguiente paso</b>. Ajusta cuántos sentinels ven caído al primario: el quórum es <b>2 de 3</b>.', idleCap:'Pulsa "Siguiente paso" o "Reproducir".',
+bind:function(a){ const r=document.getElementById('sentVotes'); r.oninput=function(){ document.getElementById('sentVotesLbl').textContent=r.value+' de 3'; a.refresh(); }; },
+steps:function(){ const n=parseInt(val('sentVotes','3'),10); const ok=n>=2; return [
+ {n:'<b>Paso 1/5 · Monitoreo.</b> Tres sentinels vigilan al primario y a la réplica ("monitoring"): todos responden.', t:'Paso 1/5 · monitoring', c:'Los 3 sentinels ven al primario vivo.'},
+ {n:'<b>Paso 2/5 · Falla.</b> El primario deja de responder. Cada sentinel que no lo alcanza lo marca como caído <i>desde su punto de vista</i>.', t:'Paso 2/5 · el primario no responde', c:'El primario no responde.'},
+ {n:'<b>Paso 3/5 · Votos.</b> '+n+' de 3 sentinels coinciden en que el primario cayó. Quórum requerido: <b>2</b>. '+(ok?'Se alcanza el acuerdo.':'<b>No se alcanza</b>: un sentinel aislado no basta.'), t:'Paso 3/5 · votos '+n+'/3 vs quórum 2', c:'Votos '+n+'/3 vs quórum 2.'},
+ ok?{n:'<b>Paso 4/5 · Failover.</b> Con quórum, los sentinels inician el failover y <b>promueven la réplica</b> a primario ("failover management").', t:'Paso 4/5 · se promueve la réplica', c:'La réplica se promueve a primario.'}
+  :{n:'<b>Paso 4/5 · Sin quórum.</b> No hay failover: evita un cambio de primario por una vista de red incorrecta, pero mientras tanto <b>no hay primario</b>.', t:'Paso 4/5 · sin quórum, sin failover', c:'Sin quórum: no se promueve a nadie.'},
+ ok?{n:'<b>Paso 5/5 · Configuración.</b> Los clientes preguntan a Sentinel quién es el primario (service discovery). Ojo: escrituras del primario viejo aún no replicadas, o hechas en una minoría aislada, <b>se pierden</b> (replicación asíncrona).', t:'Paso 5/5 · discovery + posible pérdida', c:'Clientes descubren al nuevo primario.'}
+  :{n:'<b>Paso 5/5 · Estado.</b> Sin quórum los clientes siguen sin primario operativo. Mitigación para el futuro: más sentinels (impares) y exigir ≥1 réplica para aceptar escrituras.', t:'Paso 5/5 · sistema sin primario', c:'Sistema sin primario hasta restablecer quórum.'} ]; },
+done:function(){ const n=parseInt(val('sentVotes','3'),10); return n>=2?'<b>✓ Resumen.</b> Quórum alcanzado ⇒ failover y descubrimiento del nuevo primario; las escrituras no replicadas se pierden.':'<b>✓ Resumen.</b> Sin quórum no hay failover: por eso se recomiendan al menos 3 sentinels con quórum 2.'; },
+draw:function(s,i){ const n=parseInt(val('sentVotes','3'),10); const ok=n>=2; const down=i>=1; const prom=ok&&i>=3;
+ for(let k=0;k<3;k++){ const x=150+k*210; const sees=(i>=2)?(k<n):(i===1?true:false); const col=(i>=2)?(k<n?cOrange:cTeal):cPurple; bx(s,x,60,130,50,'Sentinel '+(k+1),col,i===2,(i>=2)?(k<n?'ve caído':'ve vivo'):(i===1?'sin respuesta':'monitorea'));
+  if(i<=1) arrow(s,x,85,180+(k*50),205,i===1?cBad:cTeal,k===1?(i===1?'sin respuesta':'PING'):''); }
+ bx(s,180,240,160,56,prom?'Primario viejo':'Primario',down?cDim:cBlue,false,down?'caído':'vivo',down);
+ bx(s,430,240,160,56,prom?'Réplica → PRIMARIO':'Réplica',prom?cGold:cTeal,i===3&&ok||i===4&&ok,prom?'promovida':'sigue al primario');
+ if(i>=2) lbl(s,360,135,'votos '+n+'/3 · quórum 2 '+(ok?'✓':'✗'),ok?cTeal:cBad);
+ if(i===3&&ok) arrow(s,360,100,430,212,cGold,'failover');
+ if(i===4&&ok){ bx(s,640,150,110,44,'clientes',cGold,true,'¿primario?'); arrow(s,590,172,510,232,cGold,''); lbl(s,610,205,'discovery',cDim); lbl(s,180,285,'escrituras sin replicar: perdidas',cBad); }
+ if(i>=3&&!ok) lbl(s,360,285,'sin quórum: no hay failover',cBad); } });
 
-const animFork = { idx:0, timer:null, playing:false,
-steps:[
-  '<b>Paso 1/4 · Padre.</b> Redis padre sirve tráfico; decide hacer snapshot (RDB) o reescribir AOF.',
-  '<b>Paso 2/4 · Fork.</b> Se crea un hijo que comparte las mismas páginas de memoria (virtual).',
-  '<b>Paso 3/4 · COW.</b> Si el padre escribe una página, el kernel copia esa página: el hijo sigue viendo el snapshot.',
-  '<b>Paso 4/4 · Disco.</b> El hijo vuelca el snapshot / AOF y termina. El padre nunca dejó de servir. ✓'
-],
-titles:['1/4 padre','2/4 fork','3/4 COW','4/4 disco ✓'],
-init(){ this.svg=$('#svgArch'); svgDefs(this.svg);
-  this.ch=animChrome('svgArch',4,'Pulsa <b>Reproducir</b>: fork + copy-on-write.');
-  this.playBtn=document.querySelector('[onclick="animFork.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
-  this.cap=$('#archCaption'); this.draw(0);
-  animSetUI(this.ch,this.playBtn,'idle',0,4,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
-draw(phase){ const s=this.svg; s.innerHTML=''; svgDefs(s);
-  s.appendChild(nodeBox(200,120,'padre Redis',cBlue,cBlue));
-  s.appendChild(nodeBox(520,120,phase>=1?'hijo (fork)':'(sin hijo)',phase>=1?cTeal:cDim,phase>=1?cTeal:cDim));
-  s.appendChild(nodeBox(360,250,phase>=3?'disco RDB/AOF':'páginas compartidas',phase>=3?cOrange:cGold,phase>=3?cOrange:cGold));
-  if(phase>=1) arrow(s,258,120,462,120,cTeal,'fork');
-  if(phase>=2){ const t=el('text',{x:360,y:180,'text-anchor':'middle',class:'tedge'}); t.textContent=phase>=2?'COW: write → copia página':''; s.append(t); }
-  if(phase>=3) arrow(s,520,142,420,228,cOrange,'vuelca');
-},
-advance(manual){ if(this.idx>=this.steps.length) return;
-  const s=this.steps[this.idx];
-  this.draw(this.idx+1);
-  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,4,s,this.cap,s);
-  svgCap(this.svg,this.titles[this.idx],320); flowOn(this.svg,this.playing&&!manual);
-  this.idx++;
-  if(this.idx>=this.steps.length) this.finish(); },
-play(){ if(this.playing){ this.pause(); return; }
-  if(this.idx>=this.steps.length) this.reset();
-  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,4); flowOn(this.svg,true);
-  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
-pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,4); },
-step(){ if(this.playing) this.pause(); this.advance(true); },
-finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false); this.draw(4);
-  animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ Fork+COW.</b> Snapshot sin duplicar toda la RAM; writes del padre pagan páginas nuevas.',this.cap,'Fork + copy-on-write ✓.'); },
-reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(0); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>Reproducir</b>: fork + copy-on-write.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+/* 4 · Cluster: hashslots, reshard M1-M2-M3 */
+const SLOT_KEYS={foo:12182,bar:5061,hello:866};
+const animCluster = makeStepAnim({ name:'animCluster', svgId:'svgCluster', capId:'clusterCaption', total:5, h:340,
+idle:'Pulsa <b>Reproducir</b> o avanza con <b>Siguiente paso</b>. Elige una clave y mira si cambia de dueño al añadir M3.', idleCap:'Pulsa "Siguiente paso" o "Reproducir".',
+bind:function(a){ document.getElementById('clusterKey').onchange=function(){ a.refresh(); }; },
+steps:function(){ const k=val('clusterKey','foo'); const sl=SLOT_KEYS[k]; const o2=sl<8192?'M1':'M2'; const o3=sl<=5460?'M1':(sl<=10922?'M2':'M3'); return [
+ {n:'<b>Paso 1/5 · El problema.</b> Sharding algorítmico: <code>hash(clave) mod N</code>. Si N pasa de 2 a 3, la <b>mayoría de las claves cambia de shard</b>: mover datos sería "slow and unrealistic" y dañaría la disponibilidad.', t:'Paso 1/5 · hash mod N: resharding caro', c:'Cambiar N remapea casi todas las claves.'},
+ {n:'<b>Paso 2/5 · Indirección.</b> Redis Cluster usa <b>16K hashslots</b>: <code>clave → slot</code> es fijo (<b>'+k+' → slot '+sl+'</b>, didáctico: CRC16 mod 16384) y solo <code>slot → shard</code> es movible.', t:'Paso 2/5 · clave → hashslot (16384)', c:'"'+k+'" cae en el slot '+sl+' y siempre caerá ahí.'},
+ {n:'<b>Paso 3/5 · Dos primarios.</b> M1 posee slots 0-8191 y M2 slots 8192-16383. El slot '+sl+' pertenece a <b>'+o2+'</b>.', t:'Paso 3/5 · 2 shards: M1 y M2', c:'Con 2 shards, "'+k+'" vive en '+o2+'.'},
+ {n:'<b>Paso 4/5 · Añadir M3.</b> Se mueven slots: M1 0-5460, M2 5461-10922, M3 10923-16383. El slot de "'+k+'" ('+sl+') ahora es de <b>'+o3+'</b>'+(o2===o3?': <b>no se mueve</b>.':': <b>cambia de dueño</b> (solo los slots reasignados se mueven; el hash de la clave no cambia).'), t:'Paso 4/5 · reshard: se mueven slots', c:'Con 3 shards, "'+k+'" vive en '+o3+'.'},
+ {n:'<b>Paso 5/5 · Gossip.</b> Los nodos "gossip" su estado; si suficientes coinciden en que <b>M1</b> no responde, promueven a su secundaria <b>S1</b>. Recomendación: primarios <b>impares</b> y <b>2 réplicas</b> cada uno para evitar split brain.', t:'Paso 5/5 · gossip y promoción de S1', c:'M1 cae; S1 se promueve a primario.'} ]; },
+done:function(){ return '<b>✓ Resumen.</b> 16K hashslots: añadir shards = mover slots, sin remapear claves ni downtime. Gossip + primarios impares + 2 réplicas = clúster robusto.'; },
+draw:function(s,i){ const k=val('clusterKey','foo'); const sl=SLOT_KEYS[k]; const x0=60,W=600,y0=215;
+ const three=i>=3; const two=(i===2); const showBar=i>=1;
+ bx(s,110,55,130,44,'clave',cGold,i===1,k);
+ if(i>=1) bx(s,330,55,200,44,'hashslot',cPurple,i===1,'slot '+sl+' (de 16384)');
+ if(i>=1) arrow(s,175,55,230,55,cGold,'');
+ const m1=(i===4)?cDim:cBlue; const own3=sl<=5460?0:(sl<=10922?1:2); const own2=sl<8192?0:1; const own=three?own3:own2;
+ bx(s,130,135,170,52,'M1',m1,(two||three)&&own===0,i<2?'':(three?'slots 0-5460':'slots 0-8191'),i===4);
+ bx(s,360,135,170,52,'M2',cTeal,(two||three)&&own===1,i<2?'':(three?'slots 5461-10922':'slots 8192-16383'));
+ if(three) bx(s,590,135,170,52,'M3',cOrange,own===2,'slots 10923-16383');
+ if(i===0){ lbl(s,360,205,'hash(clave) mod 2 → M1 | M2',cDim); lbl(s,360,235,'mod 3: ¡la mayoría de claves cambia de shard!',cBad); }
+ if(showBar){ const segs=three?[[0,5460,cBlue],[5461,10922,cTeal],[10923,16383,cOrange]]:(two||i===1?[[0,8191,cBlue],[8192,16383,cTeal]]:[[0,5460,cBlue],[5461,10922,cTeal],[10923,16383,cOrange]]); if(i===1) segs.length=0;
+  if(i===1) s.appendChild(el('rect',{x:x0,y:y0,width:W,height:18,rx:4,fill:cDim,'fill-opacity':0.2,stroke:cDim,'stroke-width':1}));
+  segs.forEach(function(g){ const x=x0+g[0]/16384*W; const w=(g[1]-g[0]+1)/16384*W; s.appendChild(el('rect',{x:x,y:y0,width:w,height:18,fill:g[2],'fill-opacity':0.35,stroke:g[2],'stroke-width':1})); });
+  const mx=x0+sl/16384*W; s.appendChild(el('path',{d:'M '+mx+' '+(y0-12)+' L '+mx+' '+(y0+30),stroke:cGold,'stroke-width':2.4,fill:'none'})); lbl(s,mx,y0+46,k+' · slot '+sl,cGold); lbl(s,x0,y0+46,'0',cDim); lbl(s,x0+W,y0+46,'16383',cDim); }
+ if(i===2||i===3){ const ownLbl=['M1','M2','M3'][own]; lbl(s,360,186,'dueño de "'+k+'": '+ownLbl,cTeal); }
+ if(i===3) lbl(s,360,285,('slots que cambian de dueño: solo los reasignados · hash de clave → slot: igual'),cDim);
+ if(i===4){ bx(s,130,282,170,44,'S1 → PRIMARIO',cGold,true,'promovida por gossip'); lbl(s,130,105,'M1 no responde',cBad); lbl(s,360,285,'gossip: M2, M3 y S1 coinciden → promover',cDim); arrow(s,130,160,130,258,cGold,''); } } });
 
+/* 5 · Fork + copy-on-write */
+const animFork = makeStepAnim({ name:'animFork', svgId:'svgFork', capId:'forkCaption', total:5, h:330,
+idle:'Pulsa <b>Reproducir</b> o avanza con <b>Siguiente paso</b>. Con el control eliges cuántas páginas modifica el padre durante el snapshot.', idleCap:'Pulsa "Siguiente paso" o "Reproducir".',
+bind:function(a){ const r=document.getElementById('forkWrites'); r.oninput=function(){ document.getElementById('forkWritesLbl').textContent=r.value+' / 4'; a.refresh(); }; },
+steps:function(){ const n=parseInt(val('forkWrites','1'),10); return [
+ {n:'<b>Paso 1/5 · Antes del fork.</b> Redis es un proceso con mucha memoria (aquí 4 páginas P1 a P4). Una copia completa no cabría "without running out of memory".', t:'Paso 1/5 · un proceso, 4 páginas', c:'Redis con 4 páginas en RAM.'},
+ {n:'<b>Paso 2/5 · Fork.</b> El sistema operativo crea un hijo: nuevo PID y <b>referencias a las mismas páginas</b> ("passes references to the memory at the time the fork was created"). Cero copias.', t:'Paso 2/5 · padre e hijo comparten páginas', c:'Páginas compartidas: 0 copias nuevas.'},
+ {n:'<b>Paso 3/5 · El hijo serializa.</b> El hijo escribe el RDB leyendo su vista congelada; el padre sigue sirviendo clientes. "If no changes occur... no new allocations are made."', t:'Paso 3/5 · el hijo escribe el RDB', c:'El hijo escribe el RDB; el padre atiende.'},
+ {n:'<b>Paso 4/5 · Copy-on-write.</b> El padre modifica <b>'+n+'</b> página(s): el kernel ve más de una referencia y escribe los cambios en <b>páginas nuevas</b>. El hijo "is fully unaware of the change" y conserva el snapshot consistente.', t:'Paso 4/5 · '+n+' página(s) copiadas al escribir', c:n+' de 4 páginas copiadas.'},
+ {n:'<b>Paso 5/5 · Fin.</b> El RDB queda completo y consistente (point-in-time). El hijo termina; solo se usó <b>'+n+'/4</b> de memoria extra, no una copia entera.', t:'Paso 5/5 · RDB listo, RAM extra '+n+'/4', c:'Snapshot consistente con RAM extra '+n+'/4.'} ]; },
+done:function(){ return '<b>✓ Resumen.</b> Fork + copy-on-write: snapshot point-in-time de gigabytes con memoria extra proporcional a las páginas modificadas.'; },
+draw:function(s,i){ const n=parseInt(val('forkWrites','1'),10);
+ bx(s,150,55,180,46,'Padre (Redis)',cBlue,i===3,'sirve clientes');
+ if(i>=1) bx(s,570,55,180,46,'Hijo (snapshot)',cOrange,i===2,'vista congelada');
+ for(let p=0;p<4;p++){ const x=170+p*130; const copied=(i>=3&&p<n); bx(s,x,165,90,44,'P'+(p+1),cPurple,i>=1&&i<=2,i>=1?(i>=3&&copied?'refs=1 (hijo)':'refs=2'):'refs=1',false); if(i>=1){ arrow(s,150+(p*10),78,x,143,cBlue,''); arrow(s,570-(p*10),78,x,143,cOrange,''); } if(copied) bx(s,x,250,90,40,"P"+(p+1)+"' (nueva)",cTeal,i===3,'padre escribe aquí'); }
+ if(i>=2){ bx(s,660,250,90,44,'RDB',cPurple,i===2||i===4,i===4?'completo':'escribiendo...'); arrow(s,590,80,660,226,cOrange,''); }
+ if(i===1) lbl(s,360,118,'páginas compartidas · 0 copias',cTeal);
+ if(i===3||i===4) lbl(s,360,300,'RAM extra: '+n+'/4 páginas',n>0?cOrange:cTeal);
+ if(i===4) lbl(s,360,118,'el hijo termina',cDim); } });
+function initAnims(){ if(animsRendered) return; animsRendered=true; animSingle.init(); animHa.init(); animSentinel.init(); animCluster.init(); animFork.init(); }
 renderModuleNav(); renderModule(); renderCases(); renderGlossary(''); updateProgress(); updateContinueCard();
 enhanceTips($('#view-inicio'));
 enhanceTips($('#view-animaciones'));
