@@ -35,7 +35,7 @@
 
   function applyTheme(t) {
     document.body.classList.toggle("light", t === "light");
-    if (themeBtn) themeBtn.textContent = t === "light" ? "☀️" : "🌙";
+    if (themeBtn) themeBtn.textContent = t === "light" ? "Claro" : "Oscuro";
     try {
       localStorage.setItem(THEME_KEY, t);
       localStorage.setItem("bdii-hub-theme", t);

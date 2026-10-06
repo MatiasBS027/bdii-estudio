@@ -67,7 +67,7 @@ a:focus-visible, button:focus-visible, input:focus-visible{outline:none; box-sha
 
 /* ============ HEADER / NAV ============ */
 header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border-soft);}
-.topbar{max-width:1200px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.topbar{max-width:1480px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
 .brand{display:flex; align-items:center; gap:11px; font-weight:650; letter-spacing:-.01em; font-size:16px;}
 .brand .logo{width:34px; height:34px; border-radius:6px; flex:0 0 auto; background:var(--surface3); border:1px solid var(--border); display:grid; place-items:center; font-weight:700; font-family:var(--display); font-size:17px; color:var(--text);}
 .brand small{display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em;}
@@ -75,7 +75,7 @@ header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1
 .tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; padding:7px 13px; border-radius:6px; cursor:pointer;}
 .tab:hover{color:var(--text); background:var(--surface2);}
 .tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
-.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
+.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); min-width:36px; height:36px; padding:0 10px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:650; font-family:var(--mono); flex:0 0 auto;}
 .theme-btn:hover{border-color:var(--dim);}
 .hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
 .hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}.suite-stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
@@ -83,7 +83,7 @@ header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1
 .progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
 
 /* ============ LAYOUT / TYPE — escala 12 / 14 / 16 / 18 / 24 / 40 ============ */
-main{max-width:1200px; margin:0 auto; padding:32px 20px 110px;}
+main{max-width:1480px; margin:0 auto; padding:32px 20px 110px;}
 .view{display:none;}
 .view.active{display:block; animation:fadeUp .25s ease;}
 @keyframes fadeUp{from{opacity:0;}to{opacity:1;}}
@@ -93,10 +93,10 @@ h1.title{font-family:var(--display); font-weight:700; font-size:clamp(2rem,4.4vw
 h1.title em{font-style:italic;}
 h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0 0 12px; letter-spacing:0; line-height:1.25; text-wrap:balance;}
 h3{font-family:var(--display); font-weight:700; font-size:1.15rem; margin:30px 0 10px; line-height:1.3;}
-p{max-width:68ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
+p{max-width:88ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
 p strong, li strong, td strong{color:var(--text);}
 ul, ol{color:var(--muted);}
-.lede{font-size:1.125rem; color:var(--muted); max-width:64ch; line-height:1.65;}
+.lede{font-size:1.125rem; color:var(--muted); max-width:84ch; line-height:1.65;}
 .dateline{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--dim); margin:0 0 4px;}
 .dateline::before{content:""; width:26px; height:1px; background:var(--dim);}
 .dateline cite{font-style:normal; color:var(--muted);}
@@ -105,7 +105,7 @@ ul, ol{color:var(--muted);}
 
 .card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
 .card.accent-blue, .card.accent-teal, .card.accent-orange, .card.accent-purple, .card.accent-gold, .card.accent-pink{border-left:1px solid var(--border-soft);}
-.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:72ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
+.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:96ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
 .callout::before{display:grid; place-items:center; width:24px; height:24px; border-radius:6px; position:absolute; left:12px; top:13px; font-size:13px; font-weight:700; background:var(--surface3); border:1px solid var(--border);}
 .callout .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; font-weight:700; color:var(--dim);}
 .callout.info{border-left-color:var(--blue);} .callout.info .lbl{color:var(--blue);} .callout.info::before{content:"i"; color:var(--blue); font-family:var(--sans); font-style:normal;}
@@ -113,7 +113,7 @@ ul, ol{color:var(--muted);}
 .callout.warn{border-left-color:var(--orange);} .callout.warn .lbl{color:var(--orange);} .callout.warn::before{content:"!"; color:var(--orange);}
 .callout.err{border-left-color:var(--bad);} .callout.err .lbl{color:var(--bad);} .callout.err::before{content:"×"; color:var(--bad);}
 .callout.dark{background:var(--surface2);}
-.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:72ch; color:var(--muted);}
+.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:96ch; color:var(--muted);}
 .trade b{color:var(--text);}
 .trade b:first-child{color:var(--text);}
 
@@ -168,10 +168,10 @@ body.light .btn.teal{color:#fbf9f3;}
 .path-n{font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--dim); min-width:44px;}
 .path-step:hover .path-n{color:var(--blue);}
 .path-t{display:block; font-size:16px; font-weight:650; color:var(--text);}
-.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:62ch;}
+.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:80ch;}
 
 /* ============ APRENDE ============ */
-.aprende-layout{display:grid; grid-template-columns:250px 1fr; gap:24px; align-items:start;}
+.aprende-layout{display:grid; grid-template-columns:220px minmax(0,1fr); gap:36px; align-items:start;}
 .module-nav{position:sticky; top:78px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:6px;}
 .module-link{display:flex; align-items:center; gap:10px; text-align:left; cursor:pointer; background:transparent; border:0; border-radius:6px; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:8px 11px; border-left:2px solid transparent;}
 .module-link:hover{background:var(--surface2); color:var(--text);}
@@ -312,7 +312,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
       <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
       <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
     </nav>
-    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">Tema</button>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 </header>
@@ -363,7 +363,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== APRENDE ===================== -->
 <section id="view-aprende" class="view">
   <span class="kicker">Ruta de aprendizaje</span>
-  <h2>📚 Aprende Aurora desde cero</h2>
+  <h2>Aprende Aurora desde cero</h2>
   <p class="lede">Sigue los módulos en orden. Cada uno construye sobre el anterior. Marca "completado" para llevar tu progreso.</p>
 
   <div class="aprende-layout">
@@ -375,17 +375,17 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== ANIMACIONES ===================== -->
 <section id="view-animaciones" class="view">
   <span class="kicker">Laboratorio visual</span>
-  <h2>🎬 Animaciones interactivas</h2>
+  <h2>Animaciones interactivas</h2>
   <p class="lede">Pulsa los botones y observa cómo se comporta el sistema. Estas son las mismas ideas de los módulos, pero en movimiento.</p>
 
   <div class="card accent-blue" id="anim1">
     <h3>1 · Quórum 4/6 con 3 AZs (simulador de fallos)</h3>
     <p style="font-size:14px;">Un PG tiene <strong>6 segmentos</strong> (2 por AZ). Haz clic en un nodo para caído/vivo, o usa los botones. Write necesita <strong>4/6</strong>, read <strong>3/6</strong>.</p>
     <div class="controls">
-      <button class="btn small" onclick="animGraph.failAZ('C')">🔥 Caer AZ-C</button>
-      <button class="btn small" onclick="animGraph.failOne()">💥 Caer 1 nodo</button>
+      <button class="btn small" onclick="animGraph.failAZ('C')"> Caer AZ-C</button>
+      <button class="btn small" onclick="animGraph.failOne()"> Caer 1 nodo</button>
       <button class="btn small ghost" onclick="animGraph.reset()">Reparar todo</button>
-      <button class="btn teal small" onclick="animGraph.check()">▶ ¿Hay quórum?</button>
+      <button class="btn teal small" onclick="animGraph.check()">¿Hay quórum?</button>
     </div>
     <figure>
       <svg id="svgGraph" viewBox="0 0 720 320" role="img" aria-label="Simulador de quorum"></svg>
@@ -399,7 +399,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <div class="controls">
       <button class="btn small" onclick="animCheck.show('mysql')">MySQL espejado</button>
       <button class="btn small" onclick="animCheck.show('aurora')">Aurora</button>
-      <button class="btn teal small" onclick="animCheck.show('both')">▶ Comparar</button>
+      <button class="btn teal small" onclick="animCheck.show('both')">Comparar</button>
     </div>
     <figure>
       <svg id="svgCheck" viewBox="0 0 720 360" role="img" aria-label="Comparativa de IOs"></svg>
@@ -412,7 +412,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <p style="font-size:14px;">Solo <strong>(1) recibir y (2) persistir+ACK</strong> están en foreground. El resto es background. Recorre paso a paso.</p>
     <div class="controls">
       <button class="btn small" onclick="animEnemy.step()">Siguiente paso →</button>
-      <button class="btn small ghost" onclick="animEnemy.play()">▶ Reproducir</button>
+      <button class="btn small ghost" onclick="animEnemy.play()">Reproducir</button>
       <button class="btn small ghost" onclick="animEnemy.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -425,7 +425,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <h3>4 · VCL vs VDL: dónde truncar</h3>
     <p style="font-size:14px;">Completo hasta <strong>1007</strong>, CPLs en <strong>900/1000/1100</strong>. ¿Hasta dónde es durable?</p>
     <div class="controls">
-      <button class="btn small" onclick="animZookie.play()">▶ Reproducir</button>
+      <button class="btn small" onclick="animZookie.play()">Reproducir</button>
       <button class="btn small ghost" onclick="animZookie.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -438,7 +438,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <h3>5 · Flujo de escritura Aurora</h3>
     <p style="font-size:14px;">Writer lotea por PG → <strong>6 réplicas, espera 4 ACKs</strong> → avanza VDL → stream async a réplicas + S3.</p>
     <div class="controls">
-      <button class="btn small" onclick="animArch.play()">▶ Animar flujo</button>
+      <button class="btn small" onclick="animArch.play()">Animar flujo</button>
       <button class="btn small ghost" onclick="animArch.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -451,12 +451,12 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== QUIZ ===================== -->
 <section id="view-quiz" class="view">
   <span class="kicker">Comprueba tu aprendizaje</span>
-  <h2>📝 Quiz técnico</h2>
+  <h2>Quiz técnico</h2>
   <p class="lede">Responde y recibe la explicación al instante. Puedes reintentar las veces que quieras. Después pasa a los <strong>casos prácticos</strong>.</p>
 
   <div class="quiz-toolbar">
     <span class="score-chip" id="scoreChip">0 / 0 correctas</span>
-    <button class="btn ghost small" onclick="quiz.reset()">↺ Reiniciar quiz</button>
+    <button class="btn ghost small" onclick="quiz.reset()">Reiniciar quiz</button>
   </div>
   <div id="quizContainer"></div>
   <div class="quiz-result" id="quizResult">
@@ -467,7 +467,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 
   <hr style="border:none; border-top:1px solid var(--border-soft); margin:40px 0;">
 
-  <h2>🧩 Casos prácticos (ejercicios)</h2>
+  <h2>Casos prácticos (ejercicios)</h2>
   <p class="lede">Aplica lo aprendido. Intenta resolver cada caso <em>antes</em> de pulsar "Ver solución".</p>
   <div id="casesContainer"></div>
 </section>
@@ -475,7 +475,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== GLOSARIO ===================== -->
 <section id="view-glosario" class="view">
   <span class="kicker">Referencia rápida</span>
-  <h2>📖 Glosario</h2>
+  <h2>Glosario</h2>
   <p class="lede">Todos los términos del paper en un solo lugar. Escribe para filtrar.</p>
   <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: quórum, LSN, VDL)…">
   <div id="glossaryList"></div>
@@ -484,7 +484,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== CHEATSHEET ===================== -->
 <section id="view-cheatsheet" class="view">
   <span class="kicker">Repaso de último minuto</span>
-  <h2>⚡ Cheatsheet</h2>
+  <h2> Cheatsheet</h2>
   <p class="lede">Todo lo esencial en una página, ideal para repasar antes del quiz o el examen.</p>
   <div id="cheatsheetContent"></div>
 </section>
@@ -502,7 +502,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 ============================================================ */
 const MODULES = [
   {
-    id:'m0', icon:'🌩️', tag:'Módulo 0', accent:'gold', title:'El problema: la red es el cuello de botella',
+    id:'m0', tag:'Módulo 0', accent:'gold', title:'El problema: la red es el cuello de botella',
     summary:'Por qué mover workloads a la nube cambia el I/O, y por qué Aurora desacopla cómputo y storage.',
     html:`
     <p class="lede">Antes de hablar de quórums y LSNs, entiende <strong>qué problema</strong> resuelve Aurora. Sin esto, su arquitectura parece exagerada.</p>
@@ -533,7 +533,7 @@ const MODULES = [
     mini: { q:'Según el paper, ¿dónde está hoy el constraint central en data processing de alto throughput?', opts:['En el CPU del engine','En los discos individuales','En la red entre cómputo y storage','En el parser SQL'], a:2, why:'Con I/Os repartidos en la flota, los discos dejan de ser lo caliente; el límite se mueve a la red (PPS, ancho de banda y amplificación por writes paralelos).' }
   },
   {
-    id:'m1', icon:'🗳️', tag:'Módulo 1', accent:'blue', title:'Durabilidad a escala: quórum 6/4/3 y segmentos',
+    id:'m1', tag:'Módulo 1', accent:'blue', title:'Durabilidad a escala: quórum 6/4/3 y segmentos',
     summary:'Votos, AZs, fallos correlacionados y por qué 2/3 no alcanza: el diseño AZ+1 de Aurora.',
     html:`
     <p class="lede">Si un sistema no garantiza <strong>“dato escrito = dato leíble”</strong>, nada más importa. Aquí está el razonamiento de quórum de Aurora.</p>
@@ -564,7 +564,7 @@ nodos: VMs EC2 con SSDs locales, PGs asignados al crecer</code></pre>
     mini: { q:'¿Qué quórum usa Aurora y qué tolera?', opts:['V=3, W=2, R=2; tolera 1 nodo','V=6, W=4, R=3; tolera AZ+1 en reads y 2 nodos en writes','V=5, W=3, R=3; tolera 2 AZs','Sin quórum, todo síncrono'], a:1, why:'6 copias en 3 AZs (2 por AZ), write 4/6 y read 3/6: pierde un AZ+1 nodo sin perder datos y 2 nodos sin perder writes.' }
   },
   {
-    id:'m2', icon:'📜', tag:'Módulo 2', accent:'purple', title:'The Log is the Database',
+    id:'m2', tag:'Módulo 2', accent:'purple', title:'The Log is the Database',
     summary:'MySQL amplifica writes; Aurora solo envía redo al storage y deja que él materialice páginas.',
     html:`
     <p class="lede">Poner una base tradicional sobre storage segmentado replicado 6× con quórum 4/6 tiene un costo <strong>intolerable</strong>: cada write de app genera <strong>múltiples I/Os distintos</strong> que la replicación amplifica.</p>
@@ -593,7 +593,7 @@ nodos: VMs EC2 con SSDs locales, PGs asignados al crecer</code></pre>
     mini: { q:'¿Qué cruza la red en Aurora?', opts:['Páginas + redo + binlog','Solo redo log records','Páginas completas cada checkpoint','Snapshots S3'], a:1, why:'Del engine nunca salen páginas (ni background, ni checkpoint, ni eviction). Solo redo; el storage genera las páginas.' }
   },
   {
-    id:'m3', icon:'🔧', tag:'Módulo 3', accent:'teal', title:'Storage service: fondo vs foreground',
+    id:'m3', tag:'Módulo 3', accent:'teal', title:'Storage service: fondo vs foreground',
     summary:'Los 8 pasos del nodo de storage; solo recibir+persistir están en el path crítico.',
     html:`
     <p class="lede">El tenet del storage: <strong>minimizar la latencia del write en foreground</strong>. Casi todo lo demás va al background —y hay tiempo de sobra por la variabilidad pico-vs-promedio.</p>
@@ -621,7 +621,7 @@ nodos: VMs EC2 con SSDs locales, PGs asignados al crecer</code></pre>
     mini: { q:'¿Qué pasos del storage están en el foreground?', opts:['Los 8 pasos','Solo recibir + persistir y ACK','Solo gossip y GC','Coalesce + S3 + CRC'], a:1, why:'Únicamente (1) recibir/encolar y (2) persistir/ACK impactan la latencia; del (3) al (8) son asíncronos.' }
   },
   {
-    id:'m4', icon:'➡️', tag:'Módulo 4', accent:'orange', title:'The Log Marches Forward: consistencia sin 2PC',
+    id:'m4', tag:'Módulo 4', accent:'orange', title:'The Log Marches Forward: consistencia sin 2PC',
     summary:'LSN, VCL/VDL/CPL, commits asíncronos, reads sin quórum y réplicas con lag de ms.',
     html:`
     <p class="lede">El log avanza como <strong>secuencia ordenada</strong> (cada record tiene un <strong>LSN</strong> monotónico del engine). Con eso, Aurora mantiene consistencia <strong>asíncronamente</strong>, sin 2PC “charlatán” e intolerante a fallos.</p>
@@ -650,7 +650,7 @@ nodos: VMs EC2 con SSDs locales, PGs asignados al crecer</code></pre>
     mini: { q:'Completo hasta 1007, CPLs en 900/1000/1100. ¿Dónde se trunca?', opts:['En 1007','En 1000','En 1100','En 900'], a:1, why:'VDL = mayor CPL ≤ VCL (1007). De 900/1000/1100, el mayor ≤ 1007 es 1000. Todo lo de arriba se trunca.' }
   },
   {
-    id:'m5', icon:'🏗️', tag:'Módulo 5', accent:'gold', title:'Arquitectura completa',
+    id:'m5', tag:'Módulo 5', accent:'gold', title:'Arquitectura completa',
     summary:'Fork de MySQL/InnoDB + RDS + storage multi-AZ: cómo encajan las piezas.',
     html:`
     <p class="lede">Juntando las tres ideas (quórum, log-is-database, avance asíncrono) sale la arquitectura de la Fig. 5.</p>
@@ -672,7 +672,7 @@ nodos: VMs EC2 con SSDs locales, PGs asignados al crecer</code></pre>
     mini: { q:'¿Cuántas réplicas lectoras soporta un clúster Aurora y sobre qué storage?', opts:['5, cada una con su volumen','15, todas sobre el mismo volumen compartido','Sin límite, storage local','1 standby con EBS'], a:1, why:'Un writer y hasta 15 réplicas montan un único volumen compartido: sin costo extra de storage ni disk writes.' }
   },
   {
-    id:'m6', icon:'🚀', tag:'Módulo 6', accent:'pink', title:'Rendimiento y lecciones',
+    id:'m6', tag:'Módulo 6', accent:'pink', title:'Rendimiento y lecciones',
     summary:'Números SysBench/TPC-C, replica lag y lo aprendido en 18 meses de producción.',
     html:`
     <p class="lede">Aurora lleva en producción desde julio 2015 (GA). Estos son los números del paper (r3.8xlarge, 32 vCPU, 244GB, caché 170GB; MySQL con EBS 30K IOPS).</p>
@@ -822,36 +822,36 @@ const GLOSSARY = [
 
 const CHEATSHEET = `
 <div class="card accent-blue">
-  <h3 style="margin-top:0;">🗳️ Quórum y segmentos</h3>
+  <h3 style="margin-top:0;">️ Quórum y segmentos</h3>
   <p style="font-size:14px;"><strong>V=6, W=4, R=3</strong> (2 copias × 3 AZs). Reglas: <code>Vr+Vw&gt;V</code> · <code>Vw&gt;V/2</code>.</p>
   <p style="font-size:14px;"><strong>AZ+1:</strong> pierde un AZ + 1 nodo en reads; 2 nodos en writes. <strong>PG</strong> = 6 segmentos de <strong>10GB</strong> (~10s de repair). Volumen hasta <strong>64TB</strong>.</p>
 </div>
 
 <div class="card accent-purple">
-  <h3 style="margin-top:0;">📜 Log-is-database</h3>
+  <h3 style="margin-top:0;"> Log-is-database</h3>
   <p style="font-size:14px;">Red solo <strong>redo</strong> por la red. Páginas = <strong>caché de aplicaciones del log</strong> (coalesce solo cadenas largas).</p>
   <p style="font-size:14px;"><strong>SysBench 100GB:</strong> 27,4M vs 780K tx (<strong>35×</strong>), 0,95 vs 7,4 IOs/tx (<strong>7,7× menos</strong>), 46× menos por nodo.</p>
 </div>
 
 <div class="card accent-teal">
-  <h3 style="margin-top:0;">🔧 Storage: 8 pasos</h3>
+  <h3 style="margin-top:0;"> Storage: 8 pasos</h3>
   <p style="font-size:14px;">(1) recibir → (2) persistir+ACK = <strong>foreground</strong>. (3) gaps → (4) gossip → (5) coalesce → (6) S3 → (7) GC → (8) CRC = <strong>background</strong>.</p>
 </div>
 
 <div class="card accent-orange">
-  <h3 style="margin-top:0;">➡️ Sin 2PC: VCL/VDL</h3>
+  <h3 style="margin-top:0;">️ Sin 2PC: VCL/VDL</h3>
   <p style="font-size:14px;"><strong>LSN</strong> monotónico (LAL=VDL+10M) · <strong>SCL</strong> por segmento · <strong>VCL</strong> completitud · <strong>VDL</strong> mayor CPL ≤ VCL (trunca &gt;VDL) · <strong>PGMRPL</strong> low-water-mark para GC.</p>
   <p style="font-size:14px;"><strong>Commits async:</strong> completo sii VDL ≥ commit LSN. <strong>Reads:</strong> un segmento con SCL ≥ read-point. <strong>Réplicas:</strong> ≤VDL atómico por MTR (≤20ms).</p>
 </div>
 
 <div class="card accent-gold">
-  <h3 style="margin-top:0;">🏗️ Arquitectura</h3>
+  <h3 style="margin-top:0;">Arquitectura</h3>
   <p style="font-size:14px;">Fork <strong>MySQL/InnoDB</strong> (MTRs con CPL) · 1 writer + <strong>15 réplicas</strong> en un volumen · <strong>RDS/HM</strong> + 3 VPCs + <strong>DynamoDB/SWF/S3</strong> · EC2+SSD en ≥3 AZs.</p>
   <p style="font-size:14px;"><strong>Recovery &lt;10s:</strong> quórum de lectura por PG → VDL → trunca por epoch → undo online.</p>
 </div>
 
 <div class="card accent-pink">
-  <h3 style="margin-top:0;">🚀 Rendimiento</h3>
+  <h3 style="margin-top:0;">Rendimiento</h3>
   <p style="font-size:14px;">Escala lineal; <strong>5×</strong> MySQL (1GB), <strong>67×</strong> (100GB), <strong>34×</strong> (1TB). Conexiones 5K: 110K vs 13K. Lag 10K w/s: <strong>5,4ms vs 300s</strong>. TPC-C hot-row: <strong>2,3–16,3×</strong>.</p>
 </div>
 `;
@@ -877,8 +877,8 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(
 
 /* theme toggle */
 const themeBtn = $('#themeBtn');
-themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('aurora-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
-(function(){ let s=null; try{s=localStorage.getItem('aurora-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; } })();
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'Claro':'Oscuro'; try{localStorage.setItem('aurora-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
+(function(){ let s=null; try{s=localStorage.getItem('aurora-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='Claro'; } })();
 
 /* ============================================================
    PROGRESO (localStorage)
@@ -939,7 +939,7 @@ function renderModule(){
     </div>
     <div class="module-pager">
       <button class="btn ghost" id="prevBtn" ${currentModule===0?'disabled style="opacity:.4;cursor:default;"':''}>← Anterior</button>
-      <button class="btn ${done[m.id]?'ghost':'teal'}" id="doneBtn">${done[m.id]?'↩ Desmarcar':'✓ Marcar como completado'}</button>
+      <button class="btn ${done[m.id]?'ghost':'teal'}" id="doneBtn">${done[m.id]?'Desmarcar':'✓ Marcar como completado'}</button>
       <button class="btn" id="nextBtn" ${currentModule===MODULES.length-1?'disabled style="opacity:.4;cursor:default;"':''}>Siguiente →</button>
     </div>`;
 
@@ -1034,10 +1034,10 @@ const quiz = {
     $('#quizPercent').textContent = pct + '%';
     $('#gradeFill').style.width = pct + '%';
     let msg;
-    if(pct===100) msg = '🏆 ¡Perfecto! Dominas el paper de Aurora.';
-    else if(pct>=80) msg = '🎉 ¡Muy bien! Solo repasa los puntos fallados.';
-    else if(pct>=60) msg = '👍 Vas bien. Relee los módulos de las preguntas que fallaste.';
-    else msg = '📚 Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
+    if(pct===100) msg = '¡Perfecto! Dominas el paper de Aurora.';
+    else if(pct>=80) msg = '¡Muy bien! Solo repasa los puntos fallados.';
+    else if(pct>=60) msg = 'Vas bien. Relee los módulos de las preguntas que fallaste.';
+    else msg = 'Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
     $('#quizMsg').textContent = msg;
     r.scrollIntoView({behavior:'smooth'});
     quizScores.push(pct); if(quizScores.length>20) quizScores=quizScores.slice(-20); try{localStorage.setItem('aurora-quiz', JSON.stringify(quizScores));}catch(e){};
@@ -1067,7 +1067,7 @@ function renderCases(){
       </div>
       <h3 style="margin-top:4px;">${cs.title}</h3>
       <div class="case-step">${cs.prompt}</div>
-      <button class="btn teal small reveal-btn">💡 Ver solución</button>
+      <button class="btn teal small reveal-btn">Ver solución</button>
       <div class="explain" style="margin-top:12px;"></div>`;
     const ex = card.querySelector('.explain');
     const btn = card.querySelector('.reveal-btn');
@@ -1198,7 +1198,7 @@ const animGraph = {
     const w=alive>=4, r=alive>=3;
     $('#graphCaption').textContent = w&&r ? '✓ Quórum OK: writes (≥4) y reads (≥3) disponibles. El PG se re-replica en background.'
       : (!r ? '✗ Sin quórum de lectura (<3): datos no disponibles. En Aurora esto exige perder AZ+1+nada-más: improbable con MTTR de ~10s.'
-      : '⚠ Solo reads (≥3) sin writes (<4): se lee y se reconstruye el write-quórum agregando copias.');
+      : 'Solo reads (≥3) sin writes (<4): se lee y se reconstruye el write-quórum agregando copias.');
   }
 };
 

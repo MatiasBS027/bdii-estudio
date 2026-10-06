@@ -67,7 +67,7 @@ a:focus-visible, button:focus-visible, input:focus-visible{outline:none; box-sha
 
 /* ============ HEADER / NAV ============ */
 header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border-soft);}
-.topbar{max-width:1200px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.topbar{max-width:1480px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
 .brand{display:flex; align-items:center; gap:11px; font-weight:650; letter-spacing:-.01em; font-size:16px;}
 .brand .logo{width:34px; height:34px; border-radius:6px; flex:0 0 auto; background:var(--surface3); border:1px solid var(--border); display:grid; place-items:center; font-weight:700; font-family:var(--display); font-size:17px; color:var(--text);}
 .brand small{display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em;}
@@ -75,7 +75,7 @@ header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1
 .tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; padding:7px 13px; border-radius:6px; cursor:pointer;}
 .tab:hover{color:var(--text); background:var(--surface2);}
 .tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
-.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:16px; flex:0 0 auto;}
+.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); min-width:36px; height:36px; padding:0 10px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:650; font-family:var(--mono); flex:0 0 auto;}
 .theme-btn:hover{border-color:var(--dim);}
 .hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
 .hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}.suite-stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
@@ -83,7 +83,7 @@ header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1
 .progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
 
 /* ============ LAYOUT / TYPE — escala 12 / 14 / 16 / 18 / 24 / 40 ============ */
-main{max-width:1200px; margin:0 auto; padding:32px 20px 110px;}
+main{max-width:1480px; margin:0 auto; padding:32px 20px 110px;}
 .view{display:none;}
 .view.active{display:block; animation:fadeUp .25s ease;}
 @keyframes fadeUp{from{opacity:0;}to{opacity:1;}}
@@ -93,10 +93,10 @@ h1.title{font-family:var(--display); font-weight:700; font-size:clamp(2rem,4.4vw
 h1.title em{font-style:italic;}
 h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0 0 12px; letter-spacing:0; line-height:1.25; text-wrap:balance;}
 h3{font-family:var(--display); font-weight:700; font-size:1.15rem; margin:30px 0 10px; line-height:1.3;}
-p{max-width:68ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
+p{max-width:88ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
 p strong, li strong, td strong{color:var(--text);}
 ul, ol{color:var(--muted);}
-.lede{font-size:1.125rem; color:var(--muted); max-width:64ch; line-height:1.65;}
+.lede{font-size:1.125rem; color:var(--muted); max-width:84ch; line-height:1.65;}
 .dateline{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--dim); margin:0 0 4px;}
 .dateline::before{content:""; width:26px; height:1px; background:var(--dim);}
 .dateline cite{font-style:normal; color:var(--muted);}
@@ -105,7 +105,7 @@ ul, ol{color:var(--muted);}
 
 .card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
 .card.accent-blue, .card.accent-teal, .card.accent-orange, .card.accent-purple, .card.accent-gold, .card.accent-pink{border-left:1px solid var(--border-soft);}
-.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:72ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
+.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:96ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
 .callout::before{display:grid; place-items:center; width:24px; height:24px; border-radius:6px; position:absolute; left:12px; top:13px; font-size:13px; font-weight:700; background:var(--surface3); border:1px solid var(--border);}
 .callout .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; font-weight:700; color:var(--dim);}
 .callout.info{border-left-color:var(--blue);} .callout.info .lbl{color:var(--blue);} .callout.info::before{content:"i"; color:var(--blue); font-family:var(--sans); font-style:normal;}
@@ -113,7 +113,7 @@ ul, ol{color:var(--muted);}
 .callout.warn{border-left-color:var(--orange);} .callout.warn .lbl{color:var(--orange);} .callout.warn::before{content:"!"; color:var(--orange);}
 .callout.err{border-left-color:var(--bad);} .callout.err .lbl{color:var(--bad);} .callout.err::before{content:"×"; color:var(--bad);}
 .callout.dark{background:var(--surface2);}
-.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:72ch; color:var(--muted);}
+.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:96ch; color:var(--muted);}
 .trade b{color:var(--text);}
 .trade b:first-child{color:var(--text);}
 
@@ -168,10 +168,10 @@ body.light .btn.teal{color:#fbf9f3;}
 .path-n{font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--dim); min-width:44px;}
 .path-step:hover .path-n{color:var(--blue);}
 .path-t{display:block; font-size:16px; font-weight:650; color:var(--text);}
-.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:62ch;}
+.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:80ch;}
 
 /* ============ APRENDE ============ */
-.aprende-layout{display:grid; grid-template-columns:250px 1fr; gap:24px; align-items:start;}
+.aprende-layout{display:grid; grid-template-columns:220px minmax(0,1fr); gap:36px; align-items:start;}
 .module-nav{position:sticky; top:78px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:6px;}
 .module-link{display:flex; align-items:center; gap:10px; text-align:left; cursor:pointer; background:transparent; border:0; border-radius:6px; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:8px 11px; border-left:2px solid transparent;}
 .module-link:hover{background:var(--surface2); color:var(--text);}
@@ -312,7 +312,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
       <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
       <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
     </nav>
-    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">Tema</button>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 </header>
@@ -363,7 +363,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== APRENDE ===================== -->
 <section id="view-aprende" class="view">
   <span class="kicker">Ruta de aprendizaje</span>
-  <h2>📚 Aprende Zanzibar desde cero</h2>
+  <h2>Aprende Zanzibar desde cero</h2>
   <p class="lede">Sigue los módulos en orden. Cada uno construye sobre el anterior. Marca "completado" para llevar tu progreso.</p>
 
   <div class="aprende-layout">
@@ -375,7 +375,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== ANIMACIONES ===================== -->
 <section id="view-animaciones" class="view">
   <span class="kicker">Laboratorio visual</span>
-  <h2>🎬 Animaciones interactivas</h2>
+  <h2>Animaciones interactivas</h2>
   <p class="lede">Pulsa los botones y observa cómo se comporta el sistema. Estas son las mismas ideas de los módulos, pero en movimiento.</p>
 
   <div class="card accent-blue" id="anim1">
@@ -387,7 +387,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
       <button class="btn small" onclick="animGraph.add('viewer','group:eng#member')">+ doc#viewer@eng#member</button>
       <button class="btn small" onclick="animGraph.add('parent','folder:A')">+ doc#parent@folder:A</button>
       <button class="btn small ghost" onclick="animGraph.reset()">Reiniciar</button>
-      <button class="btn teal small" onclick="animGraph.check()">▶ Check: ¿es 11 viewer?</button>
+      <button class="btn teal small" onclick="animGraph.check()">Check: ¿es 11 viewer?</button>
     </div>
     <figure>
       <svg id="svgGraph" viewBox="0 0 720 320" role="img" aria-label="Grafo de tuplas interactivo"></svg>
@@ -400,7 +400,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <p style="font-size:14px;">Zanzibar evalúa la relación <code>viewer</code> como una <strong>unión</strong> de ramas, en paralelo. Aquí se recorre paso a paso.</p>
     <div class="controls">
       <button class="btn small" onclick="animCheck.step()">Siguiente paso →</button>
-      <button class="btn small ghost" onclick="animCheck.play()">▶ Reproducir</button>
+      <button class="btn small ghost" onclick="animCheck.play()">Reproducir</button>
       <button class="btn small ghost" onclick="animCheck.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -413,7 +413,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <h3>3 · El "new enemy problem"</h3>
     <p style="font-size:14px;">¿Por qué la consistencia importa? Mira qué pasa si un Check lee datos <em>atrasados</em> después de que alguien fue removido.</p>
     <div class="controls">
-      <button class="btn small" onclick="animEnemy.play()">▶ Reproducir historia</button>
+      <button class="btn small" onclick="animEnemy.play()">Reproducir historia</button>
       <button class="btn small ghost" onclick="animEnemy.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -426,7 +426,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <h3>4 · Ciclo de vida del zookie</h3>
     <p style="font-size:14px;">El zookie es un <strong>token de frescura</strong> que viaja con el contenido y se reenvía en futuros Checks.</p>
     <div class="controls">
-      <button class="btn small" onclick="animZookie.play()">▶ Reproducir</button>
+      <button class="btn small" onclick="animZookie.play()">Reproducir</button>
       <button class="btn small ghost" onclick="animZookie.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -439,7 +439,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
     <h3>5 · Arquitectura en movimiento</h3>
     <p style="font-size:14px;">Así fluye un Check: cliente → aclserver → (fan-out) → Spanner → respuesta.</p>
     <div class="controls">
-      <button class="btn small" onclick="animArch.play()">▶ Animar flujo</button>
+      <button class="btn small" onclick="animArch.play()">Animar flujo</button>
       <button class="btn small ghost" onclick="animArch.reset()">Reiniciar</button>
     </div>
     <figure>
@@ -452,12 +452,12 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== QUIZ ===================== -->
 <section id="view-quiz" class="view">
   <span class="kicker">Comprueba tu aprendizaje</span>
-  <h2>📝 Quiz técnico</h2>
+  <h2>Quiz técnico</h2>
   <p class="lede">Responde y recibe la explicación al instante. Puedes reintentar las veces que quieras. Después pasa a los <strong>casos prácticos</strong>.</p>
 
   <div class="quiz-toolbar">
     <span class="score-chip" id="scoreChip">0 / 0 correctas</span>
-    <button class="btn ghost small" onclick="quiz.reset()">↺ Reiniciar quiz</button>
+    <button class="btn ghost small" onclick="quiz.reset()">Reiniciar quiz</button>
   </div>
   <div id="quizContainer"></div>
   <div class="quiz-result" id="quizResult">
@@ -468,7 +468,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 
   <hr style="border:none; border-top:1px solid var(--border-soft); margin:40px 0;">
 
-  <h2>🧩 Casos prácticos (ejercicios)</h2>
+  <h2>Casos prácticos (ejercicios)</h2>
   <p class="lede">Aplica lo aprendido. Intenta resolver cada caso <em>antes</em> de pulsar "Ver solución".</p>
   <div id="casesContainer"></div>
 </section>
@@ -476,7 +476,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== GLOSARIO ===================== -->
 <section id="view-glosario" class="view">
   <span class="kicker">Referencia rápida</span>
-  <h2>📖 Glosario</h2>
+  <h2>Glosario</h2>
   <p class="lede">Todos los términos del paper en un solo lugar. Escribe para filtrar.</p>
   <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término o definición (ej: zookie, userset, rewrite)…">
   <div id="glossaryList"></div>
@@ -485,7 +485,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 <!-- ===================== CHEATSHEET ===================== -->
 <section id="view-cheatsheet" class="view">
   <span class="kicker">Repaso de último minuto</span>
-  <h2>⚡ Cheatsheet</h2>
+  <h2> Cheatsheet</h2>
   <p class="lede">Todo lo esencial en una página, ideal para repasar antes del quiz o el examen.</p>
   <div id="cheatsheetContent"></div>
 </section>
@@ -503,7 +503,7 @@ footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-sof
 ============================================================ */
 const MODULES = [
   {
-    id:'m0', icon:'🧭', tag:'Módulo 0', accent:'gold', title:'El problema que resuelve Zanzibar',
+    id:'m0', tag:'Módulo 0', accent:'gold', title:'El problema que resuelve Zanzibar',
     summary:'Autorización vs autenticación, y por qué Google necesitó un sistema unificado.',
     html:`
     <p class="lede">Antes de hablar de tuplas y zookies, entiende <strong>qué problema</strong> resuelve Zanzibar. Sin esto, todo lo demás parece magia.</p>
@@ -546,7 +546,7 @@ const MODULES = [
     mini: { q:'¿Cuál es la misión de Zanzibar?', opts:['Autenticar usuarios','Decidir si un usuario tiene permiso para algo','Guardar contraseñas','Encriptar documentos'], a:1, why:'Zanzibar es autorización: responde "¿puede este usuario hacer esto?". La autenticación (quién eres) es un problema aparte.' }
   },
   {
-    id:'m1', icon:'🧱', tag:'Módulo 1', accent:'blue', title:'Modelo de datos: la tupla de relación',
+    id:'m1', tag:'Módulo 1', accent:'blue', title:'Modelo de datos: la tupla de relación',
     summary:'objeto#relación@usuario — la pieza con la que se expresa TODO permiso.',
     html:`
     <p class="lede">Todo el poder de Zanzibar descansa en una estructura diminuta y elegante: la <strong>tupla de relación</strong>.</p>
@@ -591,7 +591,7 @@ const MODULES = [
     mini: { q:'La tupla group:eng#member@11 significa…', opts:['El grupo 11 es miembro de eng','El usuario 11 es miembro del grupo eng','eng es miembro del usuario 11','11 grupos son miembros'], a:1, why:'objeto=group:eng, relación=member, usuario=11. Se lee: "el usuario 11 es miembro del grupo eng".' }
   },
   {
-    id:'m2', icon:'🪆', tag:'Módulo 2', accent:'purple', title:'Userset rewrites: permisos derivados',
+    id:'m2', tag:'Módulo 2', accent:'purple', title:'Userset rewrites: permisos derivados',
     summary:'Cómo owner ⊂ editor ⊂ viewer se define una sola vez, con union/intersection/difference.',
     html:`
     <p class="lede">Guardar cada permiso a mano no escala: si un dueño debería poder editar, no quieres escribir "owner" y "editor" para cada persona. Los <strong>userset rewrites</strong> definen cómo <em>derivar</em> un conjunto de usuarios a partir de otros.</p>
@@ -656,7 +656,7 @@ group:cfo_staff#member@77
     mini: { q:'¿Qué hace tuple_to_userset en el ejemplo viewer?', opts:['Añade los viewers directos','Añade los owners','Hereda los viewers del objeto padre (parent)','Quita a los editors'], a:2, why:'tuple_to_userset sigue la relación "parent" hacia el objeto padre y aplica "viewer" de ese objeto, logrando herencia por carpetas.' }
   },
   {
-    id:'m3', icon:'⏱️', tag:'Módulo 3', accent:'teal', title:'Consistencia: new enemy problem y zookies',
+    id:'m3', tag:'Módulo 3', accent:'teal', title:'Consistencia: new enemy problem y zookies',
     summary:'El corazón del paper: por qué un dato atrasado puede ser un fallo de seguridad, y cómo los zookies lo evitan.',
     html:`
     <p class="lede">Aquí está la parte más sutil (y más preguntada) del paper. Trata de cómo un sistema <strong>distribuido y gigante</strong> puede responder permisos sin dar respuestas "atrasadas" que comprometan la seguridad.</p>
@@ -707,7 +707,7 @@ Check(usuario, doc#viewer, zookie = Z)
     mini: { q:'¿Qué garantiza un Check que recibe un zookie con T=15042?', opts:['Responde en T exactamente 15042','Responde en T ≥ 15042 (nunca más viejo)','Ignora todos los cambios','Solo usa caché'], a:1, why:'La semántica es "at-least-as-fresh": evalúa en un timestamp igual o posterior al del zookie, para no perder cambios anteriores.' }
   },
   {
-    id:'m4', icon:'🔌', tag:'Módulo 4', accent:'orange', title:'La API completa',
+    id:'m4', tag:'Módulo 4', accent:'orange', title:'La API completa',
     summary:'Check, Read, Expand, Write y Watch: qué hace cada una y cuándo usarla.',
     html:`
     <p class="lede">Zanzibar expone una API pequeña y bien definida. Conocer la <strong>diferencia entre cada método</strong> es material de quiz garantizado.</p>
@@ -749,7 +749,7 @@ Write(changes: [...], condition: lock.unchanged_since(lock.version))
     mini: { q:'¿Qué API devuelve el userset efectivo completo (árbol resuelto)?', opts:['Read','Check','Expand','Watch'], a:2, why:'Expand devuelve el árbol completo resuelto; Read solo las tuplas literales; Check solo sí/no.' }
   },
   {
-    id:'m5', icon:'🏗️', tag:'Módulo 5', accent:'gold', title:'Arquitectura y Leopard',
+    id:'m5', tag:'Módulo 5', accent:'gold', title:'Arquitectura y Leopard',
     summary:'aclservers, Spanner, watchservers y Leopard: cómo se sirve un Check a escala.',
     html:`
     <p class="lede">Ya sabes <em>qué</em> hace Zanzibar. Ahora mira <em>cómo</em> lo hace físicamente para soportar millones de consultas por segundo.</p>
@@ -787,7 +787,7 @@ MEMBER2GROUP(U) ∩ GROUP2GROUP(G) ≠ ∅
     mini: { q:'En Leopard, ¿cómo se responde "¿pertenece U al grupo G?"', opts:['Recorriendo el grafo recursivamente','Intersectando MEMBER2GROUP(U) con GROUP2GROUP(G)','Consultando a Spanner por cada subgrupo','Con una tabla de hashes global'], a:1, why:'Se calcula la intersección de dos conjuntos: los grupos donde U es miembro y los subgrupos de G. Si no es vacía, U pertenece a G.' }
   },
   {
-    id:'m6', icon:'🚀', tag:'Módulo 6', accent:'pink', title:'Rendimiento: caché y hot spots',
+    id:'m6', tag:'Módulo 6', accent:'pink', title:'Rendimiento: caché y hot spots',
     summary:'Cómo Zanzibar mantiene latencias de milisegundos: caché, hashing consistente, hedging y más.',
     html:`
     <p class="lede">Con &gt;10M consultas/seg, el rendimiento no es opcional. Estas técnicas aparecen en el paper y suelen caer en el quiz.</p>
@@ -955,7 +955,7 @@ const GLOSSARY = [
 
 const CHEATSHEET = `
 <div class="card accent-blue">
-  <h3 style="margin-top:0;">🧱 Modelo de datos</h3>
+  <h3 style="margin-top:0;">Modelo de datos</h3>
   <pre><code>tupla   ::= objeto '#' relación '@' usuario
 objeto  ::= namespace ':' object_id
 usuario ::= user_id  |  userset
@@ -964,7 +964,7 @@ userset ::= objeto '#' relación</code></pre>
 </div>
 
 <div class="card accent-purple">
-  <h3 style="margin-top:0;">🪆 Userset rewrites</h3>
+  <h3 style="margin-top:0;"> Userset rewrites</h3>
   <p style="font-size:14px;">Operadores: <code>union</code> · <code>intersection</code> · <code>exclusion</code></p>
   <p style="font-size:14px;">Hijos: <code>_this</code> (directos) · <code>computed_userset</code> (otra relación del MISMO objeto) · <code>tuple_to_userset</code> (salta a OTRO objeto vía parent).</p>
   <p style="font-size:14px;"><strong>Jerarquía:</strong> owner ⊂ editor ⊂ viewer · definida una vez por namespace.</p>
@@ -979,7 +979,7 @@ userset ::= objeto '#' relación</code></pre>
 </div>
 
 <div class="card accent-orange">
-  <h3 style="margin-top:0;">🔌 API</h3>
+  <h3 style="margin-top:0;">API</h3>
   <table>
     <tr><th>API</th><th>Resuelve rewrites</th><th>Zookie</th><th>Propósito</th></tr>
     <tr><td><code>Check</code></td><td>Sí</td><td>Sí</td><td>sí/no</td></tr>
@@ -991,14 +991,14 @@ userset ::= objeto '#' relación</code></pre>
 </div>
 
 <div class="card accent-gold">
-  <h3 style="margin-top:0;">🏗️ Arquitectura</h3>
+  <h3 style="margin-top:0;">Arquitectura</h3>
   <p style="font-size:14px;"><strong>aclservers</strong> (sirven + fan-out + caché) · <strong>Spanner</strong> (configs + tuplas + changelog) · <strong>watchservers</strong> (Watch) · <strong>Leopard</strong> (índices de grupos).</p>
   <p style="font-size:14px;"><strong>PK de tuplas:</strong> (shard_id, object_id, relation, user, commit_timestamp) → multiversionado.</p>
   <p style="font-size:14px;"><strong>Leopard:</strong> MEMBER2GROUP(U) ∩ GROUP2GROUP(G) ≠ ∅ → U ∈ G.</p>
 </div>
 
 <div class="card accent-pink">
-  <h3 style="margin-top:0;">🚀 Rendimiento</h3>
+  <h3 style="margin-top:0;">Rendimiento</h3>
   <p style="font-size:14px;">Consistent hashing · lock table (anti-stampede) · timestamp cuantizado · prefetching · hedging (solo a Spanner/Leopard) · performance isolation.</p>
   <p style="font-size:14px;"><strong>Latencia:</strong> Check Safe p50 3ms / p99 15ms · Check Recent p95 60ms / p99 76ms.</p>
   <p style="font-size:14px;"><strong>Escala:</strong> &gt;2B tuplas · &gt;1.500 namespaces · &gt;10M QPS · 99.999% disponibilidad.</p>
@@ -1026,8 +1026,8 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(
 
 /* theme toggle */
 const themeBtn = $('#themeBtn');
-themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'☀️':'🌙'; try{localStorage.setItem('zanzibar-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
-(function(){ let s=null; try{s=localStorage.getItem('zanzibar-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='☀️'; } })();
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'Claro':'Oscuro'; try{localStorage.setItem('zanzibar-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
+(function(){ let s=null; try{s=localStorage.getItem('zanzibar-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='Claro'; } })();
 
 /* ============================================================
    PROGRESO (localStorage)
@@ -1088,7 +1088,7 @@ function renderModule(){
     </div>
     <div class="module-pager">
       <button class="btn ghost" id="prevBtn" ${currentModule===0?'disabled style="opacity:.4;cursor:default;"':''}>← Anterior</button>
-      <button class="btn ${done[m.id]?'ghost':'teal'}" id="doneBtn">${done[m.id]?'↩ Desmarcar':'✓ Marcar como completado'}</button>
+      <button class="btn ${done[m.id]?'ghost':'teal'}" id="doneBtn">${done[m.id]?'Desmarcar':'✓ Marcar como completado'}</button>
       <button class="btn" id="nextBtn" ${currentModule===MODULES.length-1?'disabled style="opacity:.4;cursor:default;"':''}>Siguiente →</button>
     </div>`;
 
@@ -1183,10 +1183,10 @@ const quiz = {
     $('#quizPercent').textContent = pct + '%';
     $('#gradeFill').style.width = pct + '%';
     let msg;
-    if(pct===100) msg = '🏆 ¡Perfecto! Dominas el paper de Zanzibar.';
-    else if(pct>=80) msg = '🎉 ¡Muy bien! Solo repasa los puntos fallados.';
-    else if(pct>=60) msg = '👍 Vas bien. Relee los módulos de las preguntas que fallaste.';
-    else msg = '📚 Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
+    if(pct===100) msg = '¡Perfecto! Dominas el paper de Zanzibar.';
+    else if(pct>=80) msg = '¡Muy bien! Solo repasa los puntos fallados.';
+    else if(pct>=60) msg = 'Vas bien. Relee los módulos de las preguntas que fallaste.';
+    else msg = 'Sigue estudiando: vuelve a "Aprende" y repasa los conceptos clave antes de reintentar.';
     $('#quizMsg').textContent = msg;
     r.scrollIntoView({behavior:'smooth'});
     quizScores.push(pct); if(quizScores.length>20) quizScores=quizScores.slice(-20); try{localStorage.setItem('zanzibar-quiz', JSON.stringify(quizScores));}catch(e){};
@@ -1216,7 +1216,7 @@ function renderCases(){
       </div>
       <h3 style="margin-top:4px;">${cs.title}</h3>
       <div class="case-step">${cs.prompt}</div>
-      <button class="btn teal small reveal-btn">💡 Ver solución</button>
+      <button class="btn teal small reveal-btn">Ver solución</button>
       <div class="explain" style="margin-top:12px;"></div>`;
     const ex = card.querySelector('.explain');
     const btn = card.querySelector('.reveal-btn');
