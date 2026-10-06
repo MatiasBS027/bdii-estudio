@@ -127,6 +127,14 @@ Además: abrir la página, consola del navegador **sin errores rojos**, y probar
 - **Prevención:** siempre botón visible **Imprimir / Guardar PDF** (`onclick="window.print()"`) en la vista Cheatsheet.
 - **Verificar:** `rg -n "window.print" papers/<id>/<id>_app.html`; vista previa de impresión = 1 página, sin nav/header.
 
+## 15. Build script corta anim JS en medio de `resumeStudy`
+
+- **Síntoma:** tras inyectar animaciones con `indexOf('renderModuleNav(); renderModule();')`, el HTML deja de parsear (`Unexpected token 'if'`). Ese string aparece **antes** en `resumeStudy`, no solo en el boot final.
+- **Prevención:** usar el marcador **completo y único** del boot:
+  `renderModuleNav(); renderModule(); renderCases(); renderGlossary(''); updateProgress(); updateContinueCard();`
+  (ver `_build_redis.js` / `_build_mongo.js`).
+- **Verificar:** `new Function(script)` OK; un solo bloque `const quiz`; fin del archivo = boot + `bootHash`.
+
 ---
 
 ## Anti-patrones resumidos (checklist de revisión antes de commit)
@@ -143,3 +151,4 @@ Además: abrir la página, consola del navegador **sin errores rojos**, y probar
 - [ ] Prefijo de storage y `PAPER_SHUFFLE_ID` correctos; `MODULE_ANIMS` propio (§12).
 - [ ] Falladas persistidas + remediación (§13).
 - [ ] Botón Imprimir visible (§14).
+- [ ] Si hay build script de anim JS, boot marker único (§15).

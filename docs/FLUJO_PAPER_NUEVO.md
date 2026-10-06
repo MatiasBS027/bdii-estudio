@@ -12,25 +12,30 @@
 | **GFS** (`papers/gfs/gfs_app.html`) | Hermano con **UX portada** de Bigtable (Continuar, tips, quiz modes, TOC). Contenido no auditado al 100% como el piloto. | Ver cómo se remapeó `MODULE_ANIMS`, `PAPER_SHUFFLE_ID` y prefijo `gfs-*`. |
 | **Aurora / Zanzibar** | **Antiguos / desactualizados a propósito.** No tienen el paquete UX actual. | No copiar de ahí. Solo se actualizan si se decide revisitarlos (usar este flujo). |
 | **Contenerización** | Módulo aparte (Docker → K8s), layout dock. | Fuera de este flujo. |
+| **Redis / MongoDB** | Sistemas prácticos bajo **Sistemas · práctica** (hermanos de Contenerización, no anidados). Study-desk + UX completo. | Misma checklist DoD §3; viven en `redis/` y `mongo/` (no en `papers/`). Hub → `../index.html`. Fuentes: Architecture Notes + PDF curso (Redis); PDF NoSQL + Notion S6–S8 (Mongo). Build helpers opcionales: `_build_*.js` (cuidado §15 LECCIONES). |
 
 ## 1. Estructura de archivos y naming
 
 ```
 bdii-estudio/
-├── index.html                      # hub: una card por paper
+├── index.html                      # hub: papers + Sistemas práctica
 ├── README.md                       # entrada; enlaza a docs
 ├── SISTEMA_HTML_ESTUDIO.md         # spec + rúbrica + prompt
 ├── docs/
 │   ├── FLUJO_PAPER_NUEVO.md        # este archivo (checklist + DoD)
 │   └── LECCIONES_ERRORES.md        # error log / anti-patrones
-└── papers/<id>/<id>_app.html       # UN archivo, CSS+JS inline, offline
+├── papers/<id>/<id>_app.html       # papers académicos
+├── redis/redis_app.html            # sistema práctico
+├── mongo/mongo_app.html            # sistema práctico
+└── contenerizacion/                # dock aparte
 ```
 
 Convenciones:
 
-- `<id>`: slug en minúsculas, sin espacios (`bigtable`, `gfs`, `spanner`).
-- Archivo: `papers/<id>/<id>_app.html`. Botón `← Hub` con `href="../../index.html"`.
-- **Prefijo único de storage = `<id>`** (nunca compartir claves entre papers):
+- `<id>`: slug en minúsculas, sin espacios (`bigtable`, `gfs`, `redis`, `mongo`).
+- Papers: `papers/<id>/<id>_app.html` → Hub `href="../../index.html"`.
+- Sistemas prácticos (Redis/Mongo): `<id>/<id>_app.html` en raíz → Hub `href="../index.html"`. Card en la sección **Sistemas · práctica** del hub (junto a Contenerización, no mezclada con su dock).
+- **Prefijo único de storage = `<id>`** (nunca compartir claves entre apps):
 
 | Clave | Contenido |
 |---|---|

@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MongoDB · BDII Estudio — NoSQL / MongoDB</title>
+<style>
+/* ============ ESTUDIO SUITE · design system v4 ("Study-desk editorial") ============
+   Tesis: apuntes de curso compuestos como página editorial — titulares serif,
+   datelines mono, reglas finas en vez de tarjetas, examen numerado, un solo
+   azul tinta reservado a la acción. Ejes: density media · warmth cálida ·
+   formality media-baja · energy quieta · ornament estructural · contrast alto.
+   Offline: Georgia + sans/mono nativos (sin fuentes bloqueantes). Clases e ids
+   intactos: el JS no cambia salvo iconos de módulo y flechas en tabs. */
+:root{
+  --bg:#131110; --bg2:#171514; --surface:#1b1917; --surface2:#221f1c; --surface3:#2a2622;
+  --border:#322d27; --border-soft:#25211d;
+  --text:#ece7dc; --muted:#a8a196; --dim:#6f6a61;
+  --blue:#8ba3c7; --blue-soft:rgba(139,163,199,.12);
+  --teal:#6fae9d; --teal-soft:rgba(111,174,157,.11);
+  --orange:#c08d5c; --orange-soft:rgba(192,141,92,.11);
+  --purple:#9d8ab8; --purple-soft:rgba(157,138,184,.11);
+  --gold:#c2a05e; --gold-soft:rgba(194,160,94,.11);
+  --pink:#b08396; --pink-soft:rgba(176,131,150,.11);
+  --good:#74b18f; --bad:#c07f8c;
+  --brand1:#8ba3c7; --brand2:#8ba3c7;
+  --display:Georgia,'Palatino Linotype','Book Antiqua',Palatino,serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --shadow:none;
+  --shadow-sm:none;
+  --radius:8px; --radius-sm:6px; --radius-xs:4px;
+  --ring:0 0 0 2px rgba(139,163,199,.45);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; color:var(--text);
+  font-family:var(--sans); line-height:1.7; font-size:16px;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+body.light{
+  --bg:#f4f1e9; --bg2:#ece6d5; --surface:#fbf9f2; --surface2:#f0e9d6; --surface3:#e3d8bf;
+  --border:#d2c7a9; --border-soft:#e0d6bc;
+  --text:#26241f; --muted:#5e594e; --dim:#948d7d;
+  --blue:#3c5a86; --blue-soft:rgba(60,90,134,.09);
+  --teal:#337065; --teal-soft:rgba(51,112,101,.09);
+  --orange:#8f5f2b; --orange-soft:rgba(143,95,43,.09);
+  --purple:#635183; --purple-soft:rgba(99,81,131,.09);
+  --gold:#7d6a2e; --gold-soft:rgba(125,106,46,.10);
+  --pink:#8f4f68; --pink-soft:rgba(143,79,104,.09);
+  --good:#3c7a5d; --bad:#9c4a59;
+  --shadow:0 1px 2px rgba(60,50,25,.08);
+  --shadow-sm:0 1px 2px rgba(60,50,25,.06);
+  background:var(--bg);
+}
+::selection{background:var(--border); color:var(--text);}
+a{color:var(--blue); text-decoration:none; border-radius:3px;}
+a:hover{text-decoration:underline;}
+a:focus-visible, button:focus-visible, input:focus-visible{outline:none; box-shadow:var(--ring);}
+::-webkit-scrollbar{width:11px; height:11px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:8px; border:3px solid var(--bg);}
+::-webkit-scrollbar-track{background:transparent;}
+.skip-link{position:absolute; left:12px; top:-48px; z-index:100; background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px 14px; font-size:14px; font-weight:600; transition:top .15s ease; text-decoration:none;}
+.skip-link:focus{top:12px;}
+
+/* ============ HEADER / NAV ============ */
+header{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border-soft);}
+.topbar{max-width:1480px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:11px; font-weight:650; letter-spacing:-.01em; font-size:16px;}
+.brand .logo{width:34px; height:34px; border-radius:6px; flex:0 0 auto; background:var(--surface3); border:1px solid var(--border); display:grid; place-items:center; font-weight:700; font-family:var(--display); font-size:17px; color:var(--text);}
+.brand small{display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em;}
+.tabs{display:flex; gap:2px; margin-left:auto; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border-soft); border-radius:8px; padding:3px;}
+.tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; padding:7px 13px; border-radius:6px; cursor:pointer;}
+.tab:hover{color:var(--text); background:var(--surface2);}
+.tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
+.theme-btn{border:1px solid var(--border); background:var(--surface); color:var(--text); min-width:36px; height:36px; padding:0 10px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:650; font-family:var(--mono); flex:0 0 auto;}
+.theme-btn:hover{border-color:var(--dim);}
+.hub-link{flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:650; color:var(--muted); border:1px solid var(--border); background:var(--surface); padding:7px 11px; border-radius:6px; text-decoration:none; white-space:nowrap;}
+.hub-link:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}.suite-stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
+.progress-track{height:3px; background:var(--border-soft);}
+.progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+
+/* ============ LAYOUT / TYPE — escala 12 / 14 / 16 / 18 / 24 / 40 ============ */
+main{max-width:1480px; margin:0 auto; padding:32px 20px 110px;}
+.view{display:none;}
+.view.active{display:block; animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;}to{opacity:1;}}
+@keyframes pop{from{opacity:0;}to{opacity:1;}}
+@keyframes animPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+h1.title{font-family:var(--display); font-weight:700; font-size:clamp(2rem,4.4vw,2.75rem); margin:12px 0 12px; letter-spacing:0; line-height:1.12; text-wrap:balance;}
+h1.title em{font-style:italic;}
+h2{font-family:var(--display); font-weight:700; font-size:1.5rem; margin:0 0 12px; letter-spacing:0; line-height:1.25; text-wrap:balance;}
+h3{font-family:var(--display); font-weight:700; font-size:1.15rem; margin:30px 0 10px; line-height:1.3;}
+p{max-width:88ch; color:var(--muted); margin:0 0 13px; text-wrap:pretty;}
+p strong, li strong, td strong{color:var(--text);}
+ul, ol{color:var(--muted);}
+.lede{font-size:1.125rem; color:var(--muted); max-width:84ch; line-height:1.65;}
+.dateline{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--dim); margin:0 0 4px;}
+.dateline::before{content:""; width:26px; height:1px; background:var(--dim);}
+.dateline cite{font-style:normal; color:var(--muted);}
+.kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); font-weight:700;}
+.kicker::before{content:""; width:18px; height:1px; background:var(--dim);}
+
+.card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:14px 0;}
+.card.accent-blue, .card.accent-teal, .card.accent-orange, .card.accent-purple, .card.accent-gold, .card.accent-pink{border-left:1px solid var(--border-soft);}
+.callout{position:relative; border-radius:6px; padding:13px 16px 13px 48px; margin:16px 0; font-size:14px; max-width:96ch; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--dim);}
+.callout::before{display:grid; place-items:center; width:24px; height:24px; border-radius:6px; position:absolute; left:12px; top:13px; font-size:13px; font-weight:700; background:var(--surface3); border:1px solid var(--border);}
+.callout .lbl{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; font-weight:700; color:var(--dim);}
+.callout.info{border-left-color:var(--blue);} .callout.info .lbl{color:var(--blue);} .callout.info::before{content:"i"; color:var(--blue); font-family:var(--sans); font-style:normal;}
+.callout.tip{border-left-color:var(--teal);} .callout.tip .lbl{color:var(--teal);} .callout.tip::before{content:"✓"; color:var(--teal);}
+.callout.warn{border-left-color:var(--orange);} .callout.warn .lbl{color:var(--orange);} .callout.warn::before{content:"!"; color:var(--orange);}
+.callout.err{border-left-color:var(--bad);} .callout.err .lbl{color:var(--bad);} .callout.err::before{content:"×"; color:var(--bad);}
+.callout.dark{background:var(--surface2);}
+.trade{background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--gold); border-radius:6px; padding:12px 15px; margin:14px 0; font-size:14px; max-width:96ch; color:var(--muted);}
+.trade b{color:var(--text);}
+.trade b:first-child{color:var(--text);}
+
+code{font-family:var(--mono); font-size:.85em; background:var(--surface2); border:1px solid var(--border-soft); padding:1px 5px; border-radius:4px; color:var(--text);}
+pre{background:#100f0e; color:#d8d5cf; padding:16px 18px; border-radius:4px; overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.7; max-width:100%; border:1px solid var(--border-soft);}
+body.light pre{background:#26241f; color:#e2ded6;}
+pre code{background:none; border:0; padding:0; color:inherit; font-size:inherit;}
+.kw{color:#c8b88a;} .str{color:#93b898;} .cmt{color:#6e6e76;} .fn{color:#9db4d0;} .op{color:#b39ec4;}
+
+table{border-collapse:separate; border-spacing:0; width:100%; margin:14px 0; font-size:13.5px; border:1px solid var(--border-soft); border-radius:4px; overflow:hidden;}
+th,td{padding:9px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--border-soft);}
+th{background:var(--surface2); font-weight:650; color:var(--text); font-size:12.5px;}
+tr:last-child th, tr:last-child td{border-bottom:0;}
+tbody tr:hover td{background:var(--surface2);}
+tr:nth-child(even) td{background:color-mix(in srgb, var(--surface2) 50%, transparent);}
+table, .score-chip, .step-counter{font-variant-numeric:tabular-nums;}
+
+.pill{display:inline-block; padding:2px 10px; border-radius:999px; font-size:11.5px; font-weight:650; font-family:var(--mono); border:1px solid var(--border);}
+.pill.blue{background:var(--blue-soft); color:var(--blue); border-color:transparent;}
+.pill.teal{background:var(--teal-soft); color:var(--teal); border-color:transparent;}
+.pill.orange{background:var(--orange-soft); color:var(--orange); border-color:transparent;}
+.pill.purple{background:var(--purple-soft); color:var(--purple); border-color:transparent;}
+.pill.gold{background:var(--gold-soft); color:var(--gold); border-color:transparent;}
+
+.btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); cursor:pointer; background:var(--surface3); color:var(--text); font-weight:600; font-size:14px; font-family:var(--sans); padding:9px 17px; border-radius:var(--radius-sm);}
+.btn:hover{border-color:var(--dim); filter:brightness(1.1);}
+.btn:active{transform:none;}
+.btn:disabled{opacity:.45; cursor:default;}
+.btn.ghost{background:var(--surface2); color:var(--text); border-color:var(--border-soft);}
+.btn.ghost:hover{border-color:var(--dim);}
+.btn.teal{background:var(--teal); border-color:transparent; color:#10201c;}
+body.light .btn.teal{color:#fbf9f3;}
+.btn.teal:hover{filter:brightness(.94);}
+.btn.playing{background:var(--gold); border-color:transparent; color:#1a1408;}
+.btn.small{padding:6px 12px; font-size:13px;}
+.linklike{background:none; border:0; padding:9px 4px; cursor:pointer; color:var(--blue); font-family:var(--sans); font-size:14px; font-weight:600; text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px;}
+.linklike:hover{filter:brightness(1.15);}
+.controls .btn.seg-on{border-color:var(--teal); color:var(--teal);}
+
+/* ============ HERO (editorial: dateline, titular, una acción) ============ */
+.hero{display:grid; grid-template-columns:1.5fr 1fr; gap:32px; align-items:start; padding:20px 0 8px; border-bottom:1px solid var(--border-soft); padding-bottom:28px;}
+.hero-cards{display:grid; gap:12px;}
+.hero-cta{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:20px;}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:24px 0;}
+.stat{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px 14px 14px; text-align:left;}
+.stat .n{font-family:var(--display); font-size:1.7rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1.1;}
+.stat .l{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5;}
+.path{list-style:none; margin:18px 0; padding:0; border-top:1px solid var(--border-soft);}
+.path li{border-bottom:1px solid var(--border-soft);}
+.path-step{display:flex; gap:18px; align-items:baseline; width:100%; text-align:left; background:none; border:0; padding:16px 4px; cursor:pointer; color:var(--text); font-family:var(--sans);}
+.path-step:hover .path-t{color:var(--blue);}
+.path-n{font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--dim); min-width:44px;}
+.path-step:hover .path-n{color:var(--blue);}
+.path-t{display:block; font-size:16px; font-weight:650; color:var(--text);}
+.path-d{display:block; font-size:13.5px; color:var(--muted); margin-top:3px; max-width:80ch;}
+
+/* ============ APRENDE ============ */
+.aprende-layout{display:grid; grid-template-columns:220px minmax(0,1fr); gap:36px; align-items:start;}
+.module-nav{position:sticky; top:78px; display:flex; flex-direction:column; gap:2px; background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:6px;}
+.module-link{display:flex; align-items:center; gap:10px; text-align:left; cursor:pointer; background:transparent; border:0; border-radius:6px; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:8px 11px; border-left:2px solid transparent;}
+.module-link:hover{background:var(--surface2); color:var(--text);}
+.module-link.active{background:var(--surface2); color:var(--text); border-left-color:var(--blue);}
+.module-link .idx{font-family:var(--mono); font-size:11px; color:var(--dim);}
+.module-link.done .check{margin-left:auto; color:var(--good); font-size:13px; font-weight:700;}
+.module-content{min-width:0;}
+.module-content > h2{margin-top:4px;}
+.done-banner{display:none; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--good); border-radius:6px; padding:9px 14px; margin-bottom:14px; color:var(--text); font-weight:600; font-size:14px;}
+.module-pager{display:flex; justify-content:space-between; gap:12px; margin-top:24px; flex-wrap:wrap;}
+.legend{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;}
+
+/* ============ SVG figures ============ */
+figure{margin:20px 0;}
+figure svg{width:100%; height:auto; display:block; background:var(--surface); border:1px solid var(--border-soft); border-radius:4px;}
+figure figcaption{font-size:14px; color:var(--muted); background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:9px 13px; margin-top:8px; font-family:var(--sans);}
+figure figcaption span{color:var(--text);}
+.tnode{font:600 13px var(--sans); fill:var(--text);}
+.tedge{font:400 11px var(--mono); fill:var(--muted);}
+svg text.svgcap{font:700 14px var(--sans); fill:var(--gold);}
+svg .flow{stroke-dasharray:7 5; animation:dashmove 0.9s linear infinite;}
+@keyframes dashmove{to{stroke-dashoffset:-12;}}
+.controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:12px 0;}
+.controls label{cursor:pointer;}
+input[type="checkbox"]{accent-color:var(--blue);}
+input[type="range"]{-webkit-appearance:none; appearance:none; height:4px; border-radius:99px; background:var(--border); outline-offset:4px;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+input[type="range"]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--text); border:none; cursor:pointer;}
+
+/* ============ ANIM feedback ============ */
+.anim-status{display:flex; align-items:center; gap:12px; margin:14px 0 4px; flex-wrap:wrap;}
+.status-badge{font-family:var(--mono); font-size:11.5px; font-weight:700; padding:3px 11px; border-radius:999px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); white-space:nowrap;}
+.status-badge.playing{color:var(--teal); border-color:var(--teal); animation:animPulse 1.4s ease-in-out infinite;}
+.status-badge.paused{color:var(--gold); border-color:var(--gold);}
+.status-badge.done{color:var(--good); border-color:var(--good);}
+.anim-progress{flex:1; min-width:140px; height:6px; border-radius:999px; background:var(--surface2); overflow:hidden; border:1px solid var(--border-soft);}
+.anim-progress-fill{height:100%; width:0; background:var(--blue); transition:width .4s ease;}
+.step-counter{font-family:var(--mono); font-size:12px; color:var(--dim); min-width:52px; text-align:right;}
+.narrator{background:var(--surface); border:1px solid var(--border-soft); border-left:3px solid var(--blue); border-radius:6px; padding:11px 15px; margin:10px 0; font-size:15px; line-height:1.65; color:var(--text); min-height:52px;}
+.narrator b{color:var(--text);}
+
+/* ============ QUIZ (examen numerado) ============ */
+.quiz-toolbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:14px 0;}
+.score-chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-weight:650; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums;}
+.question-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:16px 0; scroll-margin-top:90px;}
+.qmeta{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+.qmeta .qnum{font-family:var(--display); font-style:italic; font-size:15px; color:var(--dim);}
+.qtag{font-family:var(--mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; border:1px solid transparent;}
+.qtext{font-size:16.5px; font-weight:650; margin-bottom:12px; color:var(--text); line-height:1.6;}
+.opts{counter-reset:qa;}
+.opt{position:relative; display:block; width:100%; text-align:left; cursor:pointer; font-family:var(--sans); background:var(--surface); border:1px solid var(--border-soft); color:var(--text); border-radius:6px; padding:10px 13px 10px 50px; margin:7px 0; font-size:14px; line-height:1.55;}
+.opt::before{counter-increment:qa; content:counter(qa,upper-alpha); position:absolute; left:11px; top:50%; transform:translateY(-50%); width:26px; height:26px; display:grid; place-items:center; border-radius:6px; background:var(--surface2); border:1px solid var(--border); font-family:var(--mono); font-size:12px; font-weight:700; color:var(--dim);}
+.opt:hover{border-color:var(--dim);}
+.opt:hover::before{color:var(--text); border-color:var(--dim);}
+.opt.correct{border-color:var(--good);}
+.opt.correct::before{background:var(--good); border-color:var(--good); color:#0e1512;}
+.opt.wrong{border-color:var(--bad);}
+.opt.wrong::before{background:var(--bad); border-color:var(--bad); color:#fff;}
+.opt:disabled{cursor:default;}
+.opt:disabled:not(.correct):not(.wrong){opacity:.7;}
+.explain{display:none; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--teal); border-radius:0 6px 6px 0; padding:13px 15px; margin-top:11px; font-size:13.5px; color:var(--muted);}
+.explain.show{display:block; animation:pop .2s ease;}
+.explain .why{font-weight:700; color:var(--text);}
+.quiz-result{display:none; text-align:center; padding:30px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border-soft); margin:20px 0;}
+.quiz-result.show{display:block; animation:pop .25s ease;}
+.big-score{font-family:var(--display); font-size:3.2rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1;}
+.grade-bar{height:10px; border-radius:999px; background:var(--surface2); border:1px solid var(--border-soft); overflow:hidden; margin:14px auto; max-width:420px;}
+.grade-fill{height:100%; width:0; border-radius:999px; background:var(--blue); transition:width .6s ease;}
+.case-card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px 22px; margin:18px 0; scroll-margin-top:90px;}
+.case-card h3{margin-top:6px;}
+.case-step{background:var(--surface2); border:1px solid var(--border-soft); border-radius:6px; padding:12px 15px; margin:10px 0; font-size:14px;}
+.hint-btn{font-family:var(--mono); font-size:12.5px;}
+.reveal-btn{margin-top:6px;}
+
+/* ============ GLOSARIO ============ */
+.glossary-search{width:100%; max-width:480px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:var(--sans); font-size:14.5px; padding:11px 15px 11px 40px; border-radius:6px; margin:12px 0 8px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236f6a61' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:13px center;}
+.glossary-search:focus{border-color:var(--blue); box-shadow:var(--ring); outline:none;}
+.glossary-search::placeholder{color:var(--dim);}
+.gloss-term{background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:15px 17px; margin:10px 0; border-left:2px solid transparent;}
+.gloss-term:hover{border-left-color:var(--dim);}
+.gloss-term h3{margin:0 0 5px; font-size:15.5px;}
+.gloss-term .def{color:var(--muted); font-size:14px;}
+
+/* ============ CHEATSHEET ============ */
+#cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:0 14px; align-items:start;}
+#cheatsheetContent .card{margin:7px 0;}
+#cheatsheetContent .card:first-child{grid-column:1 / -1;}
+
+footer{margin-top:60px; padding:24px 20px; border-top:1px solid var(--border-soft); text-align:center; color:var(--dim); font-size:12.5px;}
+
+@media(max-width:860px){
+  body{font-size:15.5px;}
+  .hero{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .path-step{padding:14px 2px;}
+  #cheatsheetContent{grid-template-columns:1fr;}
+  .aprende-layout{grid-template-columns:1fr;}
+  .module-nav{position:static; flex-direction:row; overflow-x:auto; padding:6px; scrollbar-width:thin;}
+  .module-link{white-space:nowrap; border-left:0; border-bottom:2px solid transparent; border-radius:0;}
+  .module-link.active{border-bottom-color:var(--blue);}
+  h1.title{font-size:1.7rem;}
+  .tabs{margin-left:0;}
+  table{display:block; overflow-x:auto;}
+}
+@media print{
+  header, .hub-link, .suite-stamp, .tabs, .theme-btn, .progress-track, .controls, .anim-status, .narrator, .quiz-toolbar, #glossarySearch, .module-pager, .theme-btn, .module-nav, footer{display:none !important;}
+  body{background:#fff;}
+  main{max-width:100%; padding:0;}
+  .view{display:none !important;}
+  #view-cheatsheet{display:block !important;}
+  #cheatsheetContent{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  #cheatsheetContent .card{box-shadow:none; break-inside:avoid; border:1px solid #999; margin:4px 0; padding:10px 12px;}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *, *::before, *::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+  svg .flow{animation:none;}
+}
+
+
+/* ============ GLOSSARY TIP BUBBLES (Study-desk speech) ============ */
+.tip-term{position:relative; cursor:help; border-bottom:1.5px dotted var(--blue); color:inherit; font-weight:650; background:transparent; padding:0; margin:0; font:inherit; display:inline; border-radius:0; border-top:0; border-left:0; border-right:0;}
+.tip-term:hover, .tip-term:focus-visible, .tip-term.is-open{border-bottom-color:var(--gold); color:var(--gold);}
+.tip-term:focus-visible{outline:none; box-shadow:none;}
+.tip-bubble{position:absolute; z-index:80; left:50%; bottom:calc(100% + 10px); transform:translateX(-50%); width:min(340px, 78vw); padding:12px 14px; background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:10px 10px 10px 4px; box-shadow:0 8px 24px rgba(0,0,0,.28); font-family:var(--sans); font-size:13px; font-weight:500; line-height:1.55; text-align:left; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .15s ease, visibility .15s ease;}
+.tip-bubble::after{content:""; position:absolute; left:50%; bottom:-7px; transform:translateX(-50%) rotate(45deg); width:12px; height:12px; background:var(--surface2); border-right:1px solid var(--border); border-bottom:1px solid var(--border);}
+.tip-bubble .tip-k{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--blue); margin-bottom:4px;}
+.tip-bubble .tip-ref{display:block; margin-top:6px; font-size:11.5px; color:var(--dim);}
+.tip-term:hover .tip-bubble, .tip-term:focus-within .tip-bubble, .tip-term.is-open .tip-bubble{opacity:1; visibility:visible; pointer-events:auto;}
+.tip-term.tip-below .tip-bubble{bottom:auto; top:calc(100% + 10px); border-radius:4px 10px 10px 10px;}
+.tip-term.tip-below .tip-bubble::after{bottom:auto; top:-7px; border-right:0; border-bottom:0; border-left:1px solid var(--border); border-top:1px solid var(--border);}
+@media (hover:none){
+  .tip-term:hover .tip-bubble{opacity:0; visibility:hidden;}
+  .tip-term.is-open .tip-bubble{opacity:1; visibility:visible; pointer-events:auto;}
+}
+@media print{ .tip-bubble{display:none !important;} .tip-term{border-bottom:none; font-weight:inherit;} }
+
+/* ============ STUDY UX v5 (resume / TOC / quiz modes / comfort) ============ */
+.progress-meta{display:flex; justify-content:space-between; gap:10px; align-items:center; max-width:1480px; margin:0 auto; padding:4px 20px 6px; font-family:var(--mono); font-size:11px; color:var(--dim); flex-wrap:wrap;}
+.progress-meta b{color:var(--muted); font-weight:650;}
+.continue-card{margin:18px 0 0; padding:14px 16px; background:var(--surface2); border:1px solid var(--border-soft); border-left:3px solid var(--blue); border-radius:6px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;}
+.continue-card .cc-label{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--blue); font-weight:700;}
+.continue-card .cc-detail{font-size:14px; color:var(--muted); flex:1; min-width:200px;}
+.continue-card .cc-detail strong{color:var(--text);}
+.module-outline{position:sticky; top:78px; z-index:5; display:flex; gap:6px; flex-wrap:wrap; padding:8px 0 10px; margin:0 0 8px; background:linear-gradient(var(--bg) 70%, transparent); border-bottom:1px solid var(--border-soft);}
+.module-outline a{font-family:var(--mono); font-size:11px; font-weight:650; color:var(--muted); text-decoration:none; padding:4px 9px; border-radius:999px; border:1px solid var(--border-soft); background:var(--surface); white-space:nowrap;}
+.module-outline a:hover{color:var(--text); border-color:var(--dim); text-decoration:none;}
+.module-content h3, .module-content .trade{scroll-margin-top:110px;}
+.module-chip{font-family:var(--mono); font-size:11px; font-weight:700; color:var(--dim); margin:0 0 8px;}
+.module-content.reading-mode{line-height:1.85;}
+.module-content.reading-mode p, .module-content.reading-mode .lede{max-width:72ch; font-size:1.05em;}
+.anim-learn-link{margin-top:10px; font-size:13px;}
+.seg-tabs{display:flex; gap:4px; flex-wrap:wrap; margin:10px 0 4px; background:var(--surface); border:1px solid var(--border-soft); border-radius:8px; padding:3px; width:fit-content;}
+.seg-tab{border:0; background:transparent; color:var(--muted); font-family:var(--sans); font-size:13.5px; font-weight:600; padding:7px 14px; border-radius:6px; cursor:pointer;}
+.seg-tab:hover{color:var(--text); background:var(--surface2);}
+.seg-tab.active{color:var(--text); background:var(--surface3); box-shadow:inset 0 -2px 0 var(--blue);}
+.quiz-panel, .cases-panel{display:none;}
+.quiz-panel.active, .cases-panel.active{display:block;}
+.quiz-modes, .quiz-filters, .quiz-page-ctl{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+.quiz-modes .btn.seg-on, .quiz-filters .btn.seg-on, .quiz-page-ctl .btn.seg-on{border-color:var(--blue); color:var(--blue);}
+.quiz-nav{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin:14px 0;}
+.quiz-map{display:flex; gap:4px; flex-wrap:wrap; max-width:100%;}
+.quiz-map button{width:28px; height:28px; border-radius:6px; border:1px solid var(--border-soft); background:var(--surface); color:var(--dim); font-family:var(--mono); font-size:11px; font-weight:700; cursor:pointer; padding:0;}
+.quiz-map button:hover{border-color:var(--dim); color:var(--text);}
+.quiz-map button.answered{background:var(--blue-soft); color:var(--blue); border-color:transparent;}
+.quiz-map button.wrong{background:var(--pink-soft); color:var(--bad);}
+.quiz-map button.correct{background:var(--teal-soft); color:var(--good);}
+.quiz-map button.current{box-shadow:var(--ring);}
+.quiz-remediation{text-align:left; margin:16px auto 0; max-width:640px;}
+.quiz-remediation a{display:inline-block; margin:3px 6px 3px 0; font-size:13px;}
+.tip-bubble .tip-gloss{display:inline-block; margin-top:8px; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--blue); cursor:pointer; border:0; background:none; padding:0; text-decoration:underline; text-underline-offset:2px;}
+.tip-term.tip-left .tip-bubble{left:0; transform:none;}
+.tip-term.tip-right .tip-bubble{left:auto; right:0; transform:none;}
+body.light .module-outline{background:linear-gradient(var(--bg) 70%, transparent);}
+@media(max-width:860px){
+  .module-outline{position:static; top:auto;}
+}
+@media print{
+  .continue-card, .seg-tabs, .quiz-modes, .quiz-filters, .quiz-page-ctl, .quiz-nav, .module-outline, .module-chip, .progress-meta, .anim-learn-link, .print-hint{display:none !important;}
+  @page{margin:12mm;}
+}
+
+</style>
+</head>
+<body><a class="skip-link" href="#main">Saltar al contenido</a>
+<header>
+  <div class="topbar">
+    <a class="hub-link" href="../index.html">← Hub</a><span class="suite-stamp">BDII Estudio</span>
+    <div class="brand"><div class="logo">M</div><div><div>MongoDB</div>
+        <small>BDII Estudio · NoSQL / MongoDB</small></div></div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Vistas de estudio">
+      <button class="tab active" role="tab" aria-selected="true" data-view="inicio">Inicio</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="aprende">Aprende</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="animaciones">Animaciones</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="quiz">Quiz & Casos</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="glosario">Glosario</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="cheatsheet">Cheatsheet</button>
+    </nav>
+    <button type="button" class="theme-btn" id="themeBtn" title="Cambiar tema" aria-label="Cambiar tema">Tema</button>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-meta" id="progressMeta"><span id="progressLabel">Módulos 0/8</span><span id="progressQuizHint"></span></div>
+</header>
+<main id="main">
+<section id="view-inicio" class="view active">
+  <div class="hero">
+    <div>
+      <p class="dateline">Apuntes de estudio · Basado en <cite>NoSQL — MongoDB</cite> (PDF curso BDII) · Notion Semanas 6–8</p>
+      <h1 class="title">Base de datos <em>orientada a documentos</em> que escala en clúster</h1>
+      <p class="lede">MongoDB combina <strong>documentos BSON</strong>, <strong>replica sets</strong> (oplog + elecciones) y <strong>sharding</strong> (chunks, shard key, config servers, <code>mongos</code>) con un modelo más flexible que el relacional clásico.</p>
+      <p>Esta app cubre CAP/BASE, CRUD, índices B+, réplicas, fragmentación y trade-offs frente a RDBMS — con citas EN del material del curso, tips, animaciones y casos.</p>
+      <div class="hero-cta">
+        <button class="btn" onclick="go('aprende')">Comenzar a aprender →</button>
+        <button class="linklike" onclick="go('quiz')">Ir directo al quiz →</button>
+      </div>
+      <div class="continue-card" id="continueCard" hidden>
+        <div>
+          <div class="cc-label">Continuar</div>
+          <div class="cc-detail" id="continueDetail"></div>
+        </div>
+        <button class="btn teal small" id="continueBtn" type="button">Seguir donde lo dejé →</button>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="card accent-blue" style="margin:0;"><div class="kicker">No es RDBMS</div><p style="margin:6px 0 0; font-size:14.5px;">Esquema dinámico, API de consulta, sin joins ni transacciones multi-documento clásicas. Escala <strong>out</strong> con shards.</p></div>
+      <div class="card accent-teal" style="margin:0;"><div class="kicker">La idea central en 1 línea</div><p style="margin:6px 0 0; font-size:14.5px;">Colecciones de documentos BSON · primary en replica set · oplog replica writes · <strong>mongos</strong> enruta por shard key.</p></div>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="n">CAP</div><div class="l">Consistencia vs disponibilidad bajo partición</div></div>
+    <div class="stat"><div class="n">≥3</div><div class="l">nodos típicos en replica set</div></div>
+    <div class="stat"><div class="n">BSON</div><div class="l">JSON binario + tipos extra</div></div>
+    <div class="stat"><div class="n">mongos</div><div class="l">router de consultas al shard</div></div>
+  </div>
+  <h2>¿Cómo usar esta app?</h2>
+  <p class="lede">Tres pasos, en orden. Cada uno prepara el siguiente.</p>
+  <ol class="path">
+    <li><button class="path-step" onclick="go('aprende')"><span class="path-n">01</span><span><span class="path-t">Aprende</span><span class="path-d">8 módulos (PDF + apuntes BDII). Hover en términos del glosario.</span></span></button></li>
+    <li><button class="path-step" onclick="go('animaciones')"><span class="path-n">02</span><span><span class="path-t">Animaciones</span><span class="path-d">BSON, índices, replica set, oplog, sharding y mongos.</span></span></button></li>
+    <li><button class="path-step" onclick="go('quiz')"><span class="path-n">03</span><span><span class="path-t">Quiz y casos</span><span class="path-d">~30 preguntas sobre CAP, CRUD, réplicas, sharding + casos prácticos.</span></span></button></li>
+  </ol>
+</section>
+<section id="view-aprende" class="view">
+  <span class="kicker">Ruta de aprendizaje</span>
+  <h2>Aprende MongoDB desde cero</h2>
+  <p class="lede">Sigue los módulos en orden. Fuente: PDF NoSQL-MongoDB + apuntes Notion (Semanas 6–8). Términos subrayados abren el glosario.<strong>subrayado punteado</strong>: hover o tap abre la burbuja. Los <strong>Trade-off</strong> son los que más caen en el quiz.</p>
+  <div class="aprende-layout"><nav class="module-nav" id="moduleNav"></nav><div class="module-content" id="moduleContent"></div></div>
+</section>
+<section id="view-animaciones" class="view">
+  <span class="kicker">Laboratorio visual</span>
+  <h2>Animaciones interactivas</h2>
+  <p class="lede">Modelo documento, índices, réplicas, oplog, sharding y enrutamiento. Cada animación tiene play/paso y narrador.</p>
+  <div class="card accent-blue" id="anim-bson"><h3>1 · Documento BSON en una colección</h3>
+    <p style="font-size:14px;">JSON binario: <code>_id</code> reservado, campos anidados y tipos extra (Date, ObjectId…).</p>
+    <div class="controls"><button class="btn small" onclick="animBSON.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animBSON.play()">Reproducir</button><button class="btn small ghost" onclick="animBSON.reset()">Reiniciar</button></div>
+    <figure><svg id="svgGraph" viewBox="0 0 720 340" role="img"></svg><figcaption>BSON · <span id="graphCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
+    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m1')">Leer en Aprende → Módulo 1</button></p></div>
+  <div class="card accent-purple" id="anim-index"><h3>2 · Índice B+ acelera find()</h3>
+    <p style="font-size:14px;">Índice en <code>email</code>: de collection scan a pocas entradas del árbol.</p>
+    <div class="controls"><button class="btn small" onclick="animIndex.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animIndex.play()">Reproducir</button><button class="btn small ghost" onclick="animIndex.reset()">Reiniciar</button></div>
+    <figure><svg id="svgCheck" viewBox="0 0 720 360" role="img"></svg><figcaption>Índice · <span id="checkCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
+    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m3')">Leer en Aprende → Módulo 3</button></p></div>
+  <div class="card accent-teal" id="anim-replica"><h3>3 · Replica set: primary, secondaries, elección</h3>
+    <p style="font-size:14px;">Solo el primary acepta writes; fallo → votación promueve un secondary.</p>
+    <div class="controls"><button class="btn small" onclick="animReplica.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animReplica.play()">Reproducir</button><button class="btn small ghost" onclick="animReplica.reset()">Reiniciar</button></div>
+    <figure><svg id="svgEnemy" viewBox="0 0 720 300" role="img"></svg><figcaption>Replica set · <span id="enemyCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
+    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m4')">Leer en Aprende → Módulo 4</button></p></div>
+  <div class="card accent-orange" id="anim-oplog"><h3>4 · Oplog: réplica de operaciones</h3>
+    <p style="font-size:14px;">Colección capped en el primary; secondaries tailed y aplican operaciones.</p>
+    <div class="controls"><button class="btn small" onclick="animOplog.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animOplog.play()">Reproducir</button><button class="btn small ghost" onclick="animOplog.reset()">Reiniciar</button></div>
+    <figure><svg id="svgZookie" viewBox="0 0 720 340" role="img"></svg><figcaption>Oplog · <span id="zookieCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
+    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m5')">Leer en Aprende → Módulo 5</button></p></div>
+  <div class="card accent-gold" id="anim-shard"><h3>5 · Sharding, chunks, config servers y mongos</h3>
+    <p style="font-size:14px;">Shard key → chunks → shards; <strong>mongos</strong> lee metadata en config servers y enruta la consulta.</p>
+    <div class="controls"><button class="btn small" onclick="animShard.step()">Siguiente paso →</button><button class="btn small ghost" onclick="animShard.play()">Reproducir</button><button class="btn small ghost" onclick="animShard.reset()">Reiniciar</button></div>
+    <figure><svg id="svgArch" viewBox="0 0 720 360" role="img"></svg><figcaption>Sharding · <span id="archCaption">Pulsa "Siguiente paso".</span></figcaption></figure>
+    <p class="anim-learn-link"><button class="linklike" type="button" onclick="goModule('m6')">Leer en Aprende → Módulos 5–6</button></p></div>
+</section>
+<section id="view-quiz" class="view">
+  <span class="kicker">Comprueba tu aprendizaje</span>
+  <h2>Quiz y casos</h2>
+  <p class="lede">Las marcadas con <span class="pill gold">trade-off</span> preguntan <strong>qué se gana y qué se pierde</strong>. Usa Estudio (feedback ya), Examen (nota al final) o Solo falladas.</p>
+  <div class="seg-tabs" role="tablist" aria-label="Quiz o casos">
+    <button type="button" class="seg-tab active" id="tabQuizPanel" data-panel="quiz">Preguntas</button>
+    <button type="button" class="seg-tab" id="tabCasesPanel" data-panel="cases">Casos</button>
+  </div>
+  <div class="quiz-panel active" id="quizPanel">
+    <div class="quiz-toolbar">
+      <span class="score-chip" id="scoreChip">0 / 0 correctas</span>
+      <div class="quiz-modes" id="quizModes">
+        <button type="button" class="btn ghost small seg-on" data-mode="study">Estudio</button>
+        <button type="button" class="btn ghost small" data-mode="exam">Examen</button>
+        <button type="button" class="btn ghost small" data-mode="wrong">Solo falladas</button>
+      </div>
+      <div class="quiz-filters" id="quizFilters"></div>
+      <div class="quiz-page-ctl" id="quizPageCtl">
+        <span style="font-size:12px;color:var(--dim);font-family:var(--mono);">Vista</span>
+        <button type="button" class="btn ghost small" data-page="1">1</button>
+        <button type="button" class="btn ghost small" data-page="5">5</button>
+        <button type="button" class="btn ghost small seg-on" data-page="all">Todas</button>
+      </div>
+      <button class="btn ghost small" type="button" onclick="quiz.reset()">Reiniciar</button>
+    </div>
+    <div class="quiz-nav" id="quizNav" hidden>
+      <button type="button" class="btn ghost small" id="quizPrev">← Anterior</button>
+      <div class="quiz-map" id="quizMap"></div>
+      <button type="button" class="btn ghost small" id="quizNext">Siguiente →</button>
+    </div>
+    <div id="quizContainer"></div>
+    <div class="quiz-result" id="quizResult">
+      <div class="big-score" id="quizPercent">0%</div>
+      <div class="grade-bar"><div class="grade-fill" id="gradeFill"></div></div>
+      <p id="quizMsg" style="text-align:center; margin:0 auto;"></p>
+      <div class="quiz-remediation" id="quizRemediation"></div>
+    </div>
+  </div>
+  <div class="cases-panel" id="casesPanel">
+    <h2 style="margin-top:8px;">Casos prácticos</h2>
+    <p class="lede">Intenta resolver antes de ver la solución. Pistas y soluciones se guardan en este dispositivo.</p>
+    <div id="casesContainer"></div>
+  </div>
+</section>
+<section id="view-glosario" class="view">
+  <span class="kicker">Referencia rápida</span>
+  <h2>Glosario bilingüe</h2>
+  <p class="lede">Misma fuente que las burbujas del Aprende. Escribe para filtrar (ej: oplog, mongos, CAP).</p>
+  <input class="glossary-search" id="glossarySearch" type="text" placeholder="Filtra por término (ej: oplog, shard key, BSON)…">
+  <div id="glossaryList"></div>
+</section>
+<section id="view-cheatsheet" class="view">
+  <span class="kicker">Repaso de último minuto</span>
+  <h2>Cheatsheet</h2>
+  <p class="lede">Todo lo esencial en una página. Ideal para imprimir o guardar PDF antes del quiz.</p>
+  <div class="hero-cta print-hint" style="margin:10px 0 16px;">
+    <button type="button" class="btn teal small" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <span style="font-size:13px;color:var(--dim);">Esta pestaña ya está activa — Ctrl+P también funciona.</span>
+  </div>
+  <div id="cheatsheetContent"></div>
+</section>
+</main>
+<footer>Herramienta de estudio sobre MongoDB (PDF curso BDII y apuntes Semanas 6–8) (OSDI 2006). Leer → animar → practicar.</footer>
+<script>
+const MODULES = [
+{ id:'m0', tag:'Módulo 0', accent:'gold', title:'CAP, BASE y NoSQL frente a ACID',
+summary:'Teorema CAP, réplicas vs shards, beneficios e inconvenientes de NoSQL.',
+html: `
+<p class="lede">En sistemas distribuidos con muchos nodos y particiones de red, no puedes maximizar todo a la vez: entra el <strong>teorema CAP</strong> y el estilo <strong>BASE</strong> típico de muchas bases NoSQL.</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 6 Clase 2 (interpretación CAP)</div>Si no puedes acotar fallas, las peticiones van a cualquier servidor y exiges atender todas, entonces <strong>no puedes ser coherente</strong> (consistent) en el sentido fuerte. Siempre hay que renunciar a algo: coherencia, disponibilidad o tolerancia a partición/reconfiguración.</div>
+<table><tr><th>Letra</th><th>Significado didáctico</th></tr>
+<tr><td><strong>C</strong>onsistency</td><td>Todas las réplicas ven la misma versión; el cliente tiene la misma vista sin importar el nodo.</td></tr>
+<tr><td><strong>A</strong>vailability</td><td>El sistema sigue operativo aunque fallen nodos.</td></tr>
+<tr><td><strong>P</strong>artition tolerance</td><td>Sigue operando aunque haya partición de red (comunicación rota).</td></tr></table>
+<div class="callout warn"><div class="lbl">Clase · BASE (extra didáctico)</div><strong>Basically Available, Soft state, Eventually consistent</strong> — contraste habitual con ACID en NoSQL: disponibilidad y escala primero; coherencia fuerte relajada o eventual.</div>
+<p><strong>Réplica set vs sharding (visión de clase):</strong> con ~3 réplicas replicas el mismo subconjunto de datos (HA). Con sharding divides el dataset: 10M docs → 5M en un shard y 5M en otro; cada shard suele ser a su vez un replica set.</p>
+<div class="trade"><b>Trade-off 0 · CAP en la práctica.</b> Ganas: escala horizontal y uptime. Pierdes: garantías ACID/SQL clásicas y consultas ad hoc fáciles.</div>
+<div class="callout warn"><div class="lbl">Error común</div>Decir que MongoDB “elige CP o AP siempre”. El comportamiento depende de <strong>write concern</strong>, <strong>read concern</strong> y si hay partición; el material del curso enfatiza el marco CAP, no un solo rótulo fijo.</div>
+`,
+mini:{q:'Según la interpretación de clase del teorema CAP, ¿qué es imposible bajo partición?', opts:['Tener nodos','Satisfacer C, A y P a la vez sin compromiso','Usar TCP','Tener índices'], a:1, why:'CAP: no puedes maximizar los tres sin renunciar a algo.'} },
+{ id:'m1', tag:'Módulo 1', accent:'blue', title:'Modelo documento y BSON',
+summary:'Colecciones, documentos, _id, JSON binario y esquema dinámico.',
+html: `
+<p class="lede">MongoDB es una base <strong>orientada a documentos</strong>: guardas registros flexibles en colecciones, no filas rígidas de un esquema DDL único.</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 6</div>Document-oriented · schema-less en el servidor: almacena hashes/clave-valor que elijas. La aplicación lleva el esquema. Usa formato <strong>BSON</strong> (Binary JSON) con tipos extra. Escrito en C++; drivers en muchos lenguajes.</div>
+<p><strong>BSON:</strong> JSON en binario + tipos como <code>Date</code>, <code>ObjectId</code>, <code>int64</code>. Las claves se almacenan como strings; MongoDB crea <code>_id</code> si no lo envías (campo reservado).</p>
+<pre><code>{ "_id": ObjectId("…"), "name": "Ana", "tags": ["bdii","nosql"], "meta": { "campus": "TEC" } }</code></pre>
+<div class="trade"><b>Trade-off 1 · Flexibilidad de esquema.</b> Ganas: evolucionar la app sin migraciones DDL constantes. Pierdes: validación menos centralizada (debes aplicarla en app o con JSON Schema / validator).</div>
+<div class="callout tip"><div class="lbl">PDF curso · funcionalidad</div>Dynamic schema (no DDL), document database, secondary indexes, query API, atomic writes and fully consistent reads <em>when configured that way</em>, replica sets, horizontal scaling via sharding — <strong>no joins nor transactions</strong> (material clásico del curso; versiones modernas añaden multi-doc TX limitadas — extra, no foco del PDF).</div>
+`,
+mini:{q:'¿Qué es BSON?', opts:['Un protocolo de red','JSON binario con tipos adicionales','Un índice B+','Un shard key'], a:1, why:'B = Binary; extiende JSON.'} },
+{ id:'m2', tag:'Módulo 2', accent:'purple', title:'CRUD y consultas',
+summary:'insert/find/update/remove y proyecciones.',
+html: `
+<p class="lede">El acceso es por <strong>API de consulta</strong> (shell/drivers), no SQL declarativo general.</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 7</div>Create: <code>insertOne</code>, <code>insertMany</code>, <code>save</code>, <code>update</code> con upsert. Read: <code>find</code>, <code>findOne</code> con query y projection. Update/Delete vía <code>update</code> / <code>remove</code> (legacy) o métodos modernos equivalentes.</div>
+<pre><code>db.users.insertOne({ name: "Matias", email: "m@tec.cr" })
+db.users.find({ campus: "Cartago" }, { name: 1, email: 1 })
+db.users.updateOne({ email: "m@tec.cr" }, { $set: { role: "student" } })</code></pre>
+<p><strong>Query + projection:</strong> el filtro elige documentos; la proyección recorta campos (similar a SELECT columnas). Operadores (<code>$gt</code>, <code>$in</code>, <code>$and</code>…) componen consultas.</p>
+<div class="trade"><b>Trade-off 2 · API rica vs ad hoc BI.</b> Ganas: consultas alineadas a la app. Pierdes: analítica ad hoc tipo SQL warehouse (debilidad histórica de NoSQL en clase).</div>
+`,
+mini:{q:'¿Qué hace la proyección en find()?', opts:['Ordena shards','Limita qué campos devuelve','Crea un índice','Elige el primary'], a:1, why:'Segundo argumento de find: shape del documento de salida.'} },
+{ id:'m3', tag:'Módulo 3', accent:'teal', title:'Índices B+',
+summary:'_id automático, simples, compuestos, sparse y arrays.',
+html: `
+<p class="lede">MongoDB usa <strong>índices B+</strong> para acelerar búsquedas; sin índice adecuado, un find puede escanear toda la colección.</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 7</div>Auto-index on <code>_id</code>. Users may create indexes for performance or unique values. Single-field and <strong>compound</strong> indexes — field order matters (like SQL). Indexing array fields creates separate index entries per element. <strong>Sparse</strong> index: only documents that contain the indexed field. Unique + sparse: rejects duplicate keys but allows missing field.</div>
+<p><strong>Compuesto:</strong> índice <code>{ a:1, b:1 }</code> sirve bien a queries que filtran por <code>a</code> y luego <code>b</code>, no al revés en general.</p>
+<div class="trade"><b>Trade-off 3 · Índices.</b> Ganas: latencia de lectura. Pierdes: espacio en disco y costo en writes (mantener árboles).</div>
+<div class="callout warn"><div class="lbl">Error común</div>Crear muchos índices “por si acaso” en colecciones write-heavy — cada insert/update toca índices.</div>
+`,
+mini:{q:'Un índice sparse…', opts:['Solo indexa docs con el campo presente','Prohíbe _id','Reemplaza al oplog','Shard automático'], a:0, why:'Definición Semana 7.'} },
+{ id:'m4', tag:'Módulo 4', accent:'orange', title:'Replica set, oplog y elecciones',
+summary:'Primary/secondary, journal, votación y failover.',
+html: `
+<p class="lede">La <strong>replica set</strong> es el mecanismo de HA de MongoDB: un primary y secondaries que replican datos.</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 8 Clase 2 (EN paraphrase)</div>MongoDB uses a <strong>master-slave replication</strong> strategy: one primary for all writes, replicated to slaves. Changes tracked in a capped <strong>oplog</strong> on the primary; secondaries apply operations by reading the oplog. Reads on any server OK but slaves may be slightly stale. On primary failure, a slave is <strong>automatically promoted</strong> via a <strong>voting protocol</strong>.</div>
+<p><strong>Oplog:</strong> colección limitada (capped) de operaciones — base del tailing replication. <strong>Elecciones:</strong> mayoría de votos elige nuevo primary (típicamente replica set impar ≥3).</p>
+<p><strong>Docker / rs.initiate (clase):</strong> varios <code>mongod --replSet replica-1</code> en red Docker; <code>rs.initiate(config)</code> declara miembros.</p>
+<div class="trade"><b>Trade-off 4 · Async replication.</b> Ganas: lecturas escaladas y failover. Pierdes: lag y posible ventana de writes no replicados si cae el primary.</div>
+`,
+mini:{q:'¿Quién acepta writes en un replica set?', opts:['Cualquier secondary','Solo el primary','mongos','Config server'], a:1, why:'Primary único para writes; secondaries replican.'} },
+{ id:'m5', tag:'Módulo 5', accent:'gold', title:'Sharding: shard key y chunks',
+summary:'Partición horizontal, rangos, hash y hotspots.',
+html: `
+<p class="lede"><strong>Sharding</strong> reparte una colección entre varios shards para escalar almacenamiento y throughput.</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 8</div>Sharding partitions data horizontally; each partition is a <strong>shard</strong>. MongoDB shards at <strong>collection</strong> level. Uses <strong>shard key</strong> to distribute documents in non-overlapping ranges → <strong>chunks</strong>, balanced across shards.</div>
+<p><strong>Range vs hashed shard key (clase):</strong> range optimiza consultas por rangos continuos; hash ayuda distribución uniforme y evita hotspots cuando la clave es monótona (ej. timestamp creciente).</p>
+<p>Consideraciones de clase: división lógica, consultas multi-shard, recuperación ante fallos.</p>
+<div class="trade"><b>Trade-off 5 · Shard key irreversible.</b> Ganas: scale-out. Pierdes: mal diseño de clave concentra tráfico en un shard; resharding es operación pesada.</div>
+`,
+mini:{q:'¿Qué es un chunk?', opts:['Un documento BSON','Rango de shard key asignado a un shard','Un índice sparse','El oplog'], a:1, why:'Chunks = trozos por rangos de shard key.'} },
+{ id:'m6', tag:'Módulo 6', accent:'pink', title:'Config servers y mongos',
+summary:'Metadata del cluster y enrutamiento de consultas.',
+html: `
+<p class="lede">Un clúster sharded añade piezas de control: <strong>config servers</strong> (metadata) y <strong>mongos</strong> (routers).</p>
+<div class="callout info"><div class="lbl">Apuntes BDII · Semana 8</div><strong>Config server</strong> stores sharded cluster configuration — which chunk lives on which shard. Vital for correct routing; dedicated config servers recommended. <strong>Query routers</strong> direct queries to the appropriate shard; MongoDB’s router is <strong>mongos</strong>. Often consistent hashing on shard key so same key → same shard.</div>
+<p>Flujo: cliente → <strong>mongos</strong> → lee catálogo en config → envía operación al shard (replica set) correcto. Si un shard cae, metadata + ops de recuperación redistribuyen chunks (detalle operativo va más allá del quiz, pero la idea de routing es examinable).</p>
+<div class="trade"><b>Trade-off 6 · Complejidad operativa.</b> Ganas: dataset mayor que un solo nodo. Pierdes: más componentes (config RS, mongos, balancer) y queries scatter/gather costosas.</div>
+`,
+mini:{q:'¿Qué componente enruta consultas al shard correcto?', opts:['Oplog','mongos','Chubby','Bloom filter'], a:1, why:'Query router = mongos en MongoDB sharded.'} },
+{ id:'m7', tag:'Módulo 7', accent:'gold', title:'Trade-offs vs RDBMS',
+summary:'Esquema, ACID, ad hoc, costo y cuándo elegir MongoDB.',
+html: `
+<p class="lede">El curso contraste NoSQL vs RDBMS en flexibilidad, escala y relajación de ACID.</p>
+<table><tr><th>Tema</th><th>RDBMS (clase)</th><th>MongoDB / NoSQL</th></tr>
+<tr><td>Esquema</td><td>Rígido, DDL central</td><td>Dinámico; app lleva el shape</td></tr>
+<tr><td>Consultas</td><td>SQL ad hoc, joins</td><td>API orientada a documentos; sin joins clásicos</td></tr>
+<tr><td>Escala</td><td>Scale-up (servidor más grande)</td><td>Scale-out (shards, commodity servers)</td></tr>
+<tr><td>ACID</td><td>Fuerte por defecto</td><td>Relajación histórica; tunable con concerns</td></tr>
+<tr><td>BI / analytics</td><td>Fuerte</td><td>Diseñado para apps web 2.0; BI limitado</td></tr></table>
+<div class="callout info"><div class="lbl">Apuntes BDII · beneficios NoSQL</div>Elastic scaling, less DBA-heavy ops, big data volumes, flexible data models, economy on commodity clusters.</div>
+<div class="callout warn"><div class="lbl">Inconvenientes (clase)</div>Aún requiere administración; analítica ad hoc no es el fuerte; herramientas BI en evolución.</div>
+<div class="trade"><b>Trade-off 7 · Cuándo MongoDB.</b> Ganas: documentos JSON-like, horizontal scale, HA integrada. Pierdes: joins/transacciones multi-tabla fáciles y reporting SQL clásico.</div>
+`,
+mini:{q:'Según apuntes de clase, NoSQL escala principalmente…', opts:['Scale-up en un mainframe','Scale-out repartiendo datos en hosts','Solo en memoria sin disco','Con SQL estándar'], a:1, why:'Elastic scaling / scale-out vs bigger single server.'} }
+];
+
+const QUIZ = [
+{tag:'CAP', c:'gold', q:'El teorema CAP en la lectura de clase implica…', opts:['SQL obligatorio','No C+A+P simultáneos sin compromiso bajo partición','Sin réplicas','Solo un nodo'], a:1, why:'Interpretación Semana 6: renunciar a algo.'},
+{tag:'CAP', c:'gold', q:'Un replica set de 3 nodos busca principalmente…', opts:['Partir datos en mitades','HA y tolerancia a fallo de un nodo','Reemplazar índices','Eliminar oplog'], a:1, why:'Tres réplicas del mismo dataset; sharding es otro paso.'},
+{tag:'BASE', c:'gold', q:'BASE en contraste didáctico con ACID enfatiza…', opts:['Joins fuertes','Disponibilidad y consistencia eventual','Solo batch','DDL estricto'], a:1, why:'Basically Available, Soft state, Eventually consistent.'},
+{tag:'BSON', c:'blue', q:'_id en MongoDB…', opts:['Es opcional y nunca indexado','Es campo reservado; índice único automático','Solo string','Solo en sharded'], a:1, why:'Semana 6: system reserved; auto index.'},
+{tag:'Documento', c:'blue', q:'¿Quién define el esquema en MongoDB clásico del curso?', opts:['DDL del servidor','La aplicación','mongos','Config server'], a:1, why:'Schema-less en DB; app tracks schema.'},
+{tag:'BSON', c:'blue', q:'BSON significa…', opts:['Binary JSON','Basic SQL Object Notation','Batch Sync Object Network','Bloom Sorted Object Nodes'], a:0, why:'B = Binary extension of JSON.'},
+{tag:'CRUD', c:'purple', q:'insertOne() pertenece a…', opts:['Create','Read','Update','Delete'], a:0, why:'Operación de creación.'},
+{tag:'CRUD', c:'purple', q:'find(query, projection) — projection…', opts:['Shard key','Campos a devolver','Write concern','Replica ID'], a:1, why:'Semana 7 CRUD notes.'},
+{tag:'Consulta', c:'purple', q:'NoSQL del curso vs RDBMS: consultas…', opts:['Solo SQL','Vía API orientada a documentos','Solo MapReduce','Sin filtros'], a:1, why:'Query language through API.'},
+{tag:'Índice', c:'teal', q:'Índices en MongoDB son principalmente…', opts:['Hash tables en RAM','B+ trees','LSM only','Full text only'], a:1, why:'Semana 7: B+ tree indexes.'},
+{tag:'Indice', c:'teal', q:'En índice compuesto {a:1,b:1} importa…', opts:['Solo el nombre','El orden de campos','El color del shard','El puerto mongos'], a:1, why:'Like SQL composite indexes.'},
+{tag:'Índice', c:'teal', q:'Indexar un campo array…', opts:['Prohibido','Crea entradas por elemento','Borra el array','Desactiva _id'], a:1, why:'Semana 7 note on arrays.'},
+{tag:'Replica', c:'orange', q:'Oplog vive en…', opts:['Config server','Primary (capped collection)','Cliente','mongos only'], a:1, why:'Semana 8: oplog on master/primary.'},
+{tag:'Oplog', c:'orange', q:'Secondaries se ponen al día…', opts:['Leyendo SQL logs','Aplicando entradas del oplog','Copiando RDB','Vía Bloom'], a:1, why:'Tail oplog and apply.'},
+{tag:'Election', c:'orange', q:'Nuevo primary se elige con…', opts:['Round-robin','Protocolo de votación','Primer ping','Hash del _id'], a:1, why:'Voting protocol Semana 8.'},
+{tag:'Replica', c:'orange', q:'Reads en secondaries pueden estar…', opts:['Siempre más nuevos que primary','Ligeramente desactualizados (stale)','Prohibidos','Sin oplog'], a:1, why:'Replication lag.'},
+{tag:'Sharding', c:'gold', q:'Sharding en MongoDB es a nivel de…', opts:['Campo _id solo','Colección','Instancia única','Oplog'], a:1, why:'Collection-level sharding.'},
+{tag:'Shard', c:'gold', q:'Shard key sirve para…', opts:['Cifrar BSON','Distribuir documentos en chunks/shards','Elegir primary','Compactar índices'], a:1, why:'Distribution key.'},
+{tag:'Chunk', c:'gold', q:'Chunks son…', opts:['Backups RDB','Rangos no superpuestos de shard key','Entradas oplog','Sentinel nodes'], a:1, why:'Semana 8 chunks definition.'},
+{tag:'Sharding', c:'gold', q:'Sharding por hash ayuda cuando…', opts:['Quieres rangos geográficos','La clave es monótona y riesgo de hotspot','No hay config server','No hay mongos'], a:1, why:'Class: hash for even distribution.'},
+{tag:'mongos', c:'pink', q:'mongos es…', opts:['Storage engine','Query router','Oplog','Primary election daemon'], a:1, why:'Query router Semana 8.'},
+{tag:'Config', c:'pink', q:'Config servers guardan…', opts:['Todos los documentos','Metadata de chunks y shards','Solo logs de app','Índices B+ completos'], a:1, why:'Configuration of sharded cluster.'},
+{tag:'trade-off', c:'gold', q:'Trade-off central NoSQL vs RDBMS en clase…', opts:['IPv6 vs IPv4','Scale-out + flexibilidad vs ACID/joins/ad hoc SQL','Solo UI','Solo caché'], a:1, why:'Elastic scaling, relaxed ACID, API queries.'},
+{tag:'ACID', c:'gold', q:'Relajación ACID en NoSQL implica…', opts:['Sin disco','Garantías transaccionales menos fuertes que RDBMS clásico','Sin réplicas','Sin índices'], a:1, why:'Semana 6 trade-offs.'},
+{tag:'RDBMS', c:'gold', q:'Ventaja histórica RDBMS señalada en clase…', opts:['Sharding nativo','Analítica / BI ad hoc','Sin esquema','Solo BSON'], a:1, why:'Inconveniente NoSQL: analytics niche for RDBMS.'},
+{tag:'CRUD', c:'purple', q:'update con upsert:true…', opts:['Solo borra','Inserta si no hay match','Desactiva índice','Inicia elección'], a:1, why:'Semana 7 CRUD pattern.'},
+{tag:'Replica', c:'orange', q:'Si primary cae, writes…', opts:['Continúan en secondary sin elección','Pausan hasta nuevo primary elegido','Van a mongos','Se pierden siempre'], a:1, why:'Promotion delay / election.'},
+{tag:'Sharding', c:'gold', q:'Escalabilidad horizontal clave de sharding…', opts:['Un servidor más grande','Más nodos/shards para datos y tráfico','Menos réplicas','Sin chunks'], a:1, why:'Add nodes to grow.'},
+{tag:'Indice', c:'teal', q:'Unique + sparse index…', opts:['Permite duplicados siempre','Rechaza duplicados pero permite campo ausente','Borra _id','Shard automático'], a:1, why:'Semana 7 sparse+unique rule.'},
+{tag:'CAP', c:'gold', q:'Partir 10M docs en dos replica sets distintos (5M c/u) es…', opts:['Replica set','Sharding','Oplog','Index'], a:1, why:'Semana 6: shards hold partitions.'},
+{tag:'mongos', c:'pink', q:'Cliente en clúster sharded habla normalmente con…', opts:['Solo config','mongos (no cada shard directo)','Oplog','Secondary only'], a:1, why:'Router abstracts shard map.'},
+{tag:'Oplog', c:'orange', q:'Oplog es colección…', opts:['Ilimitada','Capped / limitada','Solo en secondary','Sin orden'], a:1, why:'Capped collection on primary.'}
+];
+
+const CASES = [
+{ title:'Caso 1 · CAP en outage', prompt:'Hay partición de red: dos datacenters no se hablan pero clientes siguen escribiendo en ambos lados de un replica set mal configurado. ¿Qué principio CAP violaste y qué política usar?', solution:'<strong>Riesgo:</strong> split-brain / divergencia (consistencia). Usar mayoría en elecciones, write concern <code>majority</code>, evitar writes en minoría aislada. <strong>Trade-off:</strong> disponibilidad en minoría vs consistencia global.', h1:'¿Qué significa P en CAP?', h2:'¿Qué hace write concern majority?', rubric:'Rúbrica: 2 CAP + 2 mecanismo Mongo + 1 trade-off.'},
+{ title:'Caso 2 · Elegir shard key', prompt:'Logs con timestamp monótono como única shard key. ¿Problema y alternativa?', solution:'<strong>Hotspot:</strong> inserts van al mismo chunk/shard (range). Mezclar hashed shard key o compound con alta cardinalidad (deviceId + ts).', h1:'Range vs hashed en clase.', h2:'¿Qué es un chunk?', rubric:'Rúbrica 2/2/1.'},
+{ title:'Caso 3 · Replica set Docker', prompt:'Tres contenedores mongod --replSet rs0 pero writes fallan. Falta rs.initiate. ¿Pasos mínimos?', solution:'Misma red Docker, puertos publicados, luego <code>rs.initiate({ _id:"rs0", members:[…] })</code> con hostnames alcanzables entre contenedores.', h1:'¿Cuántos miembros mínimo recomendado?', h2:'¿Quién acepta writes?', rubric:'Rúbrica 2/2/1.'},
+{ title:'Caso 4 · Índice compuesto', prompt:'Tienes índice { campus:1, studentId:1 }. ¿Qué query lo usa bien y cuál no?', solution:'Bien: <code>{ campus:"Cartago", studentId:123 }</code> o prefix <code>{ campus:"Cartago" }</code>. Mal: solo <code>{ studentId:123 }</code> sin campus (no usa el índice compuesto eficientemente).', h1:'¿Por qué importa el orden?', h2:'¿Qué es COLLSCAN?', rubric:'Rúbrica 2/2/1.'},
+{ title:'Caso 5 · Read stale', prompt:'Dashboard lee de secondary con mucha carga write. Números van “atrás”. ¿Por qué y mitigación?', solution:'<strong>Lag</strong> oplog replication. Mitigar: read from primary, read concern majority, o tolerar staleness en UI.', h1:'¿Qué es oplog?', h2:'Read preference options.', rubric:'Rúbrica 2/2/1.'},
+{ title:'Caso 6 · MongoDB vs Postgres', prompt:'Sistema bancario con joins complejos y reportes SQL ad hoc. ¿MongoDB solo?', solution:'<strong>Probablemente no como único store:</strong> RDBMS fuerte en ACID/joins/BI. Mongo podría ser catálogo flexible o cache, pero core transaccional suele quedarse relacional (trade-offs m7).', h1:'Inconveniente NoSQL analytics.', h2:'¿Qué gana Mongo?', rubric:'Rúbrica 2/2/1.'},
+{ title:'Caso 7 · mongos caído', prompt:'Shards vivos pero mongos no responde. ¿Qué ven los clientes?', solution:'Clientes no enrutan queries: app debe usar otro mongos o SPOF de routers. Config/shards pueden estar bien pero sin router no hay acceso sharded normal.', h1:'Rol de mongos.', h2:'¿Dónde está metadata?', rubric:'Rúbrica 2/2/1.'},
+{ title:'Caso 8 · Sparse unique email', prompt:'Users con email opcional. Quieres unicidad cuando existe email.', solution:'Índice <strong>unique + sparse</strong> en email: rechaza duplicados con email definido; permite muchos docs sin campo email.', h1:'Definición sparse.', h2:'Unique behavior.', rubric:'Rúbrica 2/2/1.'}
+];
+
+const GLOSSARY = [
+['MongoDB','Base de datos document-oriented open source (10gen/2007+). (Semana 6)'],
+['BSON','Binary JSON: serialización binaria con tipos extra. (Semana 6)'],
+['Colección','Contenedor de documentos (análogo flexible a tabla). (Curso)'],
+['Documento','Registro BSON en una colección. (Curso)'],
+['_id','Identificador reservado del sistema; índice único automático. (Semana 6)'],
+['Teorema CAP','Consistencia, Disponibilidad, Tolerancia a partición — no los tres sin compromiso. (Semana 6)'],
+['BASE','Basically Available, Soft state, Eventually consistent — contraste didáctico con ACID. (Clase)'],
+['ACID','Atomicity, Consistency, Isolation, Durability — relajado en muchos NoSQL. (Semana 6)'],
+['Replica set','Grupo de mongod replicando el mismo dataset; elección de primary. (Semana 6–8)'],
+['Primary','Nodo que acepta writes en replica set. (Semana 8)'],
+['Secondary','Nodo que replica al primary; reads opcionales. (Semana 8)'],
+['Oplog','Capped collection de operaciones en primary para replication. (Semana 8)'],
+['Elección','Votación para promover secondary a primary. (Semana 8)'],
+['Sharding','Partición horizontal de datos en shards. (Semana 6–8)'],
+['Shard','Partición que contiene subset de chunks. (Semana 8)'],
+['Shard key','Campo(s) que determinan chunk de un documento. (Semana 8)'],
+['Chunk','Rango no superpuesto de shard key migrable. (Semana 8)'],
+['Config server','Almacena metadata del clúster sharded. (Semana 8)'],
+['mongos','Router de consultas hacia shards correctos. (Semana 8)'],
+['Índice B+','Estructura de índice por defecto para acelerar queries. (Semana 7)'],
+['Índice compuesto','Índice multi-campo; orden importa. (Semana 7)'],
+['Índice sparse','Solo indexa documentos con el campo presente. (Semana 7)'],
+['Write concern','Cuántas réplicas deben ack un write. (Extra operativo)'],
+['Read preference','De qué nodo leer (primary/secondary…). (Extra operativo)'],
+['CRUD','Create Read Update Delete vía API MongoDB. (Semana 7)'],
+['Scale-out','Crecer añadiendo nodos vs scale-up. (Semana 6)']
+];
+
+const CHEATSHEET = `
+<div class="card accent-gold"><h3 style="margin-top:0;">Modelo</h3><p style="font-size:14px;">Colecciones de <strong>documentos BSON</strong>; esquema en la app; <code>_id</code> automático.</p></div>
+<div class="card accent-blue"><h3 style="margin-top:0;">CAP / NoSQL</h3><p style="font-size:14px;">C+A+P no gratis bajo partición · scale-out · BASE vs ACID · API queries vs SQL ad hoc.</p></div>
+<div class="card accent-purple"><h3 style="margin-top:0;">CRUD</h3><p style="font-size:14px;"><code>insertOne/Many</code> · <code>find/findOne</code> + projection · <code>update</code> · delete/remove.</p></div>
+<div class="card accent-teal"><h3 style="margin-top:0;">Índices</h3><p style="font-size:14px;">B+ · simple/compuesto (orden) · sparse · arrays → multikey entries.</p></div>
+<div class="card accent-orange"><h3 style="margin-top:0;">Replica set</h3><p style="font-size:14px;">Primary writes · secondaries tail <strong>oplog</strong> · elección si cae primary · ≥3 nodos típico.</p></div>
+<div class="card accent-gold"><h3 style="margin-top:0;">Sharding</h3><p style="font-size:14px;"><strong>Shard key</strong> → <strong>chunks</strong> → shards (cada uno RS) · range vs hash · evitar hotspots.</p></div>
+<div class="card accent-pink"><h3 style="margin-top:0;">Cluster</h3><p style="font-size:14px;"><strong>Config servers</strong> (metadata) + <strong>mongos</strong> (router) · cliente → mongos → shard.</p></div>
+<div class="card accent-blue"><h3 style="margin-top:0;">vs RDBMS</h3><p style="font-size:14px;">Flex + horizontal scale vs joins/ACID/BI fuertes — elige según workload.</p></div>
+`;
+
+/* ---- Glossary tip bubbles ---- */
+function buildTipIndex(){
+  const map = new Map();
+  GLOSSARY.forEach(function(td){
+    const term = td[0];
+    const def = td[1];
+    map.set(term.toLowerCase(), {term:term, def:def});
+    const bare = term.split(':')[0].trim();
+    if (bare && bare.toLowerCase() !== term.toLowerCase() && !map.has(bare.toLowerCase())) {
+      map.set(bare.toLowerCase(), {term:term, def:def});
+    }
+  });
+  const aliases = {
+    'mongodb':'MongoDB', 'mongo db':'MongoDB', 'mongo':'MongoDB',
+    'bson':'BSON', 'json':'JSON',
+    'replica set':'Replica set', 'replicaset':'Replica set', 'replset':'Replica set',
+    'oplog':'Oplog', 'primary':'Primary', 'secondary':'Secondary',
+    'election':'Elección', 'elecciones':'Elección',
+    'sharding':'Sharding', 'shard':'Shard', 'shards':'Shard',
+    'shard key':'Shard key', 'chunk':'Chunk', 'chunks':'Chunk',
+    'mongos':'mongos', 'config server':'Config server', 'config servers':'Config server',
+    'cap':'Teorema CAP', 'teorema cap':'Teorema CAP', 'base':'BASE',
+    'acid':'ACID', 'crud':'CRUD',
+    'índice':'Índice B+', 'indice':'Índice B+', 'índices':'Índice B+',
+    'sparse':'Índice sparse', 'compound index':'Índice compuesto',
+    'collection':'Colección', 'document':'Documento', '_id':'_id',
+    'write concern':'Write concern', 'read preference':'Read preference'
+  };
+  Object.keys(aliases).forEach(function(a){
+    const canon = aliases[a];
+    const hit = map.get(canon.toLowerCase()) || GLOSSARY.find(function(td){ return td[0] === canon; });
+    if (hit) {
+      const entry = Array.isArray(hit) ? {term:hit[0], def:hit[1]} : hit;
+      map.set(a, entry);
+    }
+  });
+  return map;
+}
+let TIP_INDEX = null;
+function tipTermsSorted(){
+  if (!TIP_INDEX) TIP_INDEX = buildTipIndex();
+  return Array.from(TIP_INDEX.keys()).sort(function(a,b){ return b.length - a.length; });
+}
+function escapeRe(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function openGlossaryTerm(term){
+  go('glosario');
+  const inp = $('#glossarySearch');
+  if (inp) { inp.value = term || ''; renderGlossary(term || ''); inp.focus(); }
+}
+function placeTipBubble(btn){
+  btn.classList.remove('tip-below','tip-left','tip-right');
+  const r = btn.getBoundingClientRect();
+  if (r.top < 140) btn.classList.add('tip-below');
+  if (r.left < 40) btn.classList.add('tip-left');
+  else if (r.right > window.innerWidth - 40) btn.classList.add('tip-right');
+}
+function enhanceTips(root){
+  if (!root) return;
+  if (!TIP_INDEX) TIP_INDEX = buildTipIndex();
+  const terms = tipTermsSorted();
+  if (!terms.length) return;
+  const re = new RegExp('\\b(' + terms.map(escapeRe).join('|') + ')\\b', 'gi');
+  const skip = {SCRIPT:1, STYLE:1, CODE:1, PRE:1, TEXTAREA:1, BUTTON:1, A:1};
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node){
+      const p = node.parentElement;
+      if (!p) return NodeFilter.FILTER_REJECT;
+      if (p.closest('.tip-term, .tip-bubble, code, pre, button, .opt, .qtag, .kicker, .module-outline, .quiz-map, table')) return NodeFilter.FILTER_REJECT;
+      if (skip[p.tagName]) return NodeFilter.FILTER_REJECT;
+      if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(function(textNode){
+    const text = textNode.nodeValue;
+    re.lastIndex = 0;
+    if (!re.test(text)) return;
+    re.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0; let m;
+    while ((m = re.exec(text))) {
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const raw = m[0];
+      const entry = TIP_INDEX.get(raw.toLowerCase());
+      if (!entry) { frag.appendChild(document.createTextNode(raw)); last = m.index + raw.length; continue; }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tip-term';
+      btn.setAttribute('aria-label', 'Definición: ' + entry.term);
+      btn.appendChild(document.createTextNode(raw));
+      const bubble = document.createElement('span');
+      bubble.className = 'tip-bubble';
+      bubble.setAttribute('role', 'tooltip');
+      const refMatch = entry.def.match(/(\([^)]*§[^)]+\))\s*$/) || entry.def.match(/(\(§[^)]+\))\s*$/);
+      const body = refMatch ? entry.def.replace(/\s*\([^)]*§[^)]+\)\s*$/, '').replace(/\s*\(§[^)]+\)\s*$/, '') : entry.def;
+      bubble.innerHTML = '<span class="tip-k">' + entry.term + '</span>' + body +
+        (refMatch ? '<span class="tip-ref">' + refMatch[1].replace(/^\(|\)$/g,'') + '</span>' : '') +
+        '<button type="button" class="tip-gloss" data-term="' + entry.term.replace(/"/g,'&quot;') + '">Ver en glosario →</button>';
+      btn.appendChild(bubble);
+      bubble.querySelector('.tip-gloss').addEventListener('click', function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        openGlossaryTerm(entry.term);
+      });
+      btn.addEventListener('click', function(ev){
+        if (ev.target.closest('.tip-gloss')) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        const open = btn.classList.contains('is-open');
+        document.querySelectorAll('.tip-term.is-open').forEach(function(t){ t.classList.remove('is-open'); });
+        if (!open) {
+          btn.classList.add('is-open');
+          placeTipBubble(btn);
+        }
+      });
+      frag.appendChild(btn);
+      last = m.index + raw.length;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    textNode.parentNode.replaceChild(frag, textNode);
+  });
+}
+document.addEventListener('click', function(){
+  document.querySelectorAll('.tip-term.is-open').forEach(function(t){ t.classList.remove('is-open'); });
+});
+
+const $ = s => document.querySelector(s);
+const PAPER_SHUFFLE_ID = 'mongo';
+function hashSeedStr(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function seededRandom(seed){ let s=seed>>>0; return ()=>{ s=(Math.imul(s,1664525)+1013904223)>>>0; return s/4294967296; }; }
+function prepareShuffledMCQ(opts,correctIndex,seedKey){ const indices=opts.map((_,i)=>i); const rand=seededRandom(hashSeedStr(seedKey)); for(let i=indices.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [indices[i],indices[j]]=[indices[j],indices[i]]; } return { opts:indices.map(ix=>opts[ix]), a:indices.indexOf(correctIndex) }; }
+function shuffledQuizItem(qi){ const q=QUIZ[qi]; return prepareShuffledMCQ(q.opts,q.a,PAPER_SHUFFLE_ID+'|quiz|'+qi); }
+function shuffledMini(m){ return prepareShuffledMCQ(m.mini.opts,m.mini.a,PAPER_SHUFFLE_ID+'|mini|'+m.id); }
+const MODULE_ANIMS = {
+  m1: [{id:'anim-bson', label:'Documento BSON'}],
+  m3: [{id:'anim-index', label:'Índice B+'}],
+  m4: [{id:'anim-replica', label:'Replica set + elección'}],
+  m5: [{id:'anim-oplog', label:'Oplog'}, {id:'anim-shard', label:'Sharding + mongos'}],
+  m6: [{id:'anim-shard', label:'Config servers + mongos'}]
+};
+const QUIZ_MODULE_HINT = {
+  'CAP':'m0', 'BASE':'m0', 'BSON':'m1', 'Documento':'m1', 'CRUD':'m2', 'Consulta':'m2',
+  'Índice':'m3', 'Indice':'m3', 'Replica':'m4', 'Oplog':'m5', 'Election':'m4', 'Elección':'m4',
+  'Sharding':'m5', 'Chunk':'m5', 'Shard':'m5', 'mongos':'m6', 'Config':'m6',
+  'trade-off':'m7', 'RDBMS':'m7', 'ACID':'m7', 'NoSQL':'m0'
+};
+
+function loadJSON(key, fallback){
+  try { const v = JSON.parse(localStorage.getItem(key) || ''); return v == null ? fallback : v; }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+function go(view, opts){
+  opts = opts || {};
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const elv = $('#view-'+view);
+  if (!elv) return;
+  elv.classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{
+    const on = t.dataset.view===view;
+    t.classList.toggle('active', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  if (!opts.keepScroll) window.scrollTo({top:0, behavior: opts.instant ? 'auto' : 'smooth'});
+  if (view==='quiz' && !quiz.rendered) quiz.render();
+  if (view==='animaciones' && !animsRendered) initAnims();
+  if (view==='quiz' && opts.panel) setQuizPanel(opts.panel);
+  if (view==='animaciones' && opts.animId) {
+    requestAnimationFrame(()=>{
+      const target = document.getElementById(opts.animId);
+      if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
+  if (view==='glosario' && opts.term) {
+    const inp = $('#glossarySearch');
+    if (inp) { inp.value = opts.term; renderGlossary(opts.term); }
+  }
+  saveLastView(view);
+  updateProgress();
+  updateContinueCard();
+}
+function goModule(moduleId, opts){
+  opts = opts || {};
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if (idx < 0) { go('aprende'); return; }
+  currentModule = idx;
+  saveLastView('aprende');
+  go('aprende', {instant: !!opts.instant});
+  renderModuleNav();
+  renderModule();
+  if (opts.sectionId) {
+    requestAnimationFrame(()=>{
+      const t = document.getElementById(opts.sectionId);
+      if (t) t.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
+}
+function goAnim(animId){ go('animaciones', {animId: animId}); }
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>go(t.dataset.view)));
+(function(){ const bar=document.getElementById('tabs'); const sync=()=>document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', t.classList.contains('active')?'true':'false')); bar.addEventListener('click', ()=>setTimeout(sync,0)); bar.addEventListener('keydown', e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return; const ts=[...bar.querySelectorAll('.tab')]; let i=ts.indexOf(document.activeElement); if(i<0) return; e.preventDefault(); i=(i+(e.key==='ArrowRight'?1:-1)+ts.length)%ts.length; ts[i].focus(); go(ts[i].dataset.view); sync(); }); sync(); })();
+const themeBtn = $('#themeBtn');
+themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); const mode=document.body.classList.contains('light')?'light':'dark'; themeBtn.textContent=mode==='light'?'Claro':'Oscuro'; try{localStorage.setItem('mongo-theme',mode); localStorage.setItem('bdii-hub-theme',mode);}catch(e){} if(typeof refreshAnimColors==='function') refreshAnimColors(); });
+(function(){ let s=null; try{s=localStorage.getItem('mongo-theme')||localStorage.getItem('bdii-hub-theme');}catch(e){} if(s==='light'){ document.body.classList.add('light'); themeBtn.textContent='Claro'; } })();
+
+let done = loadJSON('mongo-done', {});
+let miniAnswers = loadJSON('mongo-mini', {});
+let quizScores = (function(){ const a=loadJSON('mongo-quiz', []); return Array.isArray(a)?a:[]; })();
+let quizWrong = (function(){ const a=loadJSON('mongo-quiz-wrong', []); return Array.isArray(a)?a.map(Number):[]; })();
+let caseProgress = loadJSON('mongo-cases', {});
+let lastView = loadJSON('mongo-last', null);
+
+function saveMiniAnswer(moduleId, choiceIndex){ miniAnswers[moduleId]=choiceIndex; saveJSON('mongo-mini', miniAnswers); updateProgress(); }
+function applyMiniAnswer(m, mo, choiceIndex, correctA){ [...mo.children].forEach(x=>x.disabled=true); const ex=$('#miniExplain'); const b=mo.children[choiceIndex]; if(choiceIndex===correctA){ b.classList.add('correct'); ex.innerHTML='<span class="why">✓ Correcto.</span> '+m.mini.why; } else { b.classList.add('wrong'); mo.children[correctA].classList.add('correct'); ex.innerHTML='<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> '+m.mini.why; } ex.classList.add('show'); enhanceTips(ex); }
+function revealMiniAnswer(m, mo, choiceIndex, correctA){ if(miniAnswers[m.id]!==undefined) return; saveMiniAnswer(m.id, choiceIndex); applyMiniAnswer(m, mo, choiceIndex, correctA); }
+
+function saveLastView(view){
+  lastView = {
+    view: view,
+    module: currentModule,
+    panel: quiz.panel || 'quiz',
+    mode: quiz.mode || 'study',
+    filter: quiz.filter || 'all',
+    pageSize: quiz.pageSize === 'all' ? 'all' : quiz.pageSize,
+    page: quiz.page || 0
+  };
+  saveJSON('mongo-last', lastView);
+}
+function updateContinueCard(){
+  const card = $('#continueCard');
+  if (!card) return;
+  if (!lastView || !lastView.view || lastView.view === 'inicio') { card.hidden = true; return; }
+  const doneN = MODULES.filter(m=>done[m.id]).length;
+  let detail = '';
+  if (lastView.view === 'aprende') {
+    const m = MODULES[lastView.module|0] || MODULES[0];
+    detail = '<strong>Aprende · ' + m.tag + '</strong> — ' + m.title + ' · ' + doneN + '/' + MODULES.length + ' completados';
+  } else if (lastView.view === 'quiz') {
+    detail = '<strong>Quiz</strong> — modo ' + (lastView.mode||'estudio') + (quizWrong.length ? ' · ' + quizWrong.length + ' falladas guardadas' : '') + (quizScores.length ? ' · último ' + quizScores[quizScores.length-1] + '%' : '');
+  } else if (lastView.view === 'animaciones') {
+    detail = '<strong>Animaciones</strong> — laboratorio visual';
+  } else if (lastView.view === 'glosario') {
+    detail = '<strong>Glosario</strong>';
+  } else if (lastView.view === 'cheatsheet') {
+    detail = '<strong>Cheatsheet</strong> — repaso rápido';
+  } else {
+    detail = '<strong>' + lastView.view + '</strong>';
+  }
+  $('#continueDetail').innerHTML = detail;
+  card.hidden = false;
+}
+function resumeStudy(){
+  if (!lastView || !lastView.view) { go('aprende'); return; }
+  if (lastView.view === 'aprende') {
+    currentModule = Math.min(Math.max(0, lastView.module|0), MODULES.length-1);
+    go('aprende', {instant:true});
+    renderModuleNav(); renderModule();
+    return;
+  }
+  if (lastView.view === 'quiz') {
+    quiz.mode = lastView.mode || 'study';
+    quiz.filter = lastView.filter || 'all';
+    quiz.pageSize = lastView.pageSize === 'all' ? 'all' : (parseInt(lastView.pageSize,10)||5);
+    quiz.page = lastView.page|0;
+    quiz.panel = lastView.panel || 'quiz';
+    go('quiz', {panel: quiz.panel, instant:true});
+    quiz.syncToolbar();
+    quiz.render();
+    return;
+  }
+  go(lastView.view, {instant:true});
+}
+
+function updateProgress(){
+  const total = MODULES.length;
+  const finished = MODULES.filter(m=>done[m.id]).length;
+  const miniN = MODULES.filter(m=>miniAnswers[m.id]!==undefined).length;
+  $('#progressFill').style.width = Math.round((finished/total)*100) + '%';
+  const label = $('#progressLabel');
+  if (label) label.innerHTML = 'Módulos <b>'+finished+'/'+total+'</b> · Mini-checks <b>'+miniN+'/'+total+'</b>';
+  const hint = $('#progressQuizHint');
+  if (hint) {
+    const last = quizScores.length ? quizScores[quizScores.length-1] + '%' : '—';
+    const wrongN = quizWrong.length;
+    hint.innerHTML = 'Último quiz <b>'+last+'</b>' + (wrongN ? ' · Falladas <b>'+wrongN+'</b>' : '');
+  }
+  const track = document.querySelector('.progress-track');
+  if (track) track.title = finished+'/'+total+' módulos · '+miniN+' mini-checks · último quiz '+(quizScores.length?quizScores[quizScores.length-1]+'%':'sin intentos');
+}
+function markDone(id){ done[id]=true; saveJSON('mongo-done', done); renderModuleNav(); updateProgress(); saveLastView('aprende'); }
+function unmarkDone(id){ delete done[id]; saveJSON('mongo-done', done); renderModuleNav(); updateProgress(); saveLastView('aprende'); }
+
+let currentModule = (lastView && typeof lastView.module === 'number') ? lastView.module : 0;
+if (currentModule < 0 || currentModule >= MODULES.length) currentModule = 0;
+
+function slugify(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48);
+}
+function buildModuleOutline(root){
+  const headings = [...root.querySelectorAll('h3, .trade')];
+  if (headings.length < 2) return null;
+  const nav = document.createElement('nav');
+  nav.className = 'module-outline';
+  nav.setAttribute('aria-label', 'Secciones del módulo');
+  headings.forEach((h,i)=>{
+    let label = h.tagName === 'H3' ? h.textContent.trim() : (h.querySelector('b') ? h.querySelector('b').textContent.trim() : ('Trade-off '+(i+1)));
+    if (label.length > 42) label = label.slice(0,40) + '…';
+    if (!h.id) h.id = 'sec-' + MODULES[currentModule].id + '-' + i + '-' + slugify(label);
+    const a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = label;
+    a.addEventListener('click', function(ev){
+      ev.preventDefault();
+      h.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    nav.appendChild(a);
+  });
+  return nav;
+}
+
+function renderModuleNav(){
+  const nav=$('#moduleNav'); nav.innerHTML='';
+  MODULES.forEach((m,i)=>{
+    const b=document.createElement('button');
+    b.className='module-link'+(i===currentModule?' active':'')+(done[m.id]?' done':'');
+    b.innerHTML='<span class="idx">'+String(i).padStart(2,'0')+'</span><span>'+m.title+'</span>'+(done[m.id]?'<span class="check">✓</span>':'');
+    b.onclick=()=>{ currentModule=i; saveLastView('aprende'); renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); };
+    nav.appendChild(b);
+  });
+  const active = nav.querySelector('.module-link.active');
+  if (active && nav.scrollWidth > nav.clientWidth) {
+    active.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+  }
+}
+
+function renderModule(){
+  const m=MODULES[currentModule];
+  const c=$('#moduleContent');
+  const reading = c.classList.contains('reading-mode');
+  const anims = MODULE_ANIMS[m.id] || [];
+  const animBtns = anims.map(a=>'<button type="button" class="btn ghost small" onclick="goAnim(\''+a.id+'\')">Ver animación · '+a.label+'</button>').join('');
+  c.innerHTML =
+    '<div class="module-chip">Módulo '+(currentModule+1)+' / '+MODULES.length+(done[m.id]?' · completado':'')+'</div>'+
+    '<span class="kicker" style="color:var(--'+m.accent+');">'+m.tag+'</span>'+
+    '<h2>'+m.title+'</h2>'+
+    '<p class="lede">'+m.summary+'</p>'+
+    '<div class="done-banner" style="'+(done[m.id]?'display:flex;':'display:none;')+'">✓ Módulo completado</div>'+
+    '<div id="moduleBody">'+m.html+'</div>'+
+    (animBtns ? '<div class="controls" style="margin-top:18px;">'+animBtns+'</div>' : '')+
+    '<div class="card accent-'+m.accent+'" style="margin-top:26px;"><div class="kicker" style="color:var(--'+m.accent+');">Mini-check rápido</div><p style="font-weight:600; color:var(--text); margin:8px 0;">'+m.mini.q+'</p><div id="miniOpts"></div><div class="explain" id="miniExplain"></div></div>'+
+    '<div class="module-pager">'+
+      '<button class="btn ghost" id="prevBtn"'+(currentModule===0?' disabled style="opacity:.4;cursor:default;"':'')+'>← Anterior</button>'+
+      '<button class="btn ghost small" id="readModeBtn" type="button">'+(reading?'Salir modo lectura':'Modo lectura')+'</button>'+
+      '<button class="btn '+(done[m.id]?'ghost':'teal')+'" id="doneBtn">'+(done[m.id]?'Desmarcar':'✓ Marcar como completado')+'</button>'+
+      '<button class="btn" id="nextBtn"'+(currentModule===MODULES.length-1?' disabled style="opacity:.4;cursor:default;"':'')+'>Siguiente →</button>'+
+    '</div>';
+  if (reading) c.classList.add('reading-mode'); else c.classList.remove('reading-mode');
+  const body = $('#moduleBody');
+  const outline = buildModuleOutline(body);
+  if (outline) c.insertBefore(outline, body);
+  const sm=shuffledMini(m);
+  enhanceTips(c);
+  const mo=$('#miniOpts');
+  sm.opts.forEach((opt,i)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=opt; b.onclick=()=>revealMiniAnswer(m,mo,i,sm.a); mo.appendChild(b); });
+  if(miniAnswers[m.id]!==undefined) applyMiniAnswer(m,mo,miniAnswers[m.id],sm.a);
+  $('#prevBtn').onclick=()=>{ if(currentModule>0){ currentModule--; saveLastView('aprende'); renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  $('#nextBtn').onclick=()=>{ if(currentModule<MODULES.length-1){ currentModule++; saveLastView('aprende'); renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
+  $('#doneBtn').onclick=()=>{ if(done[m.id]){ unmarkDone(m.id); } else { markDone(m.id); } renderModule(); };
+  $('#readModeBtn').onclick=()=>{ c.classList.toggle('reading-mode'); $('#readModeBtn').textContent = c.classList.contains('reading-mode') ? 'Salir modo lectura' : 'Modo lectura'; };
+}
+
+function setQuizPanel(panel){
+  quiz.panel = panel === 'cases' ? 'cases' : 'quiz';
+  $('#quizPanel').classList.toggle('active', quiz.panel==='quiz');
+  $('#casesPanel').classList.toggle('active', quiz.panel==='cases');
+  $('#tabQuizPanel').classList.toggle('active', quiz.panel==='quiz');
+  $('#tabCasesPanel').classList.toggle('active', quiz.panel==='cases');
+  saveLastView('quiz');
+}
+$('#tabQuizPanel').addEventListener('click', ()=>setQuizPanel('quiz'));
+$('#tabCasesPanel').addEventListener('click', ()=>setQuizPanel('cases'));
+
+const quiz = {
+  rendered:false, answers:{}, mode:'study', filter:'all', pageSize:'all', page:0, panel:'quiz',
+  tags(){ return [...new Set(QUIZ.map(q=>q.tag))]; },
+  activeIndices(){
+    let idxs = QUIZ.map((_,i)=>i);
+    if (this.filter !== 'all') idxs = idxs.filter(i => QUIZ[i].tag === this.filter);
+    if (this.mode === 'wrong') {
+      const set = new Set(quizWrong);
+      idxs = idxs.filter(i => set.has(i));
+    }
+    return idxs;
+  },
+  pageSlice(indices){
+    if (this.pageSize === 'all') return { slice: indices, pages: 1 };
+    const size = this.pageSize|0;
+    const pages = Math.max(1, Math.ceil(indices.length / size));
+    if (this.page >= pages) this.page = pages - 1;
+    if (this.page < 0) this.page = 0;
+    const start = this.page * size;
+    return { slice: indices.slice(start, start + size), pages };
+  },
+  syncToolbar(){
+    document.querySelectorAll('#quizModes .btn').forEach(b=>b.classList.toggle('seg-on', b.dataset.mode===this.mode));
+    document.querySelectorAll('#quizPageCtl .btn').forEach(b=>{
+      const v = b.dataset.page;
+      const on = (v==='all' && this.pageSize==='all') || (v!=='all' && String(this.pageSize)===v);
+      b.classList.toggle('seg-on', on);
+    });
+    const filt = $('#quizFilters');
+    filt.innerHTML = '';
+    const allBtn = document.createElement('button');
+    allBtn.type='button'; allBtn.className='btn ghost small'+(this.filter==='all'?' seg-on':'');
+    allBtn.textContent='Todas';
+    allBtn.onclick=()=>{ this.filter='all'; this.page=0; this.render(); };
+    filt.appendChild(allBtn);
+    this.tags().forEach(tag=>{
+      const b=document.createElement('button');
+      b.type='button'; b.className='btn ghost small'+(this.filter===tag?' seg-on':'');
+      b.textContent=tag;
+      b.onclick=()=>{ this.filter=tag; this.page=0; this.render(); };
+      filt.appendChild(b);
+    });
+  },
+  renderMap(indices){
+    const nav = $('#quizNav');
+    const map = $('#quizMap');
+    const showNav = this.pageSize !== 'all' || indices.length > 8;
+    nav.hidden = !showNav;
+    map.innerHTML = '';
+    if (this.pageSize === 'all') {
+      indices.forEach((qi, pos)=>{
+        const b=document.createElement('button');
+        b.type='button'; b.textContent=String(qi+1);
+        if (this.answers[qi]!==undefined) {
+          const ok = this.answers[qi]===shuffledQuizItem(qi).a;
+          b.classList.add(this.mode==='exam' && !this._examFinished ? 'answered' : (ok?'correct':'wrong'));
+        }
+        b.onclick=()=>{ const el=$('#q'+qi); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); };
+        map.appendChild(b);
+      });
+      $('#quizPrev').onclick=()=>{ window.scrollBy({top:-window.innerHeight*0.7, behavior:'smooth'}); };
+      $('#quizNext').onclick=()=>{ window.scrollBy({top:window.innerHeight*0.7, behavior:'smooth'}); };
+    } else {
+      const size = this.pageSize|0;
+      const pages = Math.max(1, Math.ceil(indices.length / size));
+      for (let p=0;p<pages;p++){
+        const b=document.createElement('button');
+        b.type='button'; b.textContent=String(p+1);
+        if (p===this.page) b.classList.add('current');
+        const pageIdxs = indices.slice(p*size, p*size+size);
+        if (pageIdxs.every(qi=>this.answers[qi]!==undefined)) b.classList.add('answered');
+        b.onclick=()=>{ this.page=p; this.render(); window.scrollTo({top:0,behavior:'smooth'}); };
+        map.appendChild(b);
+      }
+      $('#quizPrev').onclick=()=>{ if(this.page>0){ this.page--; this.render(); window.scrollTo({top:0,behavior:'smooth'}); } };
+      $('#quizNext').onclick=()=>{ const pages=Math.max(1, Math.ceil(indices.length/size)); if(this.page<pages-1){ this.page++; this.render(); window.scrollTo({top:0,behavior:'smooth'}); } };
+    }
+  },
+  render(){
+    this.rendered=true;
+    this._examFinished=false;
+    this.syncToolbar();
+    const indices = this.activeIndices();
+    const c=$('#quizContainer'); c.innerHTML='';
+    $('#quizResult').classList.remove('show');
+    $('#quizRemediation').innerHTML='';
+    if (!indices.length) {
+      c.innerHTML = '<div class="card"><p style="margin:0;">No hay preguntas en este filtro'+(this.mode==='wrong'?' (aún no hay falladas guardadas — haz un intento en Estudio o Examen).':'')+'.</p></div>';
+      this.refreshChip();
+      this.renderMap([]);
+      saveLastView('quiz');
+      return;
+    }
+    const {slice} = this.pageSlice(indices);
+    slice.forEach((qi, localI)=>{
+      const q=QUIZ[qi];
+      const sq=shuffledQuizItem(qi);
+      const card=document.createElement('div');
+      card.className='question-card';
+      card.id='q'+qi;
+      const posLabel = (this.pageSize==='all' ? (indices.indexOf(qi)+1) : (this.page*(this.pageSize|0)+localI+1));
+      card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--'+q.c+'-soft); color:var(--'+q.c+');">'+q.tag+'</span><span style="color:var(--dim); font-size:13px;">Pregunta '+posLabel+' · #'+(qi+1)+' · pool '+indices.length+'</span></div><div class="qtext">'+q.q+'</div><div class="opts"></div><div class="explain"></div>';
+      const box=card.querySelector('.opts');
+      sq.opts.forEach((opt,oi)=>{
+        const b=document.createElement('button');
+        b.className='opt'; b.innerHTML=opt;
+        b.onclick=()=>this.answer(qi,oi);
+        box.appendChild(b);
+      });
+      c.appendChild(card);
+      if (this.answers[qi]!==undefined) this.applyAnswerUI(qi, this.answers[qi], true);
+    });
+    enhanceTips(c);
+    this.refreshChip();
+    this.renderMap(indices);
+    saveLastView('quiz');
+  },
+  applyAnswerUI(qi, oi, restore){
+    const sq=shuffledQuizItem(qi);
+    const q=QUIZ[qi];
+    const card=$('#q'+qi);
+    if (!card) return;
+    const showFeedback = this.mode !== 'exam' || this._examFinished;
+    card.querySelectorAll('.opt').forEach((b,i)=>{
+      b.disabled = true;
+      if (showFeedback) {
+        if (i===sq.a) b.classList.add('correct');
+        if (i===oi && oi!==sq.a) b.classList.add('wrong');
+      } else {
+        if (i===oi) b.style.borderColor = 'var(--blue)';
+      }
+    });
+    const ex=card.querySelector('.explain');
+    if (showFeedback) {
+      ex.innerHTML='<span class="why">'+(oi===sq.a?'✓ Correcto':'✗ Incorrecto')+'.</span> '+q.why;
+      ex.classList.add('show');
+      enhanceTips(ex);
+    } else {
+      ex.classList.remove('show');
+      ex.innerHTML='';
+    }
+  },
+  answer(qi,oi){
+    if (this.answers[qi]!==undefined) return;
+    this.answers[qi]=oi;
+    const sq=shuffledQuizItem(qi);
+    const ok = oi===sq.a;
+    if (!ok) {
+      if (!quizWrong.includes(qi)) quizWrong.push(qi);
+    } else {
+      quizWrong = quizWrong.filter(x=>x!==qi);
+    }
+    saveJSON('mongo-quiz-wrong', quizWrong);
+    this.applyAnswerUI(qi, oi, false);
+    this.refreshChip();
+    const indices = this.activeIndices();
+    const answeredAll = indices.length && indices.every(i=>this.answers[i]!==undefined);
+    if (answeredAll) this.finish();
+    else this.renderMap(indices);
+    updateProgress();
+    saveLastView('quiz');
+  },
+  refreshChip(){
+    const indices = this.activeIndices();
+    const n = indices.filter(i=>this.answers[i]!==undefined).length;
+    const ok = indices.filter(i=>this.answers[i]!==undefined && this.answers[i]===shuffledQuizItem(i).a).length;
+    $('#scoreChip').textContent = ok+' / '+n+' correctas · mostrando '+indices.length+(this.mode==='exam'?' · examen':'');
+  },
+  finish(){
+    const indices = this.activeIndices();
+    const ok = indices.filter(i=>this.answers[i]===shuffledQuizItem(i).a).length;
+    const pct = indices.length ? Math.round(ok/indices.length*100) : 0;
+    this._examFinished = true;
+    if (this.mode === 'exam') {
+      indices.forEach(qi=>{ if (this.answers[qi]!==undefined) this.applyAnswerUI(qi, this.answers[qi], false); });
+    }
+    const wrongNow = indices.filter(i=>this.answers[i]!==shuffledQuizItem(i).a);
+    const r=$('#quizResult'); r.classList.add('show');
+    $('#quizPercent').textContent=pct+'%';
+    $('#gradeFill').style.width=pct+'%';
+    let msg;
+    if(pct===100) msg='Perfecto: Dominas MongoDB y sus trade-offs.';
+    else if(pct>=80) msg='Muy bien. Abajo tienes las falladas con salto directo.';
+    else if(pct>=60) msg='Vas bien. Relee los módulos enlazados y rehaz Solo falladas.';
+    else msg='Vuelve a Aprende: citas + trade-offs, luego reintenta en modo Examen.';
+    $('#quizMsg').textContent=msg;
+    const rem = $('#quizRemediation');
+    if (wrongNow.length) {
+      rem.innerHTML = '<p style="margin:0 0 8px;"><strong>Falladas ('+wrongNow.length+'):</strong></p>' +
+        wrongNow.map(qi=>{
+          const tag = QUIZ[qi].tag;
+          const mid = QUIZ_MODULE_HINT[tag] || 'm5';
+          return '<a href="#q'+qi+'" onclick="event.preventDefault(); const el=document.getElementById(\'q'+qi+'\'); if(el) el.scrollIntoView({behavior:\'smooth\'});">#'+(qi+1)+' '+tag+'</a>' +
+            ' <button type="button" class="linklike" style="padding:0;font-size:12.5px;" onclick="goModule(\''+mid+'\')">→ '+mid+'</button>';
+        }).join('<br>');
+      const btn = document.createElement('button');
+      btn.type='button'; btn.className='btn teal small'; btn.style.marginTop='12px';
+      btn.textContent='Rehacer '+wrongNow.length+' falladas';
+      btn.onclick=()=>{ this.mode='wrong'; this.filter='all'; this.page=0; this.answers={}; this.render(); window.scrollTo({top:0,behavior:'smooth'}); };
+      rem.appendChild(document.createElement('br'));
+      rem.appendChild(btn);
+    } else {
+      rem.innerHTML = '';
+    }
+    r.scrollIntoView({behavior:'smooth'});
+    quizScores.push(pct);
+    if(quizScores.length>20) quizScores=quizScores.slice(-20);
+    saveJSON('mongo-quiz', quizScores);
+    updateProgress();
+  },
+  reset(){
+    this.answers={}; this.rendered=false; this.page=0; this._examFinished=false;
+    $('#quizResult').classList.remove('show');
+    $('#quizRemediation').innerHTML='';
+    $('#scoreChip').textContent='0 / 0 correctas';
+    this.render();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+};
+
+document.querySelectorAll('#quizModes .btn').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    quiz.mode = b.dataset.mode;
+    quiz.answers = {};
+    quiz.page = 0;
+    quiz.render();
+  });
+});
+document.querySelectorAll('#quizPageCtl .btn').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    quiz.pageSize = b.dataset.page === 'all' ? 'all' : parseInt(b.dataset.page,10);
+    quiz.page = 0;
+    quiz.render();
+  });
+});
+
+function renderCases(){
+  const c=$('#casesContainer'); c.innerHTML='';
+  CASES.forEach((cs,i)=>{
+    const st = caseProgress[i] || {};
+    const card=document.createElement('div');
+    card.className='case-card';
+    card.id='case'+i;
+    card.innerHTML='<div class="qmeta"><span class="qtag" style="background:var(--teal-soft); color:var(--teal);">Caso '+(i+1)+'</span></div><h3 style="margin-top:4px;">'+cs.title+'</h3><div class="case-step">'+cs.prompt+'</div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn ghost small hint-btn" '+(st.h1?'style="display:none"':'')+'>Pista 1</button><button class="btn ghost small hint-btn" '+(st.h2?'style="display:none"':'')+'>Pista 2</button></div><div class="explain hint-ex'+(st.h1||st.h2?' show':'')+'">'+(st.h2?'<span class="why">Pista 2:</span> '+cs.h2:st.h1?'<span class="why">Pista 1:</span> '+cs.h1:'')+'</div><button class="btn teal small reveal-btn" style="margin-top:8px;'+(st.sol?'display:none;':'')+'">Ver solución</button><div class="explain sol-ex'+(st.sol?' show':'')+'" style="margin-top:12px;">'+(st.sol?'<span class="why">Solución:</span> '+cs.solution+'<br><br><span class="why"> '+(cs.rubric||'')+'</span>':'')+'</div>';
+    const hex=card.querySelector('.hint-ex');
+    const hbtns=card.querySelectorAll('.hint-btn');
+    hbtns[0].onclick=()=>{ hex.innerHTML='<span class="why">Pista 1:</span> '+cs.h1; hex.classList.add('show'); hbtns[0].style.display='none'; caseProgress[i]=Object.assign({},caseProgress[i],{h1:true}); saveJSON('mongo-cases', caseProgress); };
+    hbtns[1].onclick=()=>{ hex.innerHTML='<span class="why">Pista 2:</span> '+cs.h2; hex.classList.add('show'); hbtns[1].style.display='none'; caseProgress[i]=Object.assign({},caseProgress[i],{h2:true}); saveJSON('mongo-cases', caseProgress); };
+    const ex=card.querySelector('.sol-ex');
+    const btn=card.querySelector('.reveal-btn');
+    btn.onclick=()=>{ ex.innerHTML='<span class="why">Solución:</span> '+cs.solution+'<br><br><span class="why"> '+(cs.rubric||'Rúbrica (5pts): 2 decisión + 2 mecanismo + 1 trade-off.')+'</span>'; ex.classList.add('show'); btn.style.display='none'; caseProgress[i]=Object.assign({},caseProgress[i],{sol:true}); saveJSON('mongo-cases', caseProgress); enhanceTips(ex); };
+    c.appendChild(card);
+  });
+  enhanceTips(c);
+}
+
+function renderGlossary(filter){
+  filter=filter||'';
+  const list=$('#glossaryList'); list.innerHTML='';
+  const f=filter.toLowerCase();
+  GLOSSARY.filter(function(td){ return td[0].toLowerCase().includes(f)||td[1].toLowerCase().includes(f); }).forEach(function(td){
+    const div=document.createElement('div');
+    div.className='gloss-term';
+    div.innerHTML='<h3><code>'+td[0]+'</code></h3><div class="def">'+td[1]+'</div>';
+    list.appendChild(div);
+  });
+  if(!list.children.length){ list.innerHTML='<p>Sin resultados.</p>'; }
+}
+$('#glossarySearch').addEventListener('input', function(e){ renderGlossary(e.target.value); });
+$('#cheatsheetContent').innerHTML = CHEATSHEET;
+$('#continueBtn').addEventListener('click', resumeStudy);
+
+let animsRendered = false;
+function initAnims(){ if(animsRendered) return; animsRendered=true; animBSON.init(); animIndex.init(); animReplica.init(); animOplog.init(); animShard.init(); }
+
+function el(tag, attrs){ const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+const NODE={w:132,h:44,rx:10};
+let cBlue,cTeal,cOrange,cPurple,cGold,cDim,cBg,cBad;
+function refreshAnimColors(){
+  const cs=getComputedStyle(document.body);
+  const g=k=>(cs.getPropertyValue(k)||'').trim();
+  cBlue=g('--blue')||'#8ba3c7';
+  cTeal=g('--teal')||'#6fae9d';
+  cOrange=g('--orange')||'#c08d5c';
+  cPurple=g('--purple')||'#9d8ab8';
+  cGold=g('--gold')||'#c2a05e';
+  cDim=g('--dim')||'#6f6a61';
+  cBg=g('--surface')||'#1b1917';
+  cBad=g('--bad')||'#c07f8c';
+}
+refreshAnimColors();
+function nodeBox(x,y,label,fill,stroke){ const g=el('g',{}); g.appendChild(el('rect',{x:x-NODE.w/2,y:y-NODE.h/2,width:NODE.w,height:NODE.h,rx:NODE.rx,fill:fill,'fill-opacity':0.16,stroke:stroke,'stroke-width':1.2})); const t=el('text',{x:x,y:y+4,'text-anchor':'middle',class:'tnode'}); t.textContent=label; g.append(t); return g; }
+function arrow(g,x1,y1,x2,y2,color,label){ g.appendChild(el('path',{d:'M '+x1+' '+y1+' C '+((x1+x2)/2)+' '+y1+', '+((x1+x2)/2)+' '+y2+', '+x2+' '+y2,fill:'none',stroke:color,'stroke-width':1.6})); if(label){ const l=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle',class:'tedge'}); l.textContent=label; g.append(l); } }
+function svgDefs(svg){ /* Study-desk: sin glow */ }
+function animChrome(svgId, total, idleNarr){
+  const svg=document.getElementById(svgId);
+  const card=svg.closest('.card');
+  const bar=document.createElement('div'); bar.className='anim-status';
+  bar.innerHTML='<span class="status-badge">\u25CF Listo</span><div class="anim-progress"><div class="anim-progress-fill"></div></div><span class="step-counter">0/'+total+'</span>';
+  const nar=document.createElement('div'); nar.className='narrator'; nar.innerHTML=idleNarr;
+  const controls=card.querySelector('.controls');
+  controls.after(bar); bar.after(nar);
+  return {card:card, badge:bar.children[0], fill:bar.querySelector('.anim-progress-fill'), counter:bar.querySelector('.step-counter'), nar:nar};
+}
+function animSetUI(ch, playBtn, state, idx, total, narrHTML, capEl, capHTML){
+  ch.fill.style.width=Math.round(idx/total*100)+'%';
+  ch.counter.textContent=idx+'/'+total;
+  if(narrHTML!=null) ch.nar.innerHTML=narrHTML;
+  if(capEl&&capHTML!=null) capEl.innerHTML=capHTML;
+  ch.badge.classList.remove('playing','paused','done');
+  if(playBtn) playBtn.classList.remove('playing');
+  if(state==='playing'){ ch.badge.textContent='\u25B6 Reproduciendo\u2026'; ch.badge.classList.add('playing'); if(playBtn){ playBtn.innerHTML='\u23F8 Pausar'; playBtn.classList.add('playing'); } }
+  else if(state==='paused'){ ch.badge.textContent='\u23F8 Pausado \u2014 pulsa para continuar'; ch.badge.classList.add('paused'); if(playBtn) playBtn.innerHTML='\u25B6 Continuar'; }
+  else if(state==='done'){ ch.badge.textContent='\u2713 Completado'; ch.badge.classList.add('done'); if(playBtn) playBtn.innerHTML='\u21BA Repetir'; }
+  else { ch.badge.textContent='\u25CF Listo'; if(playBtn&&playBtn._idleLabel) playBtn.innerHTML=playBtn._idleLabel; }
+}
+function svgCap(svg, text, y){
+  const old=svg.querySelector('.svgcap'); if(old) old.remove();
+  if(!text) return;
+  const t=el('text',{x:360,y:y,'text-anchor':'middle',class:'svgcap'}); t.textContent=text; svg.append(t);
+}
+function glowIdx(svg, idxs){
+  const gs=svg.querySelectorAll('g');
+  gs.forEach(function(g){
+    g.querySelectorAll('rect,circle,path,line').forEach(function(n){
+      if(n.hasAttribute('data-prev-sw')){ n.setAttribute('stroke-width', n.getAttribute('data-prev-sw')); n.removeAttribute('data-prev-sw'); }
+    });
+  });
+  idxs.forEach(function(i){
+    if(!gs[i]) return;
+    gs[i].querySelectorAll('rect,circle').forEach(function(n){
+      const prev=n.getAttribute('stroke-width')||'1.2';
+      n.setAttribute('data-prev-sw', prev);
+      n.setAttribute('stroke-width','2.4');
+    });
+  });
+}
+function flowOn(svg, on){
+  svg.querySelectorAll('path').forEach(function(p){ const d=p.getAttribute('d')||''; if(d.length<30) return; if(on) p.classList.add('flow'); else p.classList.remove('flow'); });
+}
+const animBSON = { idx:0, timer:null, playing:false,
+steps:[
+  '<b>Paso 1/4 · Colección.</b> Una <strong>collection</strong> agrupa documentos (como una “tabla” sin filas fijas).',
+  '<b>Paso 2/4 · Documento.</b> Cada documento es un documento BSON: pares campo→valor anidables.',
+  '<b>Paso 3/4 · _id.</b> MongoDB reserva <code>_id</code> (ObjectId si no lo das). Índice único automático.',
+  '<b>Paso 4/4 · Esquema en la app.</b> No hay DDL rígido: la aplicación define y valida el shape. ✓'
+],
+titles:['1/4 collection','2/4 documento','3/4 _id','4/4 esquema ✓'],
+init(){ this.svg=$('#svgGraph'); svgDefs(this.svg);
+  this.ch=animChrome('svgGraph',4,'Pulsa <b>Reproducir</b>: documento BSON.');
+  this.playBtn=document.querySelector('[onclick="animBSON.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#graphCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,4,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
+  s.appendChild(nodeBox(360,50,'users (collection)',cBlue,cBlue));
+  s.appendChild(nodeBox(200,160,'{ _id, name, tags[] }',cTeal,cTeal));
+  s.appendChild(nodeBox(360,160,'{ _id, email, addr{} }',cTeal,cTeal));
+  s.appendChild(nodeBox(520,160,'{ _id, … }',cTeal,cTeal));
+  arrow(s,360,72,200,128,cTeal,'docs'); arrow(s,360,72,360,128,cTeal,''); arrow(s,360,72,520,128,cTeal,'');
+  const t=el('text',{x:360,y:240,'text-anchor':'middle',class:'tedge'}); t.textContent='BSON = JSON binario + tipos extra'; s.append(t);
+},
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const st=this.steps[this.idx];
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,4,st,this.cap,st);
+  glowIdx(this.svg,[[0],[1,2,3],[1],[0,1,2,3]][this.idx]); svgCap(this.svg,this.titles[this.idx],300); flowOn(this.svg,this.playing&&!manual);
+  this.idx++; if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; } if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,4); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1400); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,4); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ BSON.</b> Documentos flexibles; _id e índice automático.',this.cap,'BSON + colección ✓'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>Reproducir</b>: documento BSON.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+
+const animIndex = { idx:0, timer:null, playing:false,
+steps:[
+  '<b>Paso 1/4 · Sin índice.</b> <code>find({ email: "a@b.com" })</code> puede hacer <strong>COLLSCAN</strong> (todos los docs).',
+  '<b>Paso 2/4 · Índice B+.</b> Árbol B+ en el campo <code>email</code> ordena claves → punteros a documentos.',
+  '<b>Paso 3/4 · Compuesto / sparse.</b> Índice compuesto: el <strong>orden de campos importa</strong>. Sparse: solo docs con el campo.',
+  '<b>Paso 4/4 · Arrays.</b> Si indexas un array, MongoDB crea entradas por cada elemento. ✓'
+],
+titles:['1/4 COLLSCAN','2/4 B+ tree','3/4 compound/sparse','4/4 arrays ✓'],
+init(){ this.svg=$('#svgCheck'); svgDefs(this.svg);
+  this.ch=animChrome('svgCheck',4,'Pulsa <b>Reproducir</b>: índice B+.');
+  this.playBtn=document.querySelector('[onclick="animIndex.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#checkCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,4,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
+  s.appendChild(nodeBox(140,140,'docs en disco',cDim,cDim));
+  s.appendChild(nodeBox(360,140,'find(query)',cGold,cGold));
+  s.appendChild(nodeBox(580,140,'índice B+ (email)',cTeal,cTeal));
+  arrow(s,178,140,302,140,cGold,'query');
+  arrow(s,418,140,522,140,cTeal,this.idx>=1?'usa índice':'scan?');
+  const t=el('text',{x:360,y:260,'text-anchor':'middle',class:'tedge'}); t.textContent=this.idx>=1?'pocas entradas B+':'revisa N documentos'; s.append(t);
+},
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const st=this.steps[this.idx]; this.draw();
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,4,st,this.cap,st);
+  glowIdx(this.svg,[[0,1],[2],[2],[0,1,2]][this.idx]); svgCap(this.svg,this.titles[this.idx],310); flowOn(this.svg,this.playing&&!manual);
+  this.idx++; if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; } if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,4); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,4); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ Índices.</b> B+ acelera find; compuesto/sparse/arrays tienen reglas propias.',this.cap,'Índice B+ ✓'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>Reproducir</b>: índice B+.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+
+const animReplica = { idx:0, timer:null, playing:false,
+steps:[
+  '<b>Paso 1/5 · Tres nodos.</b> Replica set típico: ≥3 miembros (primary + secondaries).',
+  '<b>Paso 2/5 · Writes.</b> Solo el <strong>primary</strong> acepta writes; confirma en su journal.',
+  '<b>Paso 3/5 · Reads.</b> Lecturas en secondaries OK con <strong>read preference</strong>; pueden ir ligeramente stale.',
+  '<b>Paso 4/5 · Fallo.</b> Primary cae → protocolo de <strong>elección</strong> (votos mayoritarios).',
+  '<b>Paso 5/5 · Promoción.</b> Un secondary pasa a primary; writes continúan (breve pausa posible). ✓'
+],
+titles:['1/5 3 nodos','2/5 writes','3/5 reads','4/5 fallo','5/5 promote ✓'],
+init(){ this.svg=$('#svgEnemy'); svgDefs(this.svg);
+  this.ch=animChrome('svgEnemy',5,'Pulsa <b>Reproducir</b>: replica set.');
+  this.playBtn=document.querySelector('[onclick="animReplica.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#enemyCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,5,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
+  const prim=this.idx>=4?cTeal:cBlue;
+  s.appendChild(nodeBox(360,60,this.idx>=4?'new primary (ex-sec)':'primary',prim,prim));
+  s.appendChild(nodeBox(180,200,'secondary',cPurple,cPurple));
+  s.appendChild(nodeBox(540,200,'secondary',cPurple,cPurple));
+  if(this.idx===3){ const x=el('text',{x:360,y:130,'text-anchor':'middle',class:'tnode'}); x.textContent='primary DOWN'; s.append(x); }
+  arrow(s,300,88,220,178,cDim,'repl'); arrow(s,420,88,500,178,cDim,'repl');
+},
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const st=this.steps[this.idx]; this.draw();
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,5,st,this.cap,st);
+  glowIdx(this.svg,[[0,1,2],[0],[1,2],[1,2],[0]][this.idx]); svgCap(this.svg,this.titles[this.idx],300); flowOn(this.svg,this.playing&&!manual);
+  this.idx++; if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; } if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,5); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,5); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',5,5,'<b>✓ Replica set.</b> Primary único para writes; elección ante fallo.',this.cap,'Replica set + elección ✓'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,5,'Pulsa <b>Reproducir</b>: replica set.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+
+const animOplog = { idx:0, timer:null, playing:false,
+steps:[
+  '<b>Paso 1/4 · Oplog.</b> Colección capped <code>local.oplog.rs</code> en el primary registra operaciones.',
+  '<b>Paso 2/4 · Tailing.</b> Secondaries leen el oplog (tailable cursor) y aplican en orden.',
+  '<b>Paso 3/4 · Lag.</b> Alto volumen de writes → secondaries pueden quedar <strong>behind</strong>.',
+  '<b>Paso 4/4 · Rol.</b> Oplog es la base de réplica y de algunas herramientas de sync. ✓'
+],
+titles:['1/4 oplog','2/4 tail','3/4 lag','4/4 rol ✓'],
+init(){ this.svg=$('#svgZookie'); svgDefs(this.svg);
+  this.ch=animChrome('svgZookie',4,'Pulsa <b>Reproducir</b>: oplog.');
+  this.playBtn=document.querySelector('[onclick="animOplog.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#zookieCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,4,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
+  s.appendChild(nodeBox(200,120,'primary + oplog',cBlue,cBlue));
+  s.appendChild(nodeBox(520,120,'secondary',cTeal,cTeal));
+  for(let i=0;i<4;i++){ const y=200+i*28; s.appendChild(el('rect',{x:160,y:y-12,width:80,height:22,rx:4,fill:cOrange,'fill-opacity':0.2,stroke:cOrange,'stroke-width':1})); }
+  arrow(s,280,120,440,120,cTeal,'op entries');
+  const t=el('text',{x:360,y:310,'text-anchor':'middle',class:'tedge'}); t.textContent='master-slave replication via oplog (apuntes S8)'; s.append(t);
+},
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const st=this.steps[this.idx];
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,4,st,this.cap,st);
+  glowIdx(this.svg,[[0],[0,1],[1],[0,1]][this.idx]); svgCap(this.svg,this.titles[this.idx],330); flowOn(this.svg,this.playing&&!manual);
+  this.idx++; if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; } if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,4); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,4); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',4,4,'<b>✓ Oplog.</b> Log de operaciones en primary; secondaries replay.',this.cap,'Oplog replication ✓'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,4,'Pulsa <b>Reproducir</b>: oplog.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+
+const animShard = { idx:0, timer:null, playing:false,
+steps:[
+  '<b>Paso 1/6 · Shard key.</b> Eliges campos que particionan la colección (range o hashed).',
+  '<b>Paso 2/6 · Chunks.</b> Rangos no superpuestos de shard key → <strong>chunks</strong> migrables entre shards.',
+  '<b>Paso 3/6 · Shards.</b> Cada shard es un replica set; datos repartidos horizontalmente.',
+  '<b>Paso 4/6 · Config.</b> <strong>Config servers</strong> guardan metadata: qué chunk vive en qué shard.',
+  '<b>Paso 5/6 · mongos.</b> Router: consulta config → envía operación al shard correcto.',
+  '<b>Paso 6/6 · Hotspot.</b> Shard key mal elegida → un shard saturado; hash ayuda distribución uniforme. ✓'
+],
+titles:['1/6 key','2/6 chunks','3/6 shards','4/6 config','5/6 mongos','6/6 hotspot ✓'],
+init(){ this.svg=$('#svgArch'); svgDefs(this.svg);
+  this.ch=animChrome('svgArch',6,'Pulsa <b>Reproducir</b>: sharding + mongos.');
+  this.playBtn=document.querySelector('[onclick="animShard.play()"]'); this.playBtn._idleLabel=this.playBtn.innerHTML;
+  this.cap=$('#archCaption'); this.draw();
+  animSetUI(this.ch,this.playBtn,'idle',0,6,null,this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); },
+draw(){ const s=this.svg; s.innerHTML=''; svgDefs(s);
+  s.appendChild(nodeBox(120,160,'cliente',cGold,cGold));
+  s.appendChild(nodeBox(300,80,'mongos',cOrange,cOrange));
+  s.appendChild(nodeBox(300,200,'config servers',cPurple,cPurple));
+  s.appendChild(nodeBox(520,80,'shard A (RS)',cBlue,cBlue));
+  s.appendChild(nodeBox(520,200,'shard B (RS)',cTeal,cTeal));
+  arrow(s,178,160,242,90,cGold,'query');
+  arrow(s,300,102,300,178,cPurple,'metadata');
+  arrow(s,358,90,462,90,cBlue,'chunk');
+  arrow(s,358,90,462,200,cTeal,'chunk');
+  if(this.idx>=1){ const t=el('text',{x:360,y:280,'text-anchor':'middle',class:'tedge'}); t.textContent='shard key → chunk → shard'; s.append(t); }
+},
+advance(manual){ if(this.idx>=this.steps.length) return;
+  const st=this.steps[this.idx];
+  this.draw();
+  animSetUI(this.ch,this.playBtn,(this.playing&&!manual)?'playing':'paused',this.idx+1,6,st,this.cap,st);
+  glowIdx(this.svg,[[1],[2,3,4],[3,4],[2],[1,2],[3,4]][this.idx]); svgCap(this.svg,this.titles[this.idx],320); flowOn(this.svg,this.playing&&!manual);
+  this.idx++; if(this.idx>=this.steps.length) this.finish(); },
+play(){ if(this.playing){ this.pause(); return; } if(this.idx>=this.steps.length) this.reset();
+  this.playing=true; animSetUI(this.ch,this.playBtn,'playing',this.idx,6); flowOn(this.svg,true);
+  const self=this; this.timer=setInterval(function(){ self.advance(false); },1500); },
+pause(){ this.playing=false; if(this.timer) clearInterval(this.timer); this.timer=null; flowOn(this.svg,false); animSetUI(this.ch,this.playBtn,'paused',this.idx,6); },
+step(){ if(this.playing) this.pause(); this.advance(true); },
+finish(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; flowOn(this.svg,false);
+  animSetUI(this.ch,this.playBtn,'done',6,6,'<b>✓ Sharding.</b> mongos + config + chunks; elige bien la shard key.',this.cap,'Sharding + mongos ✓'); },
+reset(){ if(this.timer) clearInterval(this.timer); this.timer=null; this.playing=false; this.idx=0; this.draw(); animSetUI(this.ch,this.playBtn,'idle',0,6,'Pulsa <b>Reproducir</b>: sharding + mongos.',this.cap,'Pulsa "Siguiente paso" o "Reproducir".'); } };
+
+renderModuleNav(); renderModule(); renderCases(); renderGlossary(''); updateProgress(); updateContinueCard();
+enhanceTips($('#view-inicio'));
+enhanceTips($('#view-animaciones'));
+enhanceTips($('#cheatsheetContent'));
+// Deep-link hash: #aprende/m5 or #animaciones/anim-read or #quiz
+(function bootHash(){
+  const h = (location.hash||'').replace(/^#/, '');
+  if (!h) return;
+  const parts = h.split('/');
+  if (parts[0]==='aprende' && parts[1]) goModule(parts[1], {instant:true});
+  else if (parts[0]==='animaciones') go('animaciones', {animId: parts[1], instant:true});
+  else if (parts[0]==='quiz') go('quiz', {instant:true});
+  else if (parts[0]==='casos') go('quiz', {panel:'cases', instant:true});
+  else if (parts[0]==='glosario') go('glosario', {instant:true});
+  else if (parts[0]==='cheatsheet') go('cheatsheet', {instant:true});
+})();
+</script>
+</body>
+</html>

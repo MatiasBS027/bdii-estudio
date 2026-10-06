@@ -1,6 +1,6 @@
 # BDII Estudio
 
-Hub estático para estudiar Bases de Datos II: papers (GFS, Bigtable, Aurora, Zanzibar) + Contenerización.
+Hub estático para estudiar Bases de Datos II: papers (GFS, Bigtable, Aurora, Zanzibar) + sistemas prácticos (Contenerización, Redis, MongoDB).
 
 Estilo: **Study-desk editorial** (hub, papers y Contenerización). Sin backend; progreso en `localStorage`.
 
@@ -32,6 +32,8 @@ Hay un archivo `.nojekyll` para que GitHub no procese el sitio con Jekyll. El hu
 index.html                 # hub
 papers/gfs|bigtable|aurora|zanzibar/
 contenerizacion/           # Docker → K8s (Study-desk, layout dock)
+redis/redis_app.html       # Redis (Architecture Notes) — hermano bajo Sistemas
+mongo/mongo_app.html       # MongoDB / NoSQL — hermano bajo Sistemas
 SISTEMA_HTML_ESTUDIO.md    # spec para generar papers nuevos
 docs/FLUJO_PAPER_NUEVO.md  # checklist + Definition of Done (empezar acá)
 docs/LECCIONES_ERRORES.md  # error log / anti-patrones
@@ -42,9 +44,9 @@ docs/LECCIONES_ERRORES.md  # error log / anti-patrones
 **Entrada recomendada:** [`docs/FLUJO_PAPER_NUEVO.md`](docs/FLUJO_PAPER_NUEVO.md) (checklist y Definition of Done) y [`docs/LECCIONES_ERRORES.md`](docs/LECCIONES_ERRORES.md) (errores a no repetir). Referencia: **Bigtable**; GFS es el hermano con UX portada; Aurora/Zanzibar están desactualizados a propósito.
 
 1. Generá un HTML siguiendo [`SISTEMA_HTML_ESTUDIO.md`](SISTEMA_HTML_ESTUDIO.md) (6 vistas, quiz, offline).
-2. Guardalo en `papers/<slug>/<slug>_app.html`.
-3. Añadí una card en `index.html` apuntando a esa ruta.
-4. Incluí el botón `← Hub` con `href="../../index.html"`.
+2. Guardalo en `papers/<slug>/<slug>_app.html` (papers) **o** `<slug>/<slug>_app.html` en la raíz (sistemas prácticos como Redis/Mongo).
+3. Añadí una card en `index.html` apuntando a esa ruta (papers bajo la grilla de papers; Redis/Mongo bajo **Sistemas · práctica**).
+4. Incluí el botón `← Hub`: `href="../../index.html"` desde `papers/…`, o `href="../index.html"` desde `redis/` / `mongo/`.
 5. Commit + push → Pages se actualiza solo.
 
 ## Qué no va en este repo
