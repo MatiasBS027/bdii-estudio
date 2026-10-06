@@ -860,6 +860,32 @@ const CHEATSHEET = `
    NAVEGACIÓN
 ============================================================ */
 const $ = s => document.querySelector(s);
+const PAPER_SHUFFLE_ID = 'aurora';
+function hashSeedStr(str){
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function seededRandom(seed){
+  let s = seed >>> 0;
+  return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+}
+function prepareShuffledMCQ(opts, correctIndex, seedKey){
+  const indices = opts.map((_, i) => i);
+  const rand = seededRandom(hashSeedStr(seedKey));
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  return { opts: indices.map(ix => opts[ix]), a: indices.indexOf(correctIndex) };
+}
+function shuffledQuizItem(qi){
+  const q = QUIZ[qi];
+  return prepareShuffledMCQ(q.opts, q.a, PAPER_SHUFFLE_ID + '|quiz|' + qi);
+}
+function shuffledMini(m){
+  return prepareShuffledMCQ(m.mini.opts, m.mini.a, PAPER_SHUFFLE_ID + '|mini|' + m.id);
+}
 const views = ['inicio','aprende','animaciones','quiz','glosario','cheatsheet'];
 
 function go(view){
@@ -891,24 +917,24 @@ function saveMiniAnswer(moduleId, choiceIndex){
   miniAnswers[moduleId] = choiceIndex;
   try{ localStorage.setItem('aurora-mini', JSON.stringify(miniAnswers)); }catch(e){}
 }
-function applyMiniAnswer(m, mo, choiceIndex){
+function applyMiniAnswer(m, mo, choiceIndex, correctA){
   [...mo.children].forEach(x=>x.disabled=true);
   const ex = $('#miniExplain');
   const b = mo.children[choiceIndex];
-  if(choiceIndex===m.mini.a){
+  if(choiceIndex===correctA){
     b.classList.add('correct');
     ex.innerHTML = `<span class="why">✓ Correcto.</span> ${m.mini.why}`;
   } else {
     b.classList.add('wrong');
-    mo.children[m.mini.a].classList.add('correct');
+    mo.children[correctA].classList.add('correct');
     ex.innerHTML = `<span style="color:var(--bad); font-weight:700;">✗ Incorrecto.</span> ${m.mini.why}`;
   }
   ex.classList.add('show');
 }
-function revealMiniAnswer(m, mo, choiceIndex){
+function revealMiniAnswer(m, mo, choiceIndex, correctA){
   if(miniAnswers[m.id] !== undefined) return;
   saveMiniAnswer(m.id, choiceIndex);
-  applyMiniAnswer(m, mo, choiceIndex);
+  applyMiniAnswer(m, mo, choiceIndex, correctA);
 }
 
 function updateProgress(){
@@ -968,17 +994,17 @@ function renderModule(){
       <button class="btn" id="nextBtn" ${currentModule===MODULES.length-1?'disabled style="opacity:.4;cursor:default;"':''}>Siguiente →</button>
     </div>`;
 
-  // mini check options
+  const sm = shuffledMini(m);
   const mo = $('#miniOpts');
-  m.mini.opts.forEach((opt,i)=>{
+  sm.opts.forEach((opt,i)=>{
     const b = document.createElement('button');
     b.className = 'opt';
     b.textContent = opt;
-    b.onclick = ()=> revealMiniAnswer(m, mo, i);
+    b.onclick = ()=> revealMiniAnswer(m, mo, i, sm.a);
     mo.appendChild(b);
   });
   if(miniAnswers[m.id] !== undefined){
-    applyMiniAnswer(m, mo, miniAnswers[m.id]);
+    applyMiniAnswer(m, mo, miniAnswers[m.id], sm.a);
   }
 
   $('#prevBtn').onclick = ()=>{ if(currentModule>0){ currentModule--; renderModuleNav(); renderModule(); window.scrollTo({top:0,behavior:'smooth'}); } };
@@ -996,6 +1022,7 @@ const quiz = {
     const c = $('#quizContainer');
     c.innerHTML = '';
     QUIZ.forEach((q,qi)=>{
+      const sq = shuffledQuizItem(qi);
       const card = document.createElement('div');
       card.className = 'question-card';
       card.id = 'q'+qi;
@@ -1008,7 +1035,7 @@ const quiz = {
         <div class="opts"></div>
         <div class="explain"></div>`;
       const optsBox = card.querySelector('.opts');
-      q.opts.forEach((opt,oi)=>{
+      sq.opts.forEach((opt,oi)=>{
         const b = document.createElement('button');
         b.className = 'opt';
         b.innerHTML = opt;
@@ -1022,16 +1049,17 @@ const quiz = {
   answer(qi, oi){
     if(this.answers[qi]!==undefined) return; // ya respondida
     this.answers[qi] = oi;
+    const sq = shuffledQuizItem(qi);
     const q = QUIZ[qi];
     const card = $('#q'+qi);
     const opts = card.querySelectorAll('.opt');
     opts.forEach((b,i)=>{
       b.disabled = true;
-      if(i===q.a) b.classList.add('correct');
-      if(i===oi && oi!==q.a) b.classList.add('wrong');
+      if(i===sq.a) b.classList.add('correct');
+      if(i===oi && oi!==sq.a) b.classList.add('wrong');
     });
     const ex = card.querySelector('.explain');
-    ex.innerHTML = `<span class="why">${oi===q.a?'✓ Correcto':'✗ Incorrecto'}.</span> ${q.why}`;
+    ex.innerHTML = `<span class="why">${oi===sq.a?'✓ Correcto':'✗ Incorrecto'}.</span> ${q.why}`;
     ex.classList.add('show');
     this.refreshChip();
     // scroll to result when all answered
@@ -1039,11 +1067,11 @@ const quiz = {
   },
   refreshChip(){
     const n = Object.keys(this.answers).length;
-    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length;
+    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===shuffledQuizItem(+k).a).length;
     $('#scoreChip').textContent = `${correct} / ${n} correctas (${QUIZ.length} totales)`;
   },
   finish(){
-    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===QUIZ[k].a).length;
+    const correct = Object.keys(this.answers).filter(k=>this.answers[k]===shuffledQuizItem(+k).a).length;
     const pct = Math.round(correct/QUIZ.length*100);
     const r = $('#quizResult');
     r.classList.add('show');

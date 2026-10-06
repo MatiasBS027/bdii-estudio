@@ -4,6 +4,37 @@
 
   var LETTERS = ["A", "B", "C", "D", "E", "F"];
 
+  function hashSeedStr(str) {
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function seededRandom(seed) {
+    var s = seed >>> 0;
+    return function () {
+      s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+  /** Fisher–Yates with stable seed so reload keeps the same order. */
+  function prepareShuffledMCQ(opts, correctIndex, seedKey) {
+    var indices = opts.map(function (_, i) { return i; });
+    var rand = seededRandom(hashSeedStr(seedKey));
+    for (var i = indices.length - 1; i > 0; i--) {
+      var j = Math.floor(rand() * (i + 1));
+      var tmp = indices[i];
+      indices[i] = indices[j];
+      indices[j] = tmp;
+    }
+    return {
+      opts: indices.map(function (ix) { return opts[ix]; }),
+      a: indices.indexOf(correctIndex)
+    };
+  }
+
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -62,6 +93,7 @@
     }
     var saved = storeKey ? (lsGetJSON(storeKey, {}) || {}) : {};
     if (typeof saved !== "object" || Array.isArray(saved)) saved = {};
+    var shufflePrefix = storeKey || "bdii-cont-quiz";
 
     var wrap = el("div", "quiz");
     var meta = el("div", "quiz-meta");
@@ -104,23 +136,24 @@
     }
 
     questions.forEach(function (q, i) {
+      var sq = prepareShuffledMCQ(q.opts, q.a, shufflePrefix + "|" + i);
       var card = el("div", "sheet");
       card.appendChild(el("p", "kicker", "Pregunta " + (i + 1) + " / " + questions.length));
       var p = el("p", null, null);
       p.innerHTML = "<strong>" + q.q + "</strong>";
       card.appendChild(p);
       var fb = el("div", "explain");
-      q.opts.forEach(function (opt, j) {
+      sq.opts.forEach(function (opt, j) {
         var b = el("button", "opt", opt);
         b.type = "button";
         b.setAttribute("data-letter", LETTERS[j] || String(j + 1));
         b.addEventListener("click", function () {
           if (card.dataset.done) return;
           answered++;
-          if (j === q.a) score++;
+          if (j === sq.a) score++;
           saved[i] = j;
           persist();
-          paintCard(card, q, i, j);
+          paintCard(card, sq, i, j);
           updateChip();
         });
         card.appendChild(b);
@@ -132,8 +165,8 @@
         var choice = saved[i];
         if (typeof choice === "number") {
           answered++;
-          if (choice === q.a) score++;
-          paintCard(card, q, i, choice);
+          if (choice === sq.a) score++;
+          paintCard(card, sq, i, choice);
         }
       }
     });
