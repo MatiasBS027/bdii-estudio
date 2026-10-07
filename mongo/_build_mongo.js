@@ -1,10 +1,18 @@
 /**
  * Transform bigtable skeleton → MongoDB Study-desk (BDII NoSQL / MongoDB).
+ *
+ * NOTE: mongo_app.html is now the source of truth (enriched coverage). Running this
+ * against the current mongo_app.html will DESTROY that content unless you first
+ * restore from papers/bigtable/bigtable_app.html. Prefer editing mongo_app.html directly.
  */
 const fs = require('fs');
 const path = require('path');
 const file = path.join(__dirname, 'mongo_app.html');
 let html = fs.readFileSync(file, 'utf8');
+if (html.includes("PAPER_SHUFFLE_ID = 'mongo'") && !process.env.MONGO_FORCE_REBUILD) {
+  console.error('Refusing: mongo_app.html already built. Set MONGO_FORCE_REBUILD=1 after restoring Bigtable skeleton if you really mean it.');
+  process.exit(2);
+}
 
 function must(oldStr, newStr, label) {
   if (!html.includes(oldStr)) { console.error('FAIL', label); process.exit(1); }
